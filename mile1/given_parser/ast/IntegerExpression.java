@@ -9,5 +9,11 @@ public class IntegerExpression
    {
       super(lineNum);
       this.value = value;
+      this.visit();
+   }
+
+   public String visit() 
+   {
+      return this.value + " is an integer.";
    }
 }
