@@ -12,4 +12,12 @@ public class Declaration
       this.type = type;
       this.name = name;
    }
+
+   public String getName() {
+   	return name;
+   }
+
+   public Type getType() {
+   	return type;
+   }
 }

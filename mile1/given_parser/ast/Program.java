@@ -15,4 +15,8 @@ public class Program
       this.decls = decls;
       this.funcs = funcs;
    }
+
+   public List<Declaration> getDecls() {
+      return decls;
+   }
 }

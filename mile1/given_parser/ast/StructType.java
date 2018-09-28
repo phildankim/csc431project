@@ -11,4 +11,11 @@ public class StructType
       this.lineNum = lineNum;
       this.name = name;
    }
+
+   // added for Milestone 1:
+
+   @Override
+   public String toString() {
+   	return "StructType";
+   }
 }
