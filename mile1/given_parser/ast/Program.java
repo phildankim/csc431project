@@ -19,4 +19,8 @@ public class Program
    public List<Declaration> getDecls() {
       return decls;
    }
+
+   public List<Function> getFuncs() {
+      return funcs;
+   }
 }

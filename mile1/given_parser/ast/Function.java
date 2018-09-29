@@ -21,4 +21,13 @@ public class Function
       this.locals = locals;
       this.body = body;
    }
+
+   // added for Milestone 1
+   public String getName() {
+      return name;
+   }
+
+   public Type getType () {
+      return retType;
+   }
 }

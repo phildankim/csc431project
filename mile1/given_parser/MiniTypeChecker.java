@@ -13,6 +13,10 @@ public class MiniTypeChecker {
 			symbolTable.put (decl.getName(), decl.getType());
 		}
 
+		for (Function func : program.getFuncs()) {
+			symbolTable.put (func.getName(), func.getType());
+		}
+ 
 		System.out.println ("Symbol table: ");
 
 		for (String name : symbolTable.keySet()) {
