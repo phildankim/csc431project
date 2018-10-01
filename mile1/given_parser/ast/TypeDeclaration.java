@@ -22,4 +22,8 @@ public class TypeDeclaration
    public List<Declaration> getFields() {
    	return fields;
    }
+
+   public int getLine() {
+   	return lineNum;
+   }
 }

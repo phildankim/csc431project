@@ -20,4 +20,8 @@ public class Declaration
    public Type getType() {
    	return type;
    }
+
+   public int getLine() {
+      return lineNum;
+   }
 }

@@ -36,6 +36,7 @@ public class MiniCompiler
          ast.Program program = programVisitor.visit(tree);
 
          // Milestone 1: Static Type Checking
+         CheckRedeclarations.checkProgram(program);
          MiniTypeChecker.checkProgram(program);
 
       }

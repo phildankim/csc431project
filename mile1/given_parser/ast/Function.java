@@ -34,4 +34,12 @@ public class Function
    public List<Declaration> getParams() {
       return params;
    }
+
+   public List<Declaration> getLocals() {
+      return locals;
+   }
+
+   public int getLine() {
+      return lineNum;
+   }
 }
