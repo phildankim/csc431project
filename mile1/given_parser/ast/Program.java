@@ -23,4 +23,8 @@ public class Program
    public List<Function> getFuncs() {
       return funcs;
    }
+
+   public List<TypeDeclaration> getTypes() {
+      return types;
+   }
 }

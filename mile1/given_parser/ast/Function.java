@@ -30,4 +30,8 @@ public class Function
    public Type getType () {
       return retType;
    }
+
+   public List<Declaration> getParams() {
+      return params;
+   }
 }
