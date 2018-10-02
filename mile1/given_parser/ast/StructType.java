@@ -1,7 +1,7 @@
 package ast;
 
 public class StructType
-   implements Type
+   implements Type, Visitable
 {
    private final int lineNum;
    private final String name;
@@ -21,5 +21,8 @@ public class StructType
 
    public String getName() {
       return name;
+   }
+   public void accept(Visitor visitor) {
+      visitor.visit(this);
    }
 }

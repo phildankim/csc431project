@@ -1,22 +1,27 @@
 package ast;
 
-class TypeVisitor implements Visitor {
+public class TypeVisitor implements Visitor {
 
    public TypeVisitor() {
    }
 
-   @Override
    public String visit(BoolType bool) {
       return "BoolType";
    }
 
-   @Override
    public String visit(IntType integer) {
       return "IntType";
    }
 
-   @Override
    public String visit(StructType struct) {
       return "StructType";
+   }
+
+   public String visit(BinaryExpression be) {
+      return "";
+   }
+
+   public String visit(UnaryExpression ue) {
+      return "";
    }
 }

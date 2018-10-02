@@ -2,6 +2,7 @@ package ast;
 
 public class UnaryExpression
    extends AbstractExpression
+   implements Visitable
 {
    private final Operator operator;
    private final Expression operand;
@@ -11,6 +12,10 @@ public class UnaryExpression
       super(lineNum);
       this.operator = operator;
       this.operand = operand;
+   }
+
+   public void accept(Visitor visitor) {
+      visitor.visit(this);
    }
 
    public static UnaryExpression create(int lineNum, String opStr,
