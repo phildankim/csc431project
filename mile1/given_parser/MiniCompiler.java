@@ -6,7 +6,7 @@ import javax.json.JsonValue;
 
 public class MiniCompiler
 {
-   public static void main(String[] args)
+   public static void main(String[] args) throws TypeCheckException
    {
       parseParameters(args);
 
@@ -37,7 +37,13 @@ public class MiniCompiler
 
          // Milestone 1: Static Type Checking
          CheckRedeclarations.checkProgram(program);
-         MiniTypeChecker.checkProgram(program);
+
+         try {
+            MiniTypeChecker.checkProgram(program);
+         }
+         catch (Exception e) {
+            throw new TypeCheckException ("exception caught.");
+         }
 
       }
    }

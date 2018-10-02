@@ -3,7 +3,8 @@ import ast.*;
 
 public class MiniTypeChecker {
 
-	public static void checkProgram (Program program) {
+	public static void checkProgram (Program program) throws TypeCheckException
+	{
 
 		System.out.println ("\n\nChecking program.");
 
@@ -53,7 +54,8 @@ public class MiniTypeChecker {
 	public static void checkFunction (Function func,
 									  HashMap <String, Type> symbolTable,
 									  HashMap <String, List<Declaration>> funcParamsTable,
-									  HashMap <String, List<Declaration>> structTable) {
+									  HashMap <String, List<Declaration>> structTable) 
+								      throws TypeCheckException{
 		Type funcReturnType = func.getType();
 		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable);
 
@@ -65,7 +67,8 @@ public class MiniTypeChecker {
 	public static Type checkStatement (Statement statement,
 								  	   HashMap <String, Type> symbolTable,
 								  	   HashMap <String, List<Declaration>> funcParamsTable,
-								  	   HashMap <String, List<Declaration>> structTable) {
+								  	   HashMap <String, List<Declaration>> structTable) 
+									   throws TypeCheckException{
 		if (statement instanceof BlockStatement) {
 			for (Statement s : ((BlockStatement)statement).getStatements()) {
 				Type type = checkStatement (s, symbolTable,funcParamsTable, structTable);
@@ -84,7 +87,8 @@ public class MiniTypeChecker {
 	public static Type checkLValue(Lvalue lValue,
 									HashMap <String, Type> symbolTable,
 									HashMap <String, List<Declaration>> funcParamsTable,
-									HashMap <String, List<Declaration>> structTable) {
+									HashMap <String, List<Declaration>> structTable) 
+									throws TypeCheckException {
 
 		if (lValue instanceof LvalueId) {
 			String id = ((LvalueId)lValue).getId();
@@ -93,12 +97,13 @@ public class MiniTypeChecker {
 			}
 			else {
 				//placeholder, need to throw an exception here.
-				return new VoidType(); 
+				throw new TypeCheckException("Invalid LValue");
+
 			}
 		}
+				throw new TypeCheckException("Invalid LValue");
 
 		//placeholdeer, need to throw exception
-		return new VoidType();
 	}
 
 	public static void displayData(HashMap <String, Type> symbolTable,
@@ -133,6 +138,12 @@ public class MiniTypeChecker {
 			for (Declaration field: fields) {
 				System.out.println ("    " + field.getName() + " : " + field.getType());
 			}
+		}
+	}
+
+	public static class TypeCheckException extends Exception {
+		public TypeCheckException(String exception) {
+			super(exception);
 		}
 	}
 }
