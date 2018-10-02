@@ -202,7 +202,108 @@ public class MiniTypeChecker {
 									   HashMap <String, List<Declaration>> structTable) 
 									   throws TypeCheckException {
 
+		if (exp instanceof TrueExpression) {
+			return new BoolType();
+		}
+		else if (exp instanceof FalseExpression) {
+			return new BoolType();
+		}
+		else if (exp instanceof IntegerExpression) {
+			return new IntType();
+		}
+
+		else if (exp instanceof DotExpression) {
+			Type left = checkExpression (((DotExpression)exp).getLeft(), symbolTable, funcParamsTable, structTable);
+
+			if (left instanceof StructType) {
+				if (structTable.containsKey(((StructType)left).getName())) {
+					List<Declaration> structFields = structTable.get(((StructType)left).getName());
+					String id = ((DotExpression)exp).getId();
+
+					for (Declaration field : structFields) {
+						if (field.getName().equals(id)) {
+							return field.getType();
+						}
+					}
+
+					throw new TypeCheckException("ERROR on Line" + ((DotExpression)exp).getLine() + ": dot missing field " + id);
+				}
+
+				else {
+					throw new TypeCheckException("ERROR on Line" + ((DotExpression)exp).getLine() + ": invalid struct on dot" + ((StructType)left).getName());
+				}
+			}
+			else {
+				throw new TypeCheckException("ERROR on Line " + ((DotExpression)exp).getLine() + ": dot expression needs to be a StructType, instead found " + left.toString());
+			}
+		}
+
+		else if (exp instanceof IdentifierExpression) {
+			if (symbolTable.containsKey( ((IdentifierExpression)exp).getId() )){
+				return symbolTable.get(((IdentifierExpression)exp).getId());
+			}
+			else {
+				throw new TypeCheckException ("ERROR on Line " + ((IdentifierExpression)exp).getLine() + ": identifier does not exist: " + ((IdentifierExpression)exp).getId());
+			}
+		}
+
+		else if (exp instanceof BinaryExpression) {
+
+			Type left = checkExpression(((BinaryExpression)exp).getLeft(), symbolTable, funcParamsTable, structTable);
+			Type right = checkExpression(((BinaryExpression)exp).getRight(), symbolTable, funcParamsTable, structTable);
+
+			switch (((BinaryExpression)exp).getOperator()) {
+				case PLUS:
+				case MINUS:
+				case DIVIDE:
+				case TIMES:
+					if (!(left instanceof IntType)) {
+						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": left should be IntType but instead it's " + left.toString() );
+					}
+					if (!(right instanceof IntType)) {
+						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": right should be IntType but instead it's " + right.toString() );
+					}
+
+					return new IntType();
+				case LT:
+				case GT:
+				case GE:
+				case LE:
+					if (!(left instanceof IntType)) {
+						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": left should be IntType but instead it's " + left.toString() );
+					}
+					if (!(right instanceof IntType)) {
+						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": right should be IntType but instead it's " + right.toString() );
+					}
+					return new BoolType();
+
+				case EQ:
+				case NE:
+					if (left instanceof IntType && right instanceof IntType) {
+						return new BoolType();
+					}
+					if (left instanceof StructType && right instanceof StructType) {
+						return new BoolType();
+					}
+
+					else throw new TypeCheckException ("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": eq/ne expressions different. left = " + left.toString() + ", right = " + right.toString());
+
+				case AND:
+				case OR:
+					if (!(left instanceof BoolType)) {
+						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": binaryAND/OR left should be BoolType but instead it's " + left.toString() );
+					}
+					if (!(right instanceof BoolType)) {
+						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": binaryAND/OR right should be BoolType but instead it's " + right.toString() );
+					}
+					return new BoolType();
+				default:
+					throw new TypeCheckException ("invalid binexp operand");
+			}
+		}
+
 		throw new TypeCheckException("Need to implement checkExpression for " + exp.toString());
+ 
 	}
 	public static void displayData(HashMap <String, Type> symbolTable,
 							  HashMap <String, List<Declaration>> funcParamsTable,

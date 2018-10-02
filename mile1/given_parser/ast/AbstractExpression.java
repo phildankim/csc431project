@@ -9,4 +9,8 @@ public abstract class AbstractExpression
    {
       this.lineNum = lineNum;
    }
+
+   public int getLine() {
+   	return lineNum;
+   }
 }

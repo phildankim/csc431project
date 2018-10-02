@@ -10,4 +10,8 @@ public class IdentifierExpression
       super(lineNum);
       this.id = id;
    }
+
+   public String getId() {
+   	return id;
+   }
 }
