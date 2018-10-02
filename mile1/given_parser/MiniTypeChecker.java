@@ -115,7 +115,7 @@ public class MiniTypeChecker {
 				throw new TypeCheckException("ERROR on Line " + ((ConditionalStatement)statement).getLine() + ": guard needs to be BoolType, not " + guard.toString());
 			}
 
-			if (!then.equals(els)) {
+			if (!then.toString().equals(els.toString())) {
 				throw new TypeCheckException("ERROR on Line " + ((ConditionalStatement)statement).getLine() + ": different return types, then is " + then.toString() + ", else is " + els.toString());
 			}
 
@@ -263,7 +263,6 @@ public class MiniTypeChecker {
 					if (!(right instanceof IntType)) {
 						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": right should be IntType but instead it's " + right.toString() );
 					}
-
 					return new IntType();
 				case LT:
 				case GT:
@@ -297,8 +296,35 @@ public class MiniTypeChecker {
 						throw new TypeCheckException("ERROR on Line " + ((BinaryExpression)exp).getLine() + ": binaryAND/OR right should be BoolType but instead it's " + right.toString() );
 					}
 					return new BoolType();
+
 				default:
 					throw new TypeCheckException ("invalid binexp operand");
+			}
+		}
+
+		else if (exp instanceof InvocationExpression) {
+			if (symbolTable.containsKey(((InvocationExpression)exp).getName())) {
+				
+				ArrayList<Type> args = new ArrayList<Type>();
+				ArrayList<Type> params = new ArrayList<Type>();
+
+				for (Expression expr : ((InvocationExpression)exp).getArgs()) {
+					args.add(checkExpression(expr, symbolTable, funcParamsTable, structTable));
+				}
+
+				List<Declaration> decls = funcParamsTable.get(((InvocationExpression)exp).getName());
+				for (Declaration decl : decls) {
+					params.add(decl.getType());
+				}
+
+				if (args.size() != params.size()) {
+					throw new TypeCheckException("ERROR on Line " + ((InvocationExpression)exp).getLine() + ": number of args and params dont match"); 
+				}
+
+				return symbolTable.get(((InvocationExpression)exp).getName());
+			}
+			else {
+				throw new TypeCheckException("ERROR on Line " + ((InvocationExpression)exp).getLine() + ": cant find function " + ((InvocationExpression)exp).getName()); 
 			}
 		}
 
