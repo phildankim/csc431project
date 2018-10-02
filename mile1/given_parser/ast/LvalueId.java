@@ -11,4 +11,12 @@ public class LvalueId
       this.lineNum = lineNum;
       this.id = id;
    }
+
+   public String getId() {
+   	return id;
+   }
+
+   public int getLine() {
+   	return lineNum;
+   }
 }

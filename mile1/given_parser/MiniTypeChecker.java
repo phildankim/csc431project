@@ -30,7 +30,80 @@ public class MiniTypeChecker {
 		for (TypeDeclaration struct : program.getTypes()) {
 			structTable.put(struct.getName(), struct.getFields());
 		}
- 
+
+		displayData(symbolTable,funcParamsTable,structTable);
+
+		// check functions:
+		for (Function func : program.getFuncs()) {
+			HashMap <String, Type> funcSymbolTable = new HashMap<String,Type>();
+			funcSymbolTable.putAll(symbolTable); // add global symbol table
+
+			for (Declaration param : func.getParams()) {
+				funcSymbolTable.put(param.getName(), param.getType());
+			}
+
+			for (Declaration local : func.getLocals()) {
+				funcSymbolTable.put(local.getName(), local.getType());
+			}
+
+			checkFunction (func, funcSymbolTable, funcParamsTable, structTable);
+		}
+	}
+
+	public static void checkFunction (Function func,
+									  HashMap <String, Type> symbolTable,
+									  HashMap <String, List<Declaration>> funcParamsTable,
+									  HashMap <String, List<Declaration>> structTable) {
+		Type funcReturnType = func.getType();
+		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable);
+
+		if (!funcReturnType.toString().equals(bodyReturnType.toString())) {
+			System.out.println("ERROR on Line " + func.getLine() + ": invalid return type. Expected " + funcReturnType.toString() +" but got " + bodyReturnType.toString());
+		}
+	}
+
+	public static Type checkStatement (Statement statement,
+								  	   HashMap <String, Type> symbolTable,
+								  	   HashMap <String, List<Declaration>> funcParamsTable,
+								  	   HashMap <String, List<Declaration>> structTable) {
+		if (statement instanceof BlockStatement) {
+			for (Statement s : ((BlockStatement)statement).getStatements()) {
+				Type type = checkStatement (s, symbolTable,funcParamsTable, structTable);
+				return type;
+			}
+		}
+
+		else if (statement instanceof AssignmentStatement) {
+			Type lValue = checkLValue(((AssignmentStatement)statement).getTarget(), symbolTable, funcParamsTable, structTable);
+		}
+
+		// PLACEHOLDER
+		return new IntType();
+	}
+
+	public static Type checkLValue(Lvalue lValue,
+									HashMap <String, Type> symbolTable,
+									HashMap <String, List<Declaration>> funcParamsTable,
+									HashMap <String, List<Declaration>> structTable) {
+
+		if (lValue instanceof LvalueId) {
+			String id = ((LvalueId)lValue).getId();
+			if (symbolTable.containsKey(id)) {
+				return symbolTable.get(id);
+			}
+			else {
+				//placeholder, need to throw an exception here.
+				return new VoidType(); 
+			}
+		}
+
+		//placeholdeer, need to throw exception
+		return new VoidType();
+	}
+
+	public static void displayData(HashMap <String, Type> symbolTable,
+							  HashMap <String, List<Declaration>> funcParamsTable,
+						      HashMap <String, List<Declaration>> structTable) {
  		// DATA DUMP : 
 		System.out.println ("\nSymbol table: ");
 

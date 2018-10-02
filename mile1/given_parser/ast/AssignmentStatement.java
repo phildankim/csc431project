@@ -12,4 +12,12 @@ public class AssignmentStatement
       this.target = target;
       this.source = source;
    }
+
+   public Lvalue getTarget() {
+   	return target;
+   }
+
+   public Expression getSource() {
+   	return source;
+   }
 }
