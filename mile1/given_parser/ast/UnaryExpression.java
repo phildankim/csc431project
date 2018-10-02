@@ -18,6 +18,14 @@ public class UnaryExpression
       visitor.visit(this);
    }
 
+   public Operator getOperator() {
+      return operator;
+   }
+
+   public Expression getOperand() {
+      return operand;
+   }
+
    public static UnaryExpression create(int lineNum, String opStr,
       Expression operand)
    {

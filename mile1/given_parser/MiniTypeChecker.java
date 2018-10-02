@@ -81,7 +81,7 @@ public class MiniTypeChecker {
 			Type lValue = checkLValue(((AssignmentStatement)statement).getTarget(), symbolTable, funcParamsTable, structTable);
 			Type rValue = checkExpression(((AssignmentStatement)statement).getSource(), symbolTable, funcParamsTable, structTable);
 
-			if (!lValue.equals(rValue)){
+			if (!lValue.toString().equals(rValue.toString())){
 				throw new TypeCheckException("ERROR on Line " + ((AssignmentStatement)statement).getLine() + ": invalid assignment. target = " + lValue.toString() + ", source = " + rValue.toString());
 			}
 
@@ -325,6 +325,28 @@ public class MiniTypeChecker {
 			}
 			else {
 				throw new TypeCheckException("ERROR on Line " + ((InvocationExpression)exp).getLine() + ": cant find function " + ((InvocationExpression)exp).getName()); 
+			}
+		}
+
+		else if (exp instanceof UnaryExpression) {
+			Type operand = checkExpression (((UnaryExpression)exp).getOperand(),symbolTable, funcParamsTable, structTable );
+
+			if ( ((UnaryExpression)exp).getOperator().equals(UnaryExpression.Operator.NOT) ) {
+				if (operand instanceof BoolType) {
+					return new BoolType();
+				}
+				else {
+					throw new TypeCheckException ("ERROR on Line " + ((UnaryExpression)exp).getLine() + ": not needs a booltype, found a " + operand.toString());
+				}
+			}
+
+			else if ( ((UnaryExpression)exp).getOperator().equals(UnaryExpression.Operator.MINUS) ) {
+				if (operand instanceof IntType) {
+					return new IntType();
+				}
+				else {
+					throw new TypeCheckException ("ERROR on Line " + ((UnaryExpression)exp).getLine() + ": minus needs an inttype, found a " + operand.toString());
+				}
 			}
 		}
 
