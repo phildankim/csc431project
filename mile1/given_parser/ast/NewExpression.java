@@ -10,4 +10,8 @@ public class NewExpression
       super(lineNum);
       this.id = id;
    }
+
+   public String getId() {
+   	return id;
+   }
 }

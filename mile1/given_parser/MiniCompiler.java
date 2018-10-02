@@ -25,7 +25,8 @@ public class MiniCompiler
          */
          MiniToJsonVisitor jsonVisitor = new MiniToJsonVisitor();
          JsonValue json = jsonVisitor.visit(tree);
-         System.out.println(json);
+         
+         // System.out.println(json);
 
          /*
             This visitor will build an object representation of the AST

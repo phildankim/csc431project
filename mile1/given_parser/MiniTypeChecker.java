@@ -57,29 +57,33 @@ public class MiniTypeChecker {
 									  HashMap <String, List<Declaration>> structTable) 
 								      throws TypeCheckException{
 		Type funcReturnType = func.getType();
-		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable);
+		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable, funcReturnType);
 
+		/*
 		if (!funcReturnType.toString().equals(bodyReturnType.toString())) {
 			throw new TypeCheckException ("ERROR on Line " + func.getLine() + ": invalid return type. Expected " + funcReturnType.toString() +" but got " + bodyReturnType.toString());
 		}
+		*/
 	}
 
 	public static Type checkStatement (Statement statement,
 								  	   HashMap <String, Type> symbolTable,
 								  	   HashMap <String, List<Declaration>> funcParamsTable,
-								  	   HashMap <String, List<Declaration>> structTable) 
+								  	   HashMap <String, List<Declaration>> structTable,
+								  	   Type expectedReturnType) 
 									   throws TypeCheckException{
 
 		if (statement instanceof BlockStatement) {
 			for (Statement s : ((BlockStatement)statement).getStatements()) {
-				Type type = checkStatement (s, symbolTable,funcParamsTable, structTable);
-				return type;
+				Type type = checkStatement (s, symbolTable,funcParamsTable, structTable, expectedReturnType);
 			}
+
+			return new VoidType();
 		}
 
 		else if (statement instanceof AssignmentStatement) {
-			Type lValue = checkLValue(((AssignmentStatement)statement).getTarget(), symbolTable, funcParamsTable, structTable);
-			Type rValue = checkExpression(((AssignmentStatement)statement).getSource(), symbolTable, funcParamsTable, structTable);
+			Type lValue = checkLValue(((AssignmentStatement)statement).getTarget(), symbolTable, funcParamsTable, structTable,expectedReturnType);
+			Type rValue = checkExpression(((AssignmentStatement)statement).getSource(), symbolTable, funcParamsTable, structTable,expectedReturnType);
 
 			if (!lValue.toString().equals(rValue.toString())){
 				throw new TypeCheckException("ERROR on Line " + ((AssignmentStatement)statement).getLine() + ": invalid assignment. target = " + lValue.toString() + ", source = " + rValue.toString());
@@ -89,7 +93,7 @@ public class MiniTypeChecker {
 		}
 
 		else if (statement instanceof PrintStatement) {
-			Type type = checkExpression (((PrintStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable);
+			Type type = checkExpression (((PrintStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			if (!(type instanceof IntType)) {
 				throw new TypeCheckException("ERROR on Line " + ((PrintStatement)statement).getLine() + ": print needs IntType, found " + type.toString());
 			}
@@ -98,7 +102,7 @@ public class MiniTypeChecker {
 		}
 
 		else if (statement instanceof PrintLnStatement) {
-			Type type = checkExpression (((PrintLnStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable);
+			Type type = checkExpression (((PrintLnStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			if (!(type instanceof IntType)) {
 				throw new TypeCheckException("ERROR on Line " + ((PrintLnStatement)statement).getLine() + ": printline needs IntType, found " + type.toString());
 			}
@@ -107,9 +111,9 @@ public class MiniTypeChecker {
 		}
 
 		else if (statement instanceof ConditionalStatement) {
-			Type guard = checkExpression (((ConditionalStatement)statement).getGuard(), symbolTable, funcParamsTable, structTable);
-			Type then = checkStatement (((ConditionalStatement)statement).getThen(), symbolTable, funcParamsTable, structTable);
-			Type els = checkStatement (((ConditionalStatement)statement).getElse(), symbolTable, funcParamsTable, structTable);
+			Type guard = checkExpression (((ConditionalStatement)statement).getGuard(), symbolTable, funcParamsTable, structTable, expectedReturnType);
+			Type then = checkStatement (((ConditionalStatement)statement).getThen(), symbolTable, funcParamsTable, structTable, expectedReturnType);
+			Type els = checkStatement (((ConditionalStatement)statement).getElse(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 
 			if (!(guard instanceof BoolType)) {
 				throw new TypeCheckException("ERROR on Line " + ((ConditionalStatement)statement).getLine() + ": guard needs to be BoolType, not " + guard.toString());
@@ -122,8 +126,8 @@ public class MiniTypeChecker {
 			return then;
 		}
 		else if (statement instanceof WhileStatement) {
-			Type guard = checkExpression (((WhileStatement)statement).getGuard(), symbolTable, funcParamsTable, structTable);
-			Type body = checkStatement (((WhileStatement)statement).getBody(), symbolTable, funcParamsTable, structTable);
+			Type guard = checkExpression (((WhileStatement)statement).getGuard(), symbolTable, funcParamsTable, structTable, expectedReturnType);
+			Type body = checkStatement (((WhileStatement)statement).getBody(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			if (!(guard instanceof BoolType)) {
 				throw new TypeCheckException("ERROR on Line " + ((WhileStatement)statement).getLine() + ": guard needs to be BoolType, not " + guard.toString());
 			}
@@ -131,16 +135,21 @@ public class MiniTypeChecker {
 			return body;
 		}
 		else if (statement instanceof DeleteStatement) {
-			Type type = checkExpression (((DeleteStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable);
+			Type type = checkExpression (((DeleteStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			if (!(type instanceof StructType)) {
 				throw new TypeCheckException ("ERROR on Line " + ((DeleteStatement)statement).getLine() + ": delete statement needs to be StructType, not " + type.toString());
 			}
 		}
 		else if (statement instanceof ReturnStatement) {
-			return checkExpression(((ReturnStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable);
+			Type checkThis =  checkExpression(((ReturnStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable, expectedReturnType);
+			if (!checkThis.toString().equals(expectedReturnType.toString())) {
+				throw new TypeCheckException ("ERROR :on Line " + ((ReturnStatement)statement).getLine() +": return statement type needs to be " + expectedReturnType.toString() + " but it's " + checkThis.toString());
+			}
+
+			return checkThis;
 		}
 		else if (statement instanceof InvocationStatement) {
-			Type type = checkExpression (((InvocationStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable);
+			Type type = checkExpression (((InvocationStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			return type;
 		}
 		else if (statement instanceof ReturnEmptyStatement) {
@@ -154,7 +163,8 @@ public class MiniTypeChecker {
 	public static Type checkLValue(Lvalue lValue,
 									HashMap <String, Type> symbolTable,
 									HashMap <String, List<Declaration>> funcParamsTable,
-									HashMap <String, List<Declaration>> structTable) 
+									HashMap <String, List<Declaration>> structTable,
+									Type expectedReturnType) 
 									throws TypeCheckException {
 
 		if (lValue instanceof LvalueId) {
@@ -168,7 +178,7 @@ public class MiniTypeChecker {
 		}
 
 		else if (lValue instanceof LvalueDot) {
-			Type left = checkExpression (((LvalueDot)lValue).getLeft(), symbolTable, funcParamsTable, structTable);
+			Type left = checkExpression (((LvalueDot)lValue).getLeft(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 
 			if (left instanceof StructType) {
 				if (structTable.containsKey(((StructType)left).getName())) {
@@ -199,7 +209,8 @@ public class MiniTypeChecker {
 	public static Type checkExpression(Expression exp,
 									   HashMap <String, Type> symbolTable,
 									   HashMap <String, List<Declaration>> funcParamsTable,
-									   HashMap <String, List<Declaration>> structTable) 
+									   HashMap <String, List<Declaration>> structTable,
+									   Type expectedReturnType) 
 									   throws TypeCheckException {
 
 		if (exp instanceof TrueExpression) {
@@ -213,7 +224,7 @@ public class MiniTypeChecker {
 		}
 
 		else if (exp instanceof DotExpression) {
-			Type left = checkExpression (((DotExpression)exp).getLeft(), symbolTable, funcParamsTable, structTable);
+			Type left = checkExpression (((DotExpression)exp).getLeft(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 
 			if (left instanceof StructType) {
 				if (structTable.containsKey(((StructType)left).getName())) {
@@ -249,8 +260,8 @@ public class MiniTypeChecker {
 
 		else if (exp instanceof BinaryExpression) {
 
-			Type left = checkExpression(((BinaryExpression)exp).getLeft(), symbolTable, funcParamsTable, structTable);
-			Type right = checkExpression(((BinaryExpression)exp).getRight(), symbolTable, funcParamsTable, structTable);
+			Type left = checkExpression(((BinaryExpression)exp).getLeft(), symbolTable, funcParamsTable, structTable, expectedReturnType);
+			Type right = checkExpression(((BinaryExpression)exp).getRight(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 
 			switch (((BinaryExpression)exp).getOperator()) {
 				case PLUS:
@@ -309,7 +320,7 @@ public class MiniTypeChecker {
 				ArrayList<Type> params = new ArrayList<Type>();
 
 				for (Expression expr : ((InvocationExpression)exp).getArgs()) {
-					args.add(checkExpression(expr, symbolTable, funcParamsTable, structTable));
+					args.add(checkExpression(expr, symbolTable, funcParamsTable, structTable, expectedReturnType));
 				}
 
 				List<Declaration> decls = funcParamsTable.get(((InvocationExpression)exp).getName());
@@ -323,7 +334,9 @@ public class MiniTypeChecker {
 
 				for (int i = 0; i < args.size(); i++) {
 					if (!args.get(i).toString().equals(params.get(i).toString())) {
-						throw new TypeCheckException ("ERROR : arg type does not match param type");
+						if (!(params.get(i).toString().equals("StructType") && args.get(i).toString().equals("NullType"))) {
+							throw new TypeCheckException ("ERROR : arg type does not match param type, arg is " + args.get(i).toString() + " while param is " + params.get(i).toString());
+						}
 					}
 				}
 
@@ -335,7 +348,7 @@ public class MiniTypeChecker {
 		}
 
 		else if (exp instanceof UnaryExpression) {
-			Type operand = checkExpression (((UnaryExpression)exp).getOperand(),symbolTable, funcParamsTable, structTable );
+			Type operand = checkExpression (((UnaryExpression)exp).getOperand(),symbolTable, funcParamsTable, structTable,expectedReturnType );
 
 			if ( ((UnaryExpression)exp).getOperator().equals(UnaryExpression.Operator.NOT) ) {
 				if (operand instanceof BoolType) {
@@ -354,6 +367,17 @@ public class MiniTypeChecker {
 					throw new TypeCheckException ("ERROR on Line " + ((UnaryExpression)exp).getLine() + ": minus needs an inttype, found a " + operand.toString());
 				}
 			}
+		}
+
+		else if (exp instanceof NullExpression) {
+			return new NullType();
+		}
+
+		else if (exp instanceof NewExpression) {
+			if (structTable.containsKey(((NewExpression)exp).getId())) {
+				return new StructType (((NewExpression)exp).getLine(), ((NewExpression)exp).getId());
+			}
+			else throw new TypeCheckException ("ERROR on Line " + ((NewExpression)exp).getLine() + ": did not find struct");
 		}
 
 		throw new TypeCheckException("Need to implement checkExpression for " + exp.toString());
