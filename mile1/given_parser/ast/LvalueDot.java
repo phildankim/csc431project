@@ -13,4 +13,16 @@ public class LvalueDot
       this.left = left;
       this.id = id;
    }
+
+   public String getId() {
+      return id;
+   }
+
+   public int getLine() {
+      return lineNum;
+   }
+
+   public Expression getLeft() {
+      return left;
+   }
 }

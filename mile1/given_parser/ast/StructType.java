@@ -18,4 +18,8 @@ public class StructType
    public String toString() {
    	return "StructType";
    }
+
+   public String getName() {
+      return name;
+   }
 }

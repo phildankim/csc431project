@@ -38,12 +38,7 @@ public class MiniCompiler
          // Milestone 1: Static Type Checking
          CheckRedeclarations.checkProgram(program);
 
-         try {
-            MiniTypeChecker.checkProgram(program);
-         }
-         catch (Exception e) {
-            throw new TypeCheckException ("exception caught.");
-         }
+         MiniTypeChecker.checkProgram(program);
 
       }
    }

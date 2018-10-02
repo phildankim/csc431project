@@ -60,7 +60,7 @@ public class MiniTypeChecker {
 		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable);
 
 		if (!funcReturnType.toString().equals(bodyReturnType.toString())) {
-			System.out.println("ERROR on Line " + func.getLine() + ": invalid return type. Expected " + funcReturnType.toString() +" but got " + bodyReturnType.toString());
+			throw new TypeCheckException ("ERROR on Line " + func.getLine() + ": invalid return type. Expected " + funcReturnType.toString() +" but got " + bodyReturnType.toString());
 		}
 	}
 
@@ -96,16 +96,43 @@ public class MiniTypeChecker {
 				return symbolTable.get(id);
 			}
 			else {
-				//placeholder, need to throw an exception here.
-				throw new TypeCheckException("Invalid LValue");
-
+				throw new TypeCheckException("ERROR on Line " + ((LvalueId)lValue).getLine() + ": Lvalid id " + id + " does not exist.");
 			}
 		}
-				throw new TypeCheckException("Invalid LValue");
 
-		//placeholdeer, need to throw exception
+		else if (lValue instanceof LvalueDot) {
+			Type left = checkExpression (((LvalueDot)lValue).getLeft(), symbolTable, funcParamsTable, structTable);
+
+			if (left instanceof StructType) {
+				if (structTable.containsKey(((StructType)left).getName())) {
+					List<Declaration> structFields = structTable.get(((StructType)left).getName());
+					String id = ((LvalueDot)lValue).getId();
+
+					for (Declaration field : structFields) {
+						if (field.getName().equals(id)) {
+							return field.getType();
+						}
+					}
+				}
+			}
+			else {
+				throw new TypeCheckException("ERROR on Line " + ((LvalueDot)lValue).getLine() + ": LValueDot needs to be a StructType, instead found " + left.toString());
+			}
+		}
+
+		throw new TypeCheckException("Invalid LValue");
 	}
 
+	public static Type checkExpression(Expression exp,
+									   HashMap <String, Type> symbolTable,
+									   HashMap <String, List<Declaration>> funcParamsTable,
+									   HashMap <String, List<Declaration>> structTable) 
+									   throws TypeCheckException {
+
+
+
+		throw new TypeCheckException("Need to implement checkExpression");
+	}
 	public static void displayData(HashMap <String, Type> symbolTable,
 							  HashMap <String, List<Declaration>> funcParamsTable,
 						      HashMap <String, List<Declaration>> structTable) {
@@ -138,12 +165,6 @@ public class MiniTypeChecker {
 			for (Declaration field: fields) {
 				System.out.println ("    " + field.getName() + " : " + field.getType());
 			}
-		}
-	}
-
-	public static class TypeCheckException extends Exception {
-		public TypeCheckException(String exception) {
-			super(exception);
 		}
 	}
 }
