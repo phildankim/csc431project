@@ -12,4 +12,12 @@ public class WhileStatement
       this.guard = guard;
       this.body = body;
    }
+
+   public Expression getGuard() {
+   	return guard;
+   }
+
+   public Statement getBody() {
+   	return body;
+   }
 }
