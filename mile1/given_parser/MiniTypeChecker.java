@@ -321,6 +321,12 @@ public class MiniTypeChecker {
 					throw new TypeCheckException("ERROR on Line " + ((InvocationExpression)exp).getLine() + ": number of args and params dont match"); 
 				}
 
+				for (int i = 0; i < args.size(); i++) {
+					if (!args.get(i).toString().equals(params.get(i).toString())) {
+						throw new TypeCheckException ("ERROR : arg type does not match param type");
+					}
+				}
+
 				return symbolTable.get(((InvocationExpression)exp).getName());
 			}
 			else {
