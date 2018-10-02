@@ -6,7 +6,7 @@ public class MiniTypeChecker {
 	public static void checkProgram (Program program) throws TypeCheckException
 	{
 
-		System.out.println ("\n\nChecking program.");
+		// System.out.println ("\n\nChecking program.");
 
 		HashMap <String,Type> symbolTable = new HashMap<String,Type>();
 		HashMap <String, List <Declaration>> funcParamsTable = new HashMap <String, List<Declaration>>();
@@ -32,7 +32,7 @@ public class MiniTypeChecker {
 			structTable.put(struct.getName(), struct.getFields());
 		}
 
-		displayData(symbolTable,funcParamsTable,structTable);
+		// displayData(symbolTable,funcParamsTable,structTable);
 
 		// check functions:
 		for (Function func : program.getFuncs()) {

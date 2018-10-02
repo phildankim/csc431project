@@ -7,7 +7,7 @@ import java.util.*;
 public class CheckRedeclarations {
 
 	public static void checkProgram(Program program) {
-		System.out.println ("Checking redeclarations.");
+		//System.out.println ("Checking redeclarations.");
 
 		//Check global variables:
 		List<Declaration> decls = program.getDecls();
