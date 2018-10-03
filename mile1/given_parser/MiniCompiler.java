@@ -1,8 +1,12 @@
+package mini;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import java.io.*;
 import javax.json.JsonValue;
+
+import cfg.*;
 
 public class MiniCompiler
 {
@@ -40,6 +44,9 @@ public class MiniCompiler
          CheckRedeclarations.checkProgram(program);
 
          MiniTypeChecker.checkProgram(program);
+
+         //Milestone 2 Part 1: Create CFG for each function
+         CFGFactory.createAllCFG(program.getFunctions());
 
       }
    }

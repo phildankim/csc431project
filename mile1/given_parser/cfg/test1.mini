@@ -1,0 +1,4 @@
+fun foo(int n) void
+{
+   n + 1;
+}
