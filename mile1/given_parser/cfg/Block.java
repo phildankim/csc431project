@@ -28,6 +28,50 @@ public class Block {
 		instructions.add(statement);
 	}
 
+	public static Block createBlock(Block curr, Statement statement, ArrayList<Block> blocks, ArrayList<Edge> edges, int labelCounter) {
+
+		// if (statement instanceof BlockStatement) {
+		// 	List<Statement> statements = ((BlockStatement)statement).getStatements();
+
+		// 	for (Statement s : statements) {
+		// 		Block.createBlock(curr, s, blocks, edges, labelCounter);
+		// 	} 
+		// }
+		if (statement instanceof ConditionalStatement) {
+			ConditionalStatement cs = (ConditionalStatement)statement;
+
+			// Add guard to instructions
+			GuardStatement gs = new GuardStatement(cs.getGuard());
+			this.addInstructions(gs);
+
+			// Branch IfThen
+			Block ifThen = new Block("Then" + Integer.toString(labelCounter));
+			labelCounter += 1;
+			Edge toThen = new Edge(curr, ifThen);
+			edges.add(toThen);
+			blocks.add(ifThen);
+			Block.createBlock(ifThen, cs.getThen(), blocks, edges, labelCounter);
+
+
+			// Branch IfElse
+			Block ifElse = new Block("Else" + Integer.toString(labelCounter));
+			labelCounter += 1;
+			Edge toElse = new Edge(curr, ifElse);
+			edges.add(toElse);
+			blocks.add(ifThen);
+			Block.createBlock(ifElse, cs.getElse(), blocks, edges, labelCounter);
+
+						
+		}
+		else if (statement instanceof WhileStatement) {
+			return curr;
+		}
+		else {
+			curr.addInstructions(statement);
+			return curr;
+		}
+	}
+
 	public void printBlock() {
 		System.out.println("Block label: " + this.getLabel());
 		System.out.println("\tInstructions: ");

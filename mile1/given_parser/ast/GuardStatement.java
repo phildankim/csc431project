@@ -1,7 +1,7 @@
 package ast;
 
 public class GuardStatement
-	//extends AbstractStatement 
+	extends AbstractStatement 
 {
 	private final Expression guard;
 

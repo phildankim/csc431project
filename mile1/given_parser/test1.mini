@@ -1,4 +1,11 @@
 fun main() int
 {
-   return 1;
+	int n;
+	if (1 < 2) {
+		n = 0
+	}
+	else {
+		n = 2;
+	}
+	return n;
 }
