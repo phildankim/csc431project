@@ -1,10 +1,10 @@
-package mini;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import java.io.*;
 import javax.json.JsonValue;
+import java.util.*;
 
 import cfg.*;
 
@@ -17,6 +17,9 @@ public class MiniCompiler
       CommonTokenStream tokens = new CommonTokenStream(createLexer());
       MiniParser parser = new MiniParser(tokens);
       ParseTree tree = parser.program();
+
+      ArrayList<CFG> cfgs = new ArrayList<CFG>();
+
 
       if (parser.getNumberOfSyntaxErrors() == 0)
       {
@@ -46,7 +49,10 @@ public class MiniCompiler
          MiniTypeChecker.checkProgram(program);
 
          //Milestone 2 Part 1: Create CFG for each function
-         CFGFactory.createAllCFG(program.getFunctions());
+         cfgs = CFGFactory.createAllCFG(program.getFuncs());
+         for (CFG c : cfgs) {
+            c.printCFG();
+         }
 
       }
    }
