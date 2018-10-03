@@ -26,6 +26,12 @@ public class UnaryExpression
       return operand;
    }
 
+   public void printExpression() {
+      System.out.print("UnaryExpression: ");
+      //+ operator + 
+      operand.printExpression();
+   }
+
    public static UnaryExpression create(int lineNum, String opStr,
       Expression operand)
    {

@@ -10,7 +10,11 @@ public abstract class AbstractStatement
       this.lineNum = lineNum;
    }
 
-      public int getLine() {
-   	return lineNum;
+   public int getLine() {
+		return lineNum;
    }
+
+   public void printStatement() {
+   }
+
 }

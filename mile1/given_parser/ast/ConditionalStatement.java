@@ -27,4 +27,11 @@ public class ConditionalStatement
    public Statement getElse() {
       return elseBlock;
    }
+
+   public void printStatement() {
+      System.out.println("ConditionalStatement: ");
+      this.getGuard().printExpression();
+      this.getThen().printStatement();
+      this.getElse().printStatement();
+   }
 }

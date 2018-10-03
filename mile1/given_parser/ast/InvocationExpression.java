@@ -23,4 +23,8 @@ public class InvocationExpression
    public List<Expression> getArgs() {
       return arguments;
    }
+
+   public void printExpression() {
+      System.out.println("InvocationExpression: " + this.getName());
+   }
 }

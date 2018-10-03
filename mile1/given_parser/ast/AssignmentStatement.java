@@ -21,5 +21,10 @@ public class AssignmentStatement
    	return source;
    }
 
+   public void printStatement() {
+      System.out.println("AssignmentStatement: ");
+      this.source.printExpression();
+   }
+
    
 }

@@ -1,20 +1,23 @@
 package cfg;
 
 import java.util.*;
-import src.ast.*;
+import ast.*;
 
 public class CFGFactory {
 
-	public List<CFG> cfgs;
-
 	public CFGFactory() {
-
 	}
 
-	public static void createAllCFG(List<Function> functions) {
-		for (Function f : function) {
+	public static ArrayList<CFG> createAllCFG(List<Function> functions) {
+		
+		ArrayList<CFG> cfgs = new ArrayList<CFG>();
+
+		for (Function f : functions) {
 			CFG cfg = new CFG();
-			cfgs.add(cfg.createCFG(f));
+			cfg.createCFG(f);
+			cfgs.add(cfg);
 		}
+
+		return cfgs;
 	}
 }

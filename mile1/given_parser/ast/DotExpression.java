@@ -20,4 +20,10 @@ public class DotExpression
    public String getId() {
    	return id;
    }
+
+   public void printExpression() {
+      System.out.print("DotExpression: ");
+      this.left.printExpression();
+      System.out.println(id);
+   }
 }

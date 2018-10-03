@@ -14,4 +14,8 @@ public class NewExpression
    public String getId() {
    	return id;
    }
+
+   public void printExpression() {
+      System.out.println("NewExpression: " + this.id);
+   }
 }

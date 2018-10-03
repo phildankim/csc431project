@@ -14,4 +14,9 @@ public class PrintLnStatement
    public Expression getExpression() {
    	return expression;
    }
+
+   public void printStatement() {
+      System.out.println("PrintLnStatement: ");
+      this.getExpression().printExpression();
+   }
 }

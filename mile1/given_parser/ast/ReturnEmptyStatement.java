@@ -7,4 +7,8 @@ public class ReturnEmptyStatement
    {
       super(lineNum);
    }
+
+   public void printStatement() {
+   	System.out.println("ReturnEmptyStatement");
+   }
 }

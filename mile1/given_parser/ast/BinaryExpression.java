@@ -33,6 +33,13 @@ public class BinaryExpression
       return this.right;
    }
 
+   public void printExpression() {
+      System.out.print("BinaryExpression: "); 
+      this.left.printExpression();
+      //operator + 
+      this.right.printExpression();
+   }
+
    public static BinaryExpression create(int lineNum, String opStr,
       Expression left, Expression right)
    {

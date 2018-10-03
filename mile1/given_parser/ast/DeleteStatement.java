@@ -14,4 +14,9 @@ public class DeleteStatement
    public Expression getExpression() {
    	return expression;
    }
+
+   public void printStatement() {
+      System.out.println("DeleteStatement: ");
+      this.getExpression().printExpression();
+   }
 }

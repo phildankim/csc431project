@@ -16,4 +16,9 @@ public class InvocationStatement
    public Expression getExpression() {
    	return expression;
    }
+
+   public void printStatement() {
+      System.out.println("InvocationStatement: ");
+      this.getExpression().printExpression();
+   }
 }

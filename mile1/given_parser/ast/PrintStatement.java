@@ -15,5 +15,10 @@ public class PrintStatement
    	return expression;
    }
 
+   public void printStatement() {
+      System.out.println("PrintStatement: ");
+      this.getExpression().printExpression();
+   }
+
 
 }

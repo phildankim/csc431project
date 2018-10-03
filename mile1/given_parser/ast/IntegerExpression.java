@@ -9,11 +9,10 @@ public class IntegerExpression
    {
       super(lineNum);
       this.value = value;
-      this.visit();
    }
 
-   public String visit() 
-   {
-      return this.value + " is an integer.";
+   public void printExpression() {
+      System.out.println("IntegerExpression: " + (this.value));
    }
+
 }

@@ -7,4 +7,8 @@ public class NullExpression
    {
       super(lineNum);
    }
+
+   public void printExpression() {
+      System.out.println("NullExpression");
+   }
 }

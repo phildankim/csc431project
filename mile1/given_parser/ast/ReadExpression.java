@@ -7,4 +7,8 @@ public class ReadExpression
    {
       super(lineNum);
    }
+
+   public void printExpression() {
+      System.out.println("ReadExpression");
+   }
 }

@@ -13,4 +13,7 @@ public abstract class AbstractExpression
    public int getLine() {
    	return lineNum;
    }
+
+   public void printExpression() {
+   }
 }

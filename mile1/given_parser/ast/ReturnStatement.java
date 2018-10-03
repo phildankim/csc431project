@@ -14,4 +14,9 @@ public class ReturnStatement
    public Expression getExpression() {
    	return expression;
    }
+
+   public void printStatement() {
+      System.out.println("ReturnStatement: ");
+      this.expression.printExpression();
+   }
 }

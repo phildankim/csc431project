@@ -20,4 +20,10 @@ public class WhileStatement
    public Statement getBody() {
    	return body;
    }
+
+   public void printStatement() {
+      System.out.println("WhileStatement: ");
+      this.getGuard().printExpression();
+      this.getBody().printStatement();
+   }
 }

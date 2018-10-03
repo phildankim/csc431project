@@ -22,4 +22,11 @@ public class BlockStatement
    public List<Statement> getStatements() {
       return statements;
    }
+
+   public void printStatement() {
+      System.out.println("BlockStatement: ");
+      for (Statement s : this.getStatements()) {
+         s.printStatement();
+      }
+   }
 }

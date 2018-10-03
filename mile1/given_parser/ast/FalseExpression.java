@@ -7,4 +7,8 @@ public class FalseExpression
    {
       super(lineNum);
    }
+
+   public void printExpression() {
+   		System.out.println("FalseExpression");
+   }
 }

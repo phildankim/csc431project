@@ -14,4 +14,8 @@ public class IdentifierExpression
    public String getId() {
    	return id;
    }
+
+   public void printExpression() {
+      System.out.println("IdentifierExpression: " + this.id);
+   }
 }
