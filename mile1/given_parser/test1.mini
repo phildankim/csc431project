@@ -1,10 +1,20 @@
 fun main() int
 {
 	int n;
-	if (1 < 2) {
-		n = 0
+	if (1 < 2) 
+	{
+		n = 0;
+		if (2 < 3) 
+		{
+			n = 3;
+		}
+		else 
+		{
+			n = 4;
+		}
 	}
-	else {
+	else 
+	{
 		n = 2;
 	}
 	return n;

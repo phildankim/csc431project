@@ -17,4 +17,8 @@ public class Edge {
 	public Block getFrom() {
 		return this.from;
 	}
+
+	public void printEdge() {
+		System.out.println("From: " + this.from.getLabel() + "\tTo: " + this.to.getLabel());
+	}
 }

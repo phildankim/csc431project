@@ -30,19 +30,17 @@ public class Block {
 
 	public static Block createBlock(Block curr, Statement statement, ArrayList<Block> blocks, ArrayList<Edge> edges, int labelCounter) {
 
-		// if (statement instanceof BlockStatement) {
-		// 	List<Statement> statements = ((BlockStatement)statement).getStatements();
+		if (statement instanceof BlockStatement) { 
+			System.out.println(statement);
+			List<Statement> statements = ((BlockStatement)statement).getStatements();
 
-		// 	for (Statement s : statements) {
-		// 		Block.createBlock(curr, s, blocks, edges, labelCounter);
-		// 	} 
-		// }
-		if (statement instanceof ConditionalStatement) {
+			for (Statement s : statements) {
+				Block.createBlock(curr, s, blocks, edges, labelCounter);
+			} 
+		}
+		else if (statement instanceof ConditionalStatement) {
+			System.out.println(statement);
 			ConditionalStatement cs = (ConditionalStatement)statement;
-
-			// Add guard to instructions
-			GuardStatement gs = new GuardStatement(cs.getGuard());
-			this.addInstructions(gs);
 
 			// Branch IfThen
 			Block ifThen = new Block("Then" + Integer.toString(labelCounter));
@@ -50,26 +48,43 @@ public class Block {
 			Edge toThen = new Edge(curr, ifThen);
 			edges.add(toThen);
 			blocks.add(ifThen);
-			Block.createBlock(ifThen, cs.getThen(), blocks, edges, labelCounter);
+			Block thenExit = Block.createBlock(ifThen, cs.getThen(), blocks, edges, labelCounter);
 
 
 			// Branch IfElse
 			Block ifElse = new Block("Else" + Integer.toString(labelCounter));
+			System.out.println("here");
 			labelCounter += 1;
 			Edge toElse = new Edge(curr, ifElse);
 			edges.add(toElse);
-			blocks.add(ifThen);
-			Block.createBlock(ifElse, cs.getElse(), blocks, edges, labelCounter);
+			blocks.add(ifElse);
+			Block elseExit = Block.createBlock(ifElse, cs.getElse(), blocks, edges, labelCounter);
 
+			// Create Join block
+			Block join = new Block("Join" + Integer.toString(labelCounter));
+			labelCounter += 1;
+			Edge thenJoin = new Edge(thenExit, join);
+			Edge elseJoin = new Edge(elseExit, join);
+			edges.add(thenJoin);
+			edges.add(elseJoin);
+			blocks.add(join);
+
+			return join;
 						
 		}
 		else if (statement instanceof WhileStatement) {
-			return curr;
+			System.out.println(statement);
+		}
+		else if (statement instanceof ReturnStatement) {
+			System.out.println(statement);
 		}
 		else {
-			curr.addInstructions(statement);
-			return curr;
+			System.out.println(statement);
+			
+			//curr.addInstructions(statement);
+			
 		}
+		return curr;
 	}
 
 	public void printBlock() {
