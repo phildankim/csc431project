@@ -14,7 +14,7 @@ public class CFGFactory {
 
 		for (Function f : functions) {
 			CFG cfg = new CFG();
-			cfg.createCFG(f);
+			cfg.createCFG(f.getBody());
 			cfgs.add(cfg);
 		}
 

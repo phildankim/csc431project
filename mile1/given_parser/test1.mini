@@ -1,12 +1,16 @@
 fun main() int
 {
 	int n;
+
 	if (1 < 2) 
 	{
+
 		n = 0;
+
 		if (2 < 3) 
 		{
 			n = 3;
+			return n;
 		}
 		else 
 		{
