@@ -7,9 +7,13 @@ import javax.json.JsonValue;
 import java.util.*;
 
 import cfg.*;
+import ast.*;
 
 public class MiniCompiler
 {
+
+   private static boolean stack = false;
+
    public static void main(String[] args) throws TypeCheckException
    {
       parseParameters(args);
@@ -54,6 +58,10 @@ public class MiniCompiler
             c.printCFG();
          }
 
+         if (stack) {
+            LLVMPrinter.print(program,_inputFile);
+         }
+
       }
    }
 
@@ -65,8 +73,14 @@ public class MiniCompiler
       {
          if (args[i].charAt(0) == '-')
          {
-            System.err.println("unexpected option: " + args[i]);
-            System.exit(1);
+            if (args[i].equals("-stack")) {
+               stack = true;
+               System.out.println("stack detected");
+            }
+            else {
+               System.err.println("unexpected option: " + args[i]);
+               System.exit(1);
+            }
          }
          else if (_inputFile != null)
          {
