@@ -10,16 +10,18 @@ fun main() int
 		if (2 < 3) 
 		{
 			n = 3;
-			return n;
 		}
 		else 
 		{
 			n = 4;
 		}
+
+		return n;
 	}
 	else 
 	{
 		n = 2;
+		return n;
 	}
-	return n;
+
 }

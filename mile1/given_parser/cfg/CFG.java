@@ -7,6 +7,7 @@ public class CFG {
 
 	public ArrayList<Block> blocks = new ArrayList<Block>();
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
+	public ArrayList<Block> children = new ArrayList<Block>();
 	public Block entryBlock;
 	public Block exitBlock;
 	public Block currBlock;
@@ -58,24 +59,38 @@ public class CFG {
 			Edge toElse = new Edge(currBlock, ifElse);
 			edges.add(toElse);
 
+			Block join = new Block("Join" + Integer.toString(labelCounter));
+
 			// Branch IfThen
 			this.updateCurr(ifThen);
+			System.out.println("[THEN] Currblock: " + currBlock.getLabel());
 			Optional<Block> opt = Optional.ofNullable(createCFG(cs.getThen()));
+			
 			if (opt.isPresent()) {
-				Edge toExit = new Edge(opt.get(), this.exitBlock);
-				edges.add(toExit);
-				System.out.println("From: " + opt.get().getLabel() + " to exit.");
+				Block thenRes = opt.get();
+				// Edge toExit = new Edge(thenRes, this.exitBlock);
+				// edges.add(toExit);
+				// System.out.println("From: " + thenRes.getLabel() + " to exit.");
+				Edge thenJoin = new Edge(thenRes, join);
+				edges.add(thenJoin);
 			}
 
 			// Branch IfElse
 			this.updateCurr(ifElse);
-			opt = Optional.ofNullable(createCFG(cs.getElse()));
+			System.out.println("[ELSE] Currblock: " + currBlock.getLabel());
+			opt = Optional.ofNullable(createCFG(cs.getElse()));		
+			
 			if (opt.isPresent()) {
-				Edge toExit = new Edge(opt.get(), this.exitBlock);
-				edges.add(toExit);
-				System.out.println("From: " + opt.get().getLabel() + " to exit.");
+				Block elseRes = opt.get();
+				// Edge toExit = new Edge(elseRes, this.exitBlock);
+				// edges.add(toExit);
+				// System.out.println("From: " + elseRes.getLabel() + " to exit.");
+				// return null;
+				Edge elseJoin = new Edge(elseRes, join);
+				edges.add(elseJoin);
 			}
 
+			this.updateCurr(join);
 			return currBlock;
 		}
 		else if (statement instanceof WhileStatement) {
@@ -83,19 +98,20 @@ public class CFG {
 
 			// Add guard instruction
 
-			// Block whileGuard = new Block("WhileGuard" + Integer.toString(labelCounter));
-			// labelCounter += 1;
-			// Edge toGuard = new Edge(currBlock, whileGuard);
-			// edges.add(toGuard);
-			// blocks.add(whileGuard);
+			Block whileGuard = new Block("WhileGuard" + Integer.toString(labelCounter));
+			labelCounter += 1;
+			Edge toGuard = new Edge(currBlock, whileGuard);
+			edges.add(toGuard);
+			blocks.add(whileGuard);
+			this.updateCurr(whileGuard);
 
-			// Block whileBody = new Block("WhileBody" + Integer.toString(labelCounter));
-			// labelCounter += 1;
-			// Edge toBody = new Edge(whileGuard, whileBody);
-			// edges.add(toBody);
-			// blocks.add(whileBody);
-			// Edge whileLoop = new Edge(whileBody, whileGuard);
-			// edges.add(whileLoop);
+			Block whileBody = new Block("WhileBody" + Integer.toString(labelCounter));
+			labelCounter += 1;
+			Edge toBody = new Edge(whileGuard, whileBody);
+			edges.add(toBody);
+			blocks.add(whileBody);
+			Edge whileLoop = new Edge(whileBody, whileGuard);
+			edges.add(whileLoop);
 
 			// Recurse here
 			return currBlock;
@@ -111,6 +127,7 @@ public class CFG {
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);
 			blocks.add(returnBlock);
+			children.add(returnBlock);
 
 			// return returnBlock;
 			return null;

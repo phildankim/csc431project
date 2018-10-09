@@ -1,0 +1,28 @@
+fun main() int
+{
+   struct A a;
+   int i, j, k;
+   bool b;
+   int h;
+   {
+      i = --2;
+      if (i < 0)
+      {
+         print 1;
+      }
+
+      if (i > 1)
+      {
+         print 1;
+      }
+      else
+      {
+         print 3 endl;
+      }
+      while (true)
+      {
+         print 7;
+      }
+   }
+   return 0;
+}

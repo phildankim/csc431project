@@ -1,0 +1,15 @@
+fun main() int
+{
+   int n;
+   n = 0;
+
+   if (n <= 0)
+   {
+      return 1;
+   }
+   else
+   {
+      n = 3;
+   }
+   return n;
+}
