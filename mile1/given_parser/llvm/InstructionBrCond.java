@@ -1,4 +1,6 @@
-public class InstructionBrCond {
+package llvm;
+
+public class InstructionBrCond implements Instruction{
 	
 	String condition;
 	String labelTrue;

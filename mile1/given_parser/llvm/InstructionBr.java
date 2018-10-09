@@ -1,4 +1,6 @@
-public class InstructionBr {
+package llvm;
+
+public class InstructionBr implements Instruction{
 	String destination;
 
 	public InstructionBr (String destination) {
