@@ -13,9 +13,11 @@ public class CFGFactory {
 		ArrayList<CFG> cfgs = new ArrayList<CFG>();
 
 		for (Function f : functions) {
-			CFG cfg = new CFG();
+			CFG cfg = new CFG(f.getName());
 			cfg.createCFG(f.getBody());
+			cfg.connectToExit();
 			cfgs.add(cfg);
+
 		}
 
 		return cfgs;

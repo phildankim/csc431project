@@ -15,11 +15,11 @@ GENERATED=MiniBaseVisitor.java MiniLexer.java MiniLexer.tokens Mini.tokens MiniV
 all : MiniCompiler.class
 
 MiniCompiler.class : antlr.generated ${FILES}
-	$(JAVAC) -cp ${CLASSPATH}:$(CLASSPATH_MOD) *.java ast/*.java cfg/*.java
-
+	$(JAVAC) -cp ${CLASSPATH}:$(CLASSPATH_MOD) *.java ast/*.java cfg/*.java llvm/*.java
+ 
 antlr.generated : Mini.g4
 	$(JAVA) -cp ${CLASSPATH}:$(CLASSPATH_MOD) org.antlr.v4.Tool -visitor Mini.g4
 	touch antlr.generated
 
 clean:
-	\rm -rf *generated* ${GENERATED} *.class ast/*.class cfg/*.class
+	\rm -rf *generated* ${GENERATED} *.class ast/*.class cfg/*.class llvm/*.class

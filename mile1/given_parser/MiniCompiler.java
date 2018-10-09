@@ -8,6 +8,7 @@ import java.util.*;
 
 import cfg.*;
 import ast.*;
+import llvm.*;
 
 public class MiniCompiler
 {

@@ -2,12 +2,13 @@ package cfg;
 
 import java.util.*;
 import ast.*;
+import llvm.*;
 
 public class Block {
 
 	private String label;
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
-	public ArrayList<Statement> instructions = new ArrayList<Statement>();
+	public ArrayList<Instruction> instructions = new ArrayList<Instruction>();
 
 	public Block(String label) {
 		this.label = label;
@@ -24,15 +25,8 @@ public class Block {
 		}
 	}
 
-	public void addInstructions(Statement statement) {
-		instructions.add(statement);
-	}
-
-	public static void createBlock(Block curr, Statement statement, ArrayList<Block> blocks, ArrayList<Edge> edges, int labelCounter) {
-
-		
-
-		
+	public void addInstructions(Instruction instr) {
+		instructions.add(instr);
 	}
 
 	public void printBlock() {

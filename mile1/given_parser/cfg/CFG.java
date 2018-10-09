@@ -1,29 +1,46 @@
 package cfg;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import ast.*;
+import llvm.*;
 
 public class CFG {
 
 	public ArrayList<Block> blocks = new ArrayList<Block>();
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
-	public ArrayList<Block> children = new ArrayList<Block>();
+
+	// public InstructionTranslator it = new InstructionTranslator();
+	//public ArrayList<LinkedList<Block>> adj = new ArrayList<Block>();
+
+
 	public Block entryBlock;
 	public Block exitBlock;
 	public Block currBlock;
-	public int labelCounter;
 
-	public CFG() {
+	public int labelCounter;
+	public String functionName;
+
+	public CFG(String functionName) {
 		this.entryBlock = new Block("Entry");
 		this.exitBlock = new Block("Exit");
 		this.blocks.add(entryBlock);
 		this.blocks.add(exitBlock);
 		this.currBlock = entryBlock;
 		this.labelCounter = 1;
+		this.functionName = functionName;
 	}
 
 	public void updateCurr(Block newCurr) {
 		this.currBlock = newCurr;
+	}
+
+	public int numEdges() {
+		return this.edges.size();
+	}
+
+	public void addAdj(Block from, Block to) {
+		
 	}
 
 	public Block createCFG(Statement statement) {
@@ -44,6 +61,7 @@ public class CFG {
 			ConditionalStatement cs = (ConditionalStatement)statement;
 
 			// Add guard instruction to currBlock
+			// it.translate(cs.getGuard());
 
 			// Create Then and Else blocks
 			Block ifThen = new Block("Then" + Integer.toString(labelCounter));
@@ -71,6 +89,7 @@ public class CFG {
 				// Edge toExit = new Edge(thenRes, this.exitBlock);
 				// edges.add(toExit);
 				// System.out.println("From: " + thenRes.getLabel() + " to exit.");
+				//Branh isntructions here
 				Edge thenJoin = new Edge(thenRes, join);
 				edges.add(thenJoin);
 			}
@@ -127,7 +146,6 @@ public class CFG {
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);
 			blocks.add(returnBlock);
-			children.add(returnBlock);
 
 			// return returnBlock;
 			return null;
@@ -147,12 +165,46 @@ public class CFG {
 	}
 
 	public void printCFG() {
-		System.out.println("Num blocks: " + blocks.size());
+		System.out.println("===== CFG FOR FUNCTION: " + this.functionName + " =====");
 		for (Block b : blocks) {
 			b.printBlock();
 		}
 		for (Edge e : edges) {
 			e.printEdge();
+		}
+	}
+
+	public void connectToExit() {
+		String regex = "Return\\d+";
+
+		for (Block b : blocks) {
+			if (Pattern.matches(regex, b.getLabel())) {
+				Edge toExit = new Edge(b, this.exitBlock);
+				edges.add(toExit);
+			}
+		}
+	}
+
+	public void topologicalHelper(int i, boolean visited[], Stack stack) {
+		visited[i] = true;
+
+		//Iterator<Integer> itr = new Ite
+
+	} 
+
+	public void topologicalPrinter() {
+		int numEdges = this.numEdges();
+		Stack stack = new Stack();
+		boolean visited[] = new boolean[numEdges];
+
+		for (int i = 0; i < numEdges; i++) {
+			if (!visited[i]) {
+				topologicalHelper(i, visited, stack);
+			}
+		}
+
+		while (!stack.empty()) {
+			System.out.println(stack.pop() + " ");
 		}
 	}
 }
