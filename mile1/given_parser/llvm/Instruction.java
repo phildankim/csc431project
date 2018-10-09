@@ -1,4 +1,4 @@
-package instructions;
+package llvm;
 
 public interface Instruction {
 	
