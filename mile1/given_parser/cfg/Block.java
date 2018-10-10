@@ -32,8 +32,7 @@ public class Block {
 	public void printBlock() {
 		System.out.println("Block label: " + this.getLabel());
 		System.out.println("\tInstructions: ");
-		for (Statement s : instructions) {
-			s.printStatement();
+		for (Instruction s : instructions) {
 		}
 	}
 }
