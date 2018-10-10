@@ -32,7 +32,9 @@ public class Block {
 	public void printBlock() {
 		System.out.println("Block label: " + this.getLabel());
 		System.out.println("\tInstructions: ");
-		for (Instruction s : instructions) {
+
+		for (Instruction i : instructions) {
+			i.toString();
 		}
 	}
 }
