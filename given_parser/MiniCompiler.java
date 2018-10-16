@@ -14,6 +14,8 @@ public class MiniCompiler
 {
 
    private static boolean stack = false;
+   private static boolean jsonPrint = false;
+   private static boolean cfg = false;
 
    public static void main(String[] args) throws TypeCheckException
    {
@@ -38,7 +40,9 @@ public class MiniCompiler
          MiniToJsonVisitor jsonVisitor = new MiniToJsonVisitor();
          JsonValue json = jsonVisitor.visit(tree);
          
-         System.out.println(json);
+         if (jsonPrint) {
+            System.out.println(json);
+         }
 
          /*
             This visitor will build an object representation of the AST
@@ -56,7 +60,9 @@ public class MiniCompiler
          //Milestone 2 Part 1: Create CFG for each function
          cfgs = CFGFactory.createAllCFG(program.getFuncs());
          for (CFG c : cfgs) {
-            c.printCFG();
+            if (cfg) {
+               c.printCFG();
+            }
          }
 
          if (stack) {
@@ -77,6 +83,14 @@ public class MiniCompiler
             if (args[i].equals("-stack")) {
                stack = true;
                System.out.println("stack detected");
+            }
+
+            else if (args[i].equals("-json")) {
+               jsonPrint = true;
+            }
+
+            else if (args[i].equals("-cfg")) {
+               cfg = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);
