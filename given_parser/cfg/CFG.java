@@ -38,7 +38,7 @@ public class CFG {
 	public Block createCFG(Statement statement) {
 
 		if (statement instanceof BlockStatement) { 
-			System.out.println(statement);
+			//System.out.println(statement);
 			List<Statement> statements = ((BlockStatement)statement).getStatements();
 
 			Block result = null;
@@ -49,12 +49,12 @@ public class CFG {
 			return result;
 		}
 		else if (statement instanceof ConditionalStatement) {
-			System.out.println(statement);
+			//System.out.println(statement);
 			ConditionalStatement cs = (ConditionalStatement)statement;
 
 			// Add guard instruction to currBlock
 			// ArrayList<Instruction> guard = it.translate(cs.getGuard());
-			System.out.println("guard: " + cs.getGuard());
+			//System.out.println("guard: " + cs.getGuard());
 			// currBlock.addInstruction(guard);
 
 			// Create Then and Else blocks
@@ -75,7 +75,7 @@ public class CFG {
 
 			// Branch IfThen
 			this.updateCurr(ifThen);
-			System.out.println("[THEN] Currblock: " + currBlock.getLabel());
+			//System.out.println("[THEN] Currblock: " + currBlock.getLabel());
 			Optional<Block> opt = Optional.ofNullable(createCFG(cs.getThen()));
 			
 			if (opt.isPresent()) {
@@ -90,7 +90,7 @@ public class CFG {
 
 			// Branch IfElse
 			this.updateCurr(ifElse);
-			System.out.println("[ELSE] Currblock: " + currBlock.getLabel());
+			//System.out.println("[ELSE] Currblock: " + currBlock.getLabel());
 			opt = Optional.ofNullable(createCFG(cs.getElse()));		
 			
 			if (opt.isPresent()) {
@@ -107,7 +107,7 @@ public class CFG {
 			return currBlock;
 		}
 		else if (statement instanceof WhileStatement) {
-			System.out.println(statement);
+			//System.out.println(statement);
 
 			// Add guard instruction
 
@@ -131,7 +131,7 @@ public class CFG {
 
 		}
 		else if (statement instanceof ReturnStatement) {
-			System.out.println(statement);
+			//System.out.println(statement);
 
 			// Add return instruction
 
@@ -145,7 +145,7 @@ public class CFG {
 			return null;
 		}
 		else {
-			System.out.println(statement);
+			//System.out.println(statement);
 			
 			// Add instructions to currBlock
 
