@@ -11,7 +11,7 @@ public class CFGFactory {
 	public static ArrayList<CFG> createAllCFG(Program p) {
 		
 		ArrayList<CFG> cfgs = new ArrayList<CFG>();
-		ArrayList<Function> functions = p.getFuncs();
+		List<Function> functions = p.getFuncs();
 
 		for (Function f : functions) {
 			CFG cfg = new CFG(f.getName(), p);
