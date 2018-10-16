@@ -58,17 +58,10 @@ public class MiniCompiler
          MiniTypeChecker.checkProgram(program);
 
          //Milestone 2 Part 1: Create CFG for each function
-         cfgs = CFGFactory.createAllCFG(program);
-         for (CFG c : cfgs) {
-            if (cfg) {
-               c.printCFG();
-            }
+         LLVM llvm = new LLVM(program);
+         if (cfg) {
+            llvm.printProgram();
          }
-
-         if (stack) {
-            LLVMPrinter.print(program,_inputFile);
-         }
-
       }
    }
 

@@ -75,11 +75,13 @@ public class InstructionTranslator {
 	}
 
 	// global/program level type declarations such as structs
-	public static void setDeclInstruction(Block b, Declaration decl) {
-
-	}
-	public static void setTypeDeclInstruction(Block b, TypeDeclaration type) {
-		
+	// public static String setDeclInstruction(Declaration decl) {
+	// 	return "";
+	// 	// add logic
+	// }
+	public static InstructionTypeDecl setTypeDeclInstruction(TypeDeclaration type) {
+		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
+		return typeDecl;
 	}
 
 }
