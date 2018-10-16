@@ -30,7 +30,21 @@ public class CFG {
 		this.labelCounter = 1;
 		this.functionName = functionName;
 		this.p = p;
+		this.setDeclInstructions();
+		this.setTypeDeclInstructions();
 		//this.funcDef = new Instruction()
+	}
+
+	public void setDeclInstructions() {
+		for (Declaration d : p.getDecls()) {
+			InstructionTranslator.setDeclInstruction(this.entryBlock, d);
+		}
+	}
+
+	public void setTypeDeclInstructions() {
+		for (TypeDeclaration td : p.getTypes()) {
+			InstructionTranslator.setTypeDeclInstruction(this.entryBlock, td);
+		}
 	}
 
 	public void updateCurr(Block newCurr) {
@@ -154,7 +168,10 @@ public class CFG {
 			//System.out.println(statement);
 			
 			// Add instructions to currBlock
-
+			System.out.println("SADLKFJA;SLKDF");
+			InstructionTranslator.translate(currBlock, statement);
+			System.out.println("IN CFG: ");
+			currBlock.printBlock();
 			return currBlock;
 		}
 	}

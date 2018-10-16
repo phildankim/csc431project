@@ -1,13 +1,15 @@
 package llvm;
 
+import ast.*;
+
 public class InstructionStore implements Instruction {
 
-	String value;
-	String pointer;
+	String value; //target
+	String pointer; //source
 
-	public InstructionStore (String value, String pointer) {
-		this.value = value;
-		this.pointer = pointer;
+	public InstructionStore (String target, String source) {
+		this.value = source;
+		this.pointer = target;
 	}
 
 	@Override

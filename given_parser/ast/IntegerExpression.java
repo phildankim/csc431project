@@ -11,6 +11,10 @@ public class IntegerExpression
       this.value = value;
    }
 
+   public String getValue() {
+      return this.value;
+   }
+
    public void printExpression() {
       System.out.println("IntegerExpression: " + (this.value));
    }

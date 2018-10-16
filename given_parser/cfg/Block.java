@@ -34,7 +34,7 @@ public class Block {
 		}
 	}
 
-	public void addInstructions(Instruction instr) {
+	public void addInstruction(Instruction instr) {
 		instructions.add(instr);
 	}
 
@@ -42,7 +42,7 @@ public class Block {
 		System.out.println("Block label: " + this.getLabel());
 		System.out.println("\tInstructions: ");
 		for (Instruction i : instructions) {
-			i.toString();
+			System.out.println("\t\t" + i.toString());
 		}
 
 		System.out.println("\tPredecessors: ");
