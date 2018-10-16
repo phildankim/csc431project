@@ -10,10 +10,6 @@ public class CFG {
 	public ArrayList<Block> blocks = new ArrayList<Block>();
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
 
-	// public InstructionTranslator it = new InstructionTranslator();
-	//public ArrayList<LinkedList<Block>> adj = new ArrayList<Block>();
-
-
 	public Block entryBlock;
 	public Block exitBlock;
 	public Block currBlock;
@@ -39,10 +35,6 @@ public class CFG {
 		return this.edges.size();
 	}
 
-	public void addAdj(Block from, Block to) {
-		
-	}
-
 	public Block createCFG(Statement statement) {
 
 		if (statement instanceof BlockStatement) { 
@@ -61,7 +53,9 @@ public class CFG {
 			ConditionalStatement cs = (ConditionalStatement)statement;
 
 			// Add guard instruction to currBlock
-			// it.translate(cs.getGuard());
+			// ArrayList<Instruction> guard = it.translate(cs.getGuard());
+			System.out.println("guard: " + cs.getGuard());
+			// currBlock.addInstruction(guard);
 
 			// Create Then and Else blocks
 			Block ifThen = new Block("Then" + Integer.toString(labelCounter));
@@ -164,6 +158,15 @@ public class CFG {
 		this.edges.add(e);
 	}
 
+	public void addPredecessorsAndSuccessors() {
+		for (Edge e : this.edges) {
+			Block from = e.getFrom();
+			Block to = e.getTo();
+			from.addSucc(to);
+			to.addPred(from);
+		}
+	}
+
 	public void printCFG() {
 		System.out.println("===== CFG FOR FUNCTION: " + this.functionName + " =====");
 		for (Block b : blocks) {
@@ -185,26 +188,26 @@ public class CFG {
 		}
 	}
 
-	public void topologicalHelper(int i, boolean visited[], Stack stack) {
-		visited[i] = true;
+	// public void topologicalHelper(int i, boolean visited[], Stack stack) {
+	// 	visited[i] = true;
 
-		//Iterator<Integer> itr = new Ite
+	// 	//Iterator<Integer> itr = new Ite
 
-	} 
+	// } 
 
-	public void topologicalPrinter() {
-		int numEdges = this.numEdges();
-		Stack stack = new Stack();
-		boolean visited[] = new boolean[numEdges];
+	// public void topologicalPrinter() {
+	// 	int numEdges = this.numEdges();
+	// 	Stack stack = new Stack();
+	// 	boolean visited[] = new boolean[numEdges];
 
-		for (int i = 0; i < numEdges; i++) {
-			if (!visited[i]) {
-				topologicalHelper(i, visited, stack);
-			}
-		}
+	// 	for (int i = 0; i < numEdges; i++) {
+	// 		if (!visited[i]) {
+	// 			topologicalHelper(i, visited, stack);
+	// 		}
+	// 	}
 
-		while (!stack.empty()) {
-			System.out.println(stack.pop() + " ");
-		}
-	}
+	// 	while (!stack.empty()) {
+	// 		System.out.println(stack.pop() + " ");
+	// 	}
+	// }
 }
