@@ -58,7 +58,7 @@ public class MiniCompiler
          MiniTypeChecker.checkProgram(program);
 
          //Milestone 2 Part 1: Create CFG for each function
-         cfgs = CFGFactory.createAllCFG(program.getFuncs());
+         cfgs = CFGFactory.createAllCFG(program);
          for (CFG c : cfgs) {
             if (cfg) {
                c.printCFG();
