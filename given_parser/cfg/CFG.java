@@ -17,7 +17,11 @@ public class CFG {
 	public int labelCounter;
 	public String functionName;
 
-	public CFG(String functionName) {
+	public Program p;
+
+	//public Instruction funcDef;
+
+	public CFG(String functionName, Program p) {
 		this.entryBlock = new Block("Entry");
 		this.exitBlock = new Block("Exit");
 		this.blocks.add(entryBlock);
@@ -25,6 +29,8 @@ public class CFG {
 		this.currBlock = entryBlock;
 		this.labelCounter = 1;
 		this.functionName = functionName;
+		this.p = p;
+		//this.funcDef = new Instruction()
 	}
 
 	public void updateCurr(Block newCurr) {
