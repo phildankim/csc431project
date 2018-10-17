@@ -6,6 +6,7 @@ struct simple
 fun main() int
 {
 	int n;
+	struct simple f;
 	n = 0;
 	if (n > 0)
 	{

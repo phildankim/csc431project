@@ -24,28 +24,6 @@ public class InstructionTranslator {
 			InstructionStore instr = new InstructionStore(target, source);
 			b.addInstruction(instr);
 		}
-
-		// if (e instanceof BinaryExpression) {
-		// 	String opr = e.getOperator().name();
-
-		// 	switch (opr) {
-		// 		case BinaryExpression.Operator.TIMES:
-		// 			return InstructionIcmp
-		// 		case BinaryExpression.Operator.DIVIDE:
-		// 		case BinaryExpression.Operator.PLUS:
-		// 		case BinaryExpression.Operator.MINUS:
-		// 		case BinaryExpression.Operator.LT:
-		// 		case BinaryExpression.Operator.LE
-		// 		case BinaryExpression.Operator.GT:
-		// 		case BinaryExpression.Operator.GE:
-		// 		case BinaryExpression.Operator.EQ:
-		// 		case BinaryExpression.Operator.NE:
-		// 		case BinaryExpression.Operator.AND:
-		// 		case BinaryExpression.Operator.OR:
-		// 		default:
-		// 			throw new IllegalArgumentException();
-		// 	}
-		// }
 		else {
 
 		}
@@ -74,6 +52,7 @@ public class InstructionTranslator {
 		}
 	}
 
+
 	// global/program level type declarations such as structs
 	// public static String setDeclInstruction(Declaration decl) {
 	// 	return "";
@@ -82,6 +61,12 @@ public class InstructionTranslator {
 	public static InstructionTypeDecl setTypeDeclInstruction(TypeDeclaration type) {
 		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
 		return typeDecl;
+	}
+	public static void setLocalDeclInstruction(Block b, List<Declaration> locals) {
+		for (Declaration d : locals) {
+			InstructionAlloca localDecl = new InstructionAlloca(d);
+			b.addInstruction(localDecl);
+		}
 	}
 
 }

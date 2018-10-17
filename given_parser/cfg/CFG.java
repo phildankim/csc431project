@@ -17,19 +17,20 @@ public class CFG {
 	public int labelCounter;
 	public String functionName;
 
-	public Program p;
+	public Function f;
 
 	//public Instruction funcDef;
 
-	public CFG(String functionName, Program p) {
+	public CFG(Function f) {
 		this.entryBlock = new Block("Entry");
 		this.exitBlock = new Block("Exit");
 		this.blocks.add(entryBlock);
 		this.blocks.add(exitBlock);
 		this.currBlock = entryBlock;
 		this.labelCounter = 1;
-		this.functionName = functionName;
-		this.p = p;
+		this.functionName = f.getName();
+		this.f = f;
+		InstructionTranslator.setLocalDeclInstruction(entryBlock, f.getLocals());
 		//this.setDeclInstructions();
 		//this.setTypeDeclInstructions();
 		//this.funcDef = new Instruction()
