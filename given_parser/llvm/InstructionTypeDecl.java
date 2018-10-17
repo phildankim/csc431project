@@ -41,11 +41,13 @@ public class InstructionTypeDecl implements Instruction {
 
 	@Override
 	public String toString() {
-		String res = "%struct." + this.name + " =  type {";
-		for (String s : this.types) {
-			res += (s + ", ");
-		}
-		res += "}";
+		String pre = "%struct." + this.name + " = type ";	
+		StringBuilder builder = new StringBuilder("{");
+		for (String s : this.types) builder.append(s).append(",");
+		if (this.types.size() > 0) builder.deleteCharAt(builder.length() - 1);
+		builder.append("}");
+		builder.insert(0, pre);
+		String res = builder.toString();
 		return res;
 	}
 
