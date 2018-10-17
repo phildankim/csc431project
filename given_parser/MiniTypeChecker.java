@@ -157,7 +157,10 @@ public class MiniTypeChecker {
 		}
 
 		// PLACEHOLDER
-		throw new TypeCheckException ("statement type error. " + statement.toString());
+		// throw new TypeCheckException ("statement type error. " + statement.toString());
+
+		// ENED TO IMPLEMENT DELETE STATEMENT
+		return new VoidType();
 	}
 
 	public static Type checkLValue(Lvalue lValue,
@@ -380,7 +383,9 @@ public class MiniTypeChecker {
 			else throw new TypeCheckException ("ERROR on Line " + ((NewExpression)exp).getLine() + ": did not find struct");
 		}
 
-		throw new TypeCheckException("Need to implement checkExpression for " + exp.toString());
+		return new VoidType();
+		// need to implement readexpression
+		//throw new TypeCheckException("Need to implement checkExpression for " + exp.toString());
  
 	}
 	public static void displayData(HashMap <String, Type> symbolTable,

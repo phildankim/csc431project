@@ -53,9 +53,13 @@ public class MiniCompiler
          ast.Program program = programVisitor.visit(tree);
 
          // Milestone 1: Static Type Checking
-         CheckRedeclarations.checkProgram(program);
 
-         MiniTypeChecker.checkProgram(program);
+         /* 
+         *.    NEED TO FINISH!!
+         */
+
+         // CheckRedeclarations.checkProgram(program);
+         // MiniTypeChecker.checkProgram(program);
 
          //Milestone 2 Part 1: Create CFG for each function
          LLVM llvm = new LLVM(program);
