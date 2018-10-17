@@ -63,10 +63,26 @@ public class InstructionTranslator {
 		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
 		return typeDecl;
 	}
+
 	public static void setLocalDeclInstruction(Block b, List<Declaration> locals) {
 		for (Declaration d : locals) {
 			InstructionAlloca localDecl = new InstructionAlloca(d);
 			b.addInstruction(localDecl);
+		}
+	}
+
+	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
+		for (Declaration param : params) {
+			InstructionParamAlloca pAlloc = new InstructionParamAlloca(param);
+			b.addInstruction(pAlloc);
+		}
+	}
+
+	public static void setFunctionReturnInstruction(Block b, Type returnType ) {
+		if (returnType instanceof IntType) {
+			Declaration d = new Declaration(0, returnType, "_retval_");
+			InstructionAlloca returnAlloc = new InstructionAlloca(d);
+			b.addInstruction(returnAlloc);
 		}
 	}
 

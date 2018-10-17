@@ -30,6 +30,9 @@ public class CFG {
 		this.labelCounter = 1;
 		this.functionName = f.getName();
 		this.f = f;
+
+		InstructionTranslator.setFunctionReturnInstruction(entryBlock,f.getType());
+		InstructionTranslator.setLocalParamInstruction(entryBlock,f.getParams());
 		InstructionTranslator.setLocalDeclInstruction(entryBlock, f.getLocals());
 		//this.setDeclInstructions();
 		//this.setTypeDeclInstructions();
