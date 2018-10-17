@@ -14,7 +14,7 @@ public class LLVM {
 	public LLVM(Program p) {
 		this.p = p;
 		this.cfgs = CFGFactory.createAllCFG(p);
-		//setDeclInstructions();
+		setDeclInstructions();
 		setTypeDeclInstructions();
 	}
 
@@ -25,11 +25,11 @@ public class LLVM {
 		}
 	}
 
-	// public void setDeclInstructions() {
-	// 	for (Declaration d : this.p.getDecls()) {
-	// 		this.globalDecls.add(InstructionTranslator.setDeclInstruction(d));
-	// 	}
-	// }
+	public void setDeclInstructions() {
+		for (Declaration d : this.p.getDecls()) {
+	 		this.globalDecls.add(InstructionTranslator.setDeclInstruction(d));
+		}
+	}
 
 	public void setTypeDeclInstructions() {
 		for (TypeDeclaration td : this.p.getTypes()) {
