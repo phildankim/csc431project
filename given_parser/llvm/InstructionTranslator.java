@@ -73,7 +73,8 @@ public class InstructionTranslator {
 
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
 		for (Declaration param : params) {
-			InstructionParamAlloca pAlloc = new InstructionParamAlloca(param);
+			Declaration d = new Declaration(0, param.getType(), "_P_" + param.getName());
+			InstructionAlloca pAlloc = new InstructionAlloca(d);
 			b.addInstruction(pAlloc);
 		}
 	}
