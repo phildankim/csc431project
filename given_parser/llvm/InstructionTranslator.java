@@ -95,7 +95,13 @@ public class InstructionTranslator {
 					b.addInstruction(instr);
 					return reg;
 				case AND:
+					instr = new InstructionAnd(reg, left, right);
+					b.addInstruction(instr);
+					return reg;
 				case OR:
+					instr = new InstructionOr(reg, left, right);
+					b.addInstruction(instr);
+					return reg;
 				default:
 					return "";
 			}
