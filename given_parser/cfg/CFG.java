@@ -190,13 +190,24 @@ public class CFG {
 	}
 
 	public void printCFG() {
+		
 		System.out.println("===== CFG FOR FUNCTION: " + this.functionName + " =====");
+
+		//function header
+		String funcHeader = buildFuncHeader(f);
+
+		System.out.println(funcHeader);
+		
+		System.out.println("{");
+
 		for (Block b : blocks) {
 			b.printBlock();
 		}
 		for (Edge e : edges) {
 			e.printEdge();
 		}
+
+		System.out.println("}");
 	}
 
 	public void connectToExit() {
@@ -208,6 +219,35 @@ public class CFG {
 				edges.add(toExit);
 			}
 		}
+	}
+
+	public String buildFuncHeader(Function f) {
+		String header = "define ";
+
+		if (f.getType() instanceof IntType) {
+				header += "i32";
+		}
+		else {
+			header += "void";
+		}
+
+		header += " @" + f.getName() + "(";
+
+		List<Declaration> params = f.getParams();
+
+		for (int i = 0; i < params.size(); i++) {
+			Declaration currDec = params.get(i);
+
+			header += "i32 %" + currDec.getName();
+			if (i != (params.size() - 1)) {
+				header += ", ";
+			}
+		}
+
+		header += ")";
+
+		return header;
+
 	}
 
 	// public void topologicalHelper(int i, boolean visited[], Stack stack) {
