@@ -8,7 +8,7 @@ public class Register {
 	//private String value;
 	//private String name;
 
-	public String getRegName() {
+	public static String getRegName() {
 		return "%r" + Integer.toString(counter++);
 	}
 

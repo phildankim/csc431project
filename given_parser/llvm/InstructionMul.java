@@ -4,9 +4,9 @@ public class InstructionMul implements Instruction {
 	
 	String operand1;
 	String operand2;
-	Register register;
+	String register;
 
-	public InstructionMul (Register register, String operand1, String operand2) {
+	public InstructionMul (String register, String operand1, String operand2) {
 		this.register = register;
 		this.operand1 = operand1;
 		this.operand2 = operand2;

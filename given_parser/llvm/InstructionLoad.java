@@ -2,10 +2,10 @@ package llvm;
 
 public class InstructionLoad implements Instruction{
 	
-	Register result;
+	String result;
 	String pointer;
 
-	public InstructionLoad (Register result, String pointer) {
+	public InstructionLoad (String result, String pointer) {
 		this.result = result;
 		this.pointer = pointer;
 	}

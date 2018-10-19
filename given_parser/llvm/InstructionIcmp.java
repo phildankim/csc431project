@@ -5,9 +5,9 @@ public class InstructionIcmp implements Instruction
 	String condition;
 	String operand1;
 	String operand2;
-	Register result;
+	String result;
 
-	public InstructionIcmp (Register result, String condition, String operand1, String operand2) {
+	public InstructionIcmp (String result, String condition, String operand1, String operand2) {
 		this.result = result;
 		this.condition = condition;
 		this.operand1 = operand1;
@@ -16,7 +16,7 @@ public class InstructionIcmp implements Instruction
 
 	@Override
 	public String toString() {
-		return result.toString() + " = icmp " + condition + " i32 " + operand1 + ", " + operand2;
+		return result + " = icmp " + condition + " i32 " + operand1 + ", " + operand2;
 	}
 
 	// public String convertOpr(String opr) {

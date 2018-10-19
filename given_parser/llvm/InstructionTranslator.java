@@ -19,8 +19,8 @@ public class InstructionTranslator {
 		else if (s instanceof AssignmentStatement) {
 			System.out.println(b);
 			AssignmentStatement as = (AssignmentStatement)s;
-			String target = InstructionTranslator.parseLvalue(as.getTarget());
-			String source = InstructionTranslator.parseExpression(as.getSource());
+			String target = InstructionTranslator.parseLvalue(b, as.getTarget());
+			String source = InstructionTranslator.parseExpression(b, as.getSource());
 			InstructionStore instr = new InstructionStore(target, source);
 			b.addInstruction(instr);
 		}
@@ -29,16 +29,81 @@ public class InstructionTranslator {
 		}
 	}
 
-	public static String parseExpression(Expression e) {
+	public static String parseExpression(Block b, Expression e) {
 		if (e instanceof IntegerExpression) {
 			IntegerExpression ie = (IntegerExpression)e;
 
 			return ie.getValue();
 		}
+
+		else if (e instanceof IdentifierExpression) {
+			IdentifierExpression ie = (IdentifierExpression)e;
+			String register = Register.getRegName();
+			InstructionLoad load = new InstructionLoad (register, "%" + ie.getId());
+			b.addInstruction(load);
+
+			return register;
+		}
+
+		else if (e instanceof BinaryExpression) {
+			BinaryExpression be = (BinaryExpression)e;
+			String left = parseExpression(b, be.getLeft());
+			String right = parseExpression(b, be.getRight());
+
+			Instruction instr;
+			String reg = Register.getRegName();
+
+			switch (be.getOperator()) {
+				case PLUS:
+					instr = new InstructionAdd(reg, left, right);
+					b.addInstruction(instr);
+					return reg;
+				case MINUS:
+					instr = new InstructionSub(reg, left, right);
+					b.addInstruction(instr);
+					return reg;
+				case DIVIDE:
+					instr = new InstructionSdiv(reg, left, right);
+					b.addInstruction(instr);
+					return reg;
+				case TIMES:
+					instr = new InstructionMul(reg, left, right);
+					b.addInstruction(instr);
+					return reg;
+				case LT:
+					instr = new InstructionIcmp(reg, "slt", left, right);
+					b.addInstruction(instr);
+					return reg;
+				case GT:
+					instr = new InstructionIcmp(reg, "sgt", left, right);
+					b.addInstruction(instr);
+					return reg;
+				case GE:
+					instr = new InstructionIcmp(reg, "sge", left, right);
+					b.addInstruction(instr);
+					return reg;
+				case LE:
+					instr = new InstructionIcmp(reg, "sle", left, right);
+					b.addInstruction(instr);
+					return reg;
+				case EQ:
+					instr = new InstructionIcmp(reg, "eq", left, right);
+					b.addInstruction(instr);
+					return reg;
+				case NE:
+					instr = new InstructionIcmp(reg, "ne", left, right);
+					b.addInstruction(instr);
+					return reg;
+				case AND:
+				case OR:
+				default:
+					return "";
+			}
+		}
 		return "";
 	}
 
-	public static String parseLvalue(Lvalue lv) {
+	public static String parseLvalue(Block b, Lvalue lv) {
 		if (lv instanceof LvalueId) {
 			LvalueId lvid = (LvalueId)lv;
 
@@ -47,7 +112,7 @@ public class InstructionTranslator {
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;
 
-			String lft = InstructionTranslator.parseExpression(lvdot.getLeft());
+			String lft = InstructionTranslator.parseExpression(b, lvdot.getLeft());
 			return lft;
 		}
 	}
@@ -76,6 +141,9 @@ public class InstructionTranslator {
 			Declaration d = new Declaration(0, param.getType(), "_P_" + param.getName());
 			InstructionAlloca pAlloc = new InstructionAlloca(d);
 			b.addInstruction(pAlloc);
+
+			Instruction instruction = new InstructionStore("_P_" + param.getName(), "%"+param.getName());
+			b.addInstruction(instruction);
 		}
 	}
 

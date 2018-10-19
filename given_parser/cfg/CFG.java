@@ -145,10 +145,17 @@ public class CFG {
 		else if (statement instanceof ReturnStatement) {
 			//System.out.println(statement);
 
-			// Add return instruction
-
 			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
 			labelCounter += 1;
+
+			//return instruction loads from _retval_ and calls return:
+
+			String returnRegister = Register.getRegName();
+			Instruction instr = new InstructionLoad(returnRegister, "%_retval_");
+			Instruction ret = new InstructionRet(returnRegister);
+			returnBlock.addInstruction(instr);
+			returnBlock.addInstruction(ret);
+
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);
 			blocks.add(returnBlock);
