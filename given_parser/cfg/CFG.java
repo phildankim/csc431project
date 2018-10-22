@@ -19,8 +19,6 @@ public class CFG {
 
 	public Function f;
 
-	//public Instruction funcDef;
-
 	public CFG(Function f) {
 		this.entryBlock = new Block("Entry");
 		this.exitBlock = new Block("Exit");
@@ -34,9 +32,6 @@ public class CFG {
 		InstructionTranslator.setFunctionReturnInstruction(entryBlock,f.getType());
 		InstructionTranslator.setLocalParamInstruction(entryBlock,f.getParams());
 		InstructionTranslator.setLocalDeclInstruction(entryBlock, f.getLocals());
-		//this.setDeclInstructions();
-		//this.setTypeDeclInstructions();
-		//this.funcDef = new Instruction()
 	}
 
 	public void updateCurr(Block newCurr) {
@@ -50,7 +45,6 @@ public class CFG {
 	public Block createCFG(Statement statement) {
 
 		if (statement instanceof BlockStatement) { 
-			//System.out.println(statement);
 			List<Statement> statements = ((BlockStatement)statement).getStatements();
 
 			Block result = null;
@@ -61,13 +55,7 @@ public class CFG {
 			return result;
 		}
 		else if (statement instanceof ConditionalStatement) {
-			//System.out.println(statement);
 			ConditionalStatement cs = (ConditionalStatement)statement;
-
-			// Add guard instruction to currBlock
-			// ArrayList<Instruction> guard = it.translate(cs.getGuard());
-			//System.out.println("guard: " + cs.getGuard());
-			// currBlock.addInstruction(guard);
 
 			// Create Then and Else blocks
 			Block ifThen = new Block("Then" + Integer.toString(labelCounter));
@@ -85,16 +73,15 @@ public class CFG {
 
 			Block join = new Block("Join" + Integer.toString(labelCounter));
 
+			// Add guard instruction to currBlock
+			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard());
+
 			// Branch IfThen
 			this.updateCurr(ifThen);
-			//System.out.println("[THEN] Currblock: " + currBlock.getLabel());
 			Optional<Block> opt = Optional.ofNullable(createCFG(cs.getThen()));
 			
 			if (opt.isPresent()) {
 				Block thenRes = opt.get();
-				// Edge toExit = new Edge(thenRes, this.exitBlock);
-				// edges.add(toExit);
-				// System.out.println("From: " + thenRes.getLabel() + " to exit.");
 				//Branh isntructions here
 				Edge thenJoin = new Edge(thenRes, join);
 				edges.add(thenJoin);
@@ -102,15 +89,10 @@ public class CFG {
 
 			// Branch IfElse
 			this.updateCurr(ifElse);
-			//System.out.println("[ELSE] Currblock: " + currBlock.getLabel());
 			opt = Optional.ofNullable(createCFG(cs.getElse()));		
 			
 			if (opt.isPresent()) {
 				Block elseRes = opt.get();
-				// Edge toExit = new Edge(elseRes, this.exitBlock);
-				// edges.add(toExit);
-				// System.out.println("From: " + elseRes.getLabel() + " to exit.");
-				// return null;
 				Edge elseJoin = new Edge(elseRes, join);
 				edges.add(elseJoin);
 			}
@@ -119,8 +101,6 @@ public class CFG {
 			return currBlock;
 		}
 		else if (statement instanceof WhileStatement) {
-			//System.out.println(statement);
-
 			// Add guard instruction
 
 			Block whileGuard = new Block("WhileGuard" + Integer.toString(labelCounter));
@@ -143,7 +123,6 @@ public class CFG {
 
 		}
 		else if (statement instanceof ReturnStatement) {
-			//System.out.println(statement);
 
 			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
 			labelCounter += 1;
@@ -160,17 +139,11 @@ public class CFG {
 			edges.add(toReturn);
 			blocks.add(returnBlock);
 
-			// return returnBlock;
 			return null;
 		}
 		else {
-			//System.out.println(statement);
-			
 			// Add instructions to currBlock
-			System.out.println("SADLKFJA;SLKDF");
 			InstructionTranslator.translate(currBlock, statement);
-			System.out.println("IN CFG: ");
-			currBlock.printBlock();
 			return currBlock;
 		}
 	}
@@ -249,27 +222,4 @@ public class CFG {
 		return header;
 
 	}
-
-	// public void topologicalHelper(int i, boolean visited[], Stack stack) {
-	// 	visited[i] = true;
-
-	// 	//Iterator<Integer> itr = new Ite
-
-	// } 
-
-	// public void topologicalPrinter() {
-	// 	int numEdges = this.numEdges();
-	// 	Stack stack = new Stack();
-	// 	boolean visited[] = new boolean[numEdges];
-
-	// 	for (int i = 0; i < numEdges; i++) {
-	// 		if (!visited[i]) {
-	// 			topologicalHelper(i, visited, stack);
-	// 		}
-	// 	}
-
-	// 	while (!stack.empty()) {
-	// 		System.out.println(stack.pop() + " ");
-	// 	}
-	// }
 }

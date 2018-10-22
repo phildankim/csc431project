@@ -27,14 +27,16 @@ public class InstructionTranslator {
 		else {
 
 		}
-	}
+}
 
+	// Returns register or literal
 	public static String parseExpression(Block b, Expression e) {
 		if (e instanceof IntegerExpression) {
 			IntegerExpression ie = (IntegerExpression)e;
 
 			return ie.getValue();
 		}
+
 
 		else if (e instanceof IdentifierExpression) {
 			IdentifierExpression ie = (IdentifierExpression)e;
@@ -123,7 +125,6 @@ public class InstructionTranslator {
 		}
 	}
 
-
 	// global/program level type declarations such as structs
 	public static InstructionDecl setDeclInstruction(Declaration decl) {
 	 	InstructionDecl here = new InstructionDecl(decl);
@@ -159,6 +160,13 @@ public class InstructionTranslator {
 			InstructionAlloca returnAlloc = new InstructionAlloca(d);
 			b.addInstruction(returnAlloc);
 		}
+	}
+
+	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e) {
+		String guardReg = InstructionTranslator.parseExpression(curr, e);
+		InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
+		curr.addInstruction(instr);
+
 	}
 
 }
