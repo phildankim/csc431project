@@ -137,6 +137,9 @@ public class CFG {
 				edges.add(bodyJoin);
 			}
 
+			InstructionBr instr = new InstructionBr(whileGuard.getLabel());
+			whileBody.addInstruction(instr);
+
 			this.updateCurr(join);
 
 			// Recurse here
