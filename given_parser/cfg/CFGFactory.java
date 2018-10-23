@@ -14,7 +14,7 @@ public class CFGFactory {
 		List<Function> functions = p.getFuncs();
 
 		for (Function f : functions) {
-			CFG cfg = new CFG(f);
+			CFG cfg = new CFG(f, p);
 			cfg.createCFG(f.getBody());
 			cfg.connectToExit();
 			cfgs.add(cfg);

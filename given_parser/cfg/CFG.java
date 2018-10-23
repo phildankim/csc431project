@@ -18,8 +18,9 @@ public class CFG {
 	public String functionName;
 
 	public Function f;
+	public Program p;
 
-	public CFG(Function f) {
+	public CFG(Function f, Program p) {
 		this.entryBlock = new Block("Entry");
 		this.exitBlock = new Block("Exit");
 		this.blocks.add(entryBlock);
@@ -28,6 +29,7 @@ public class CFG {
 		this.labelCounter = 1;
 		this.functionName = f.getName();
 		this.f = f;
+		this.p = p;
 
 		InstructionTranslator.setFunctionReturnInstruction(entryBlock,f.getType());
 		InstructionTranslator.setLocalParamInstruction(entryBlock,f.getParams());
@@ -74,7 +76,7 @@ public class CFG {
 			Block join = new Block("Join" + Integer.toString(labelCounter));
 
 			// Add guard instruction to currBlock
-			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard());
+			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard(), p);
 
 			// Branch IfThen
 			this.updateCurr(ifThen);
@@ -123,16 +125,17 @@ public class CFG {
 			blocks.add(join);
 			edges.add(toJoin);
 
-			InstructionTranslator.setWhileGuardInstruction(currBlock, join, whileBody, ws.getGuard());
+			InstructionTranslator.setWhileGuardInstruction(currBlock, join, whileBody, ws.getGuard(), p);
 
 			// Branch whilebody
 			this.updateCurr(whileBody);
-			Optional<Block> opt = Optional.ofNullable(createCFG(ws.getBody()));
-			
-			if (opt.isPresent()) {
-				Block bodyRes = opt.get();
-				//Branh isntructions here
+			Block bodyRes = createCFG(ws.getBody());
+
+			if (this.isJoin(bodyRes)) {
+				//Branch isntructions here
 				//InstructionTranslator.setWhileGuardInstruction(currBlock, join, bodyRes, ws.getGuard());
+				InstructionBr instr = new InstructionBr(join.getLabel());
+				bodyRes.addInstruction(instr);
 				Edge bodyJoin = new Edge(bodyRes, join);
 				edges.add(bodyJoin);
 			}
@@ -216,6 +219,14 @@ public class CFG {
 				edges.add(toExit);
 			}
 		}
+	}
+
+	public boolean isJoin(Block b) {
+		String regex = "Join\\d+";
+		if (Pattern.matches(regex, b.getLabel())) {
+			return true;
+		}	
+		return false;
 	}
 
 	public String buildFuncHeader(Function f) {

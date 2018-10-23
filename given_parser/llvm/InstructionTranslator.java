@@ -162,13 +162,13 @@ public class InstructionTranslator {
 		}
 	}
 
-	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e) {
+	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e, Program p) {
 		String guardReg = InstructionTranslator.parseExpression(curr, e);
 		InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
 		curr.addInstruction(instr);
 	}
 
-	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e) {
+	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e, Program p) {
 		String guardReg = InstructionTranslator.parseExpression(curr, e);
 		InstructionBrCond instr = new InstructionBrCond(guardReg, body.getLabel(), join.getLabel());
 		curr.addInstruction(instr);
