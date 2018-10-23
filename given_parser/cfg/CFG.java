@@ -101,7 +101,7 @@ public class CFG {
 			return currBlock;
 		}
 		else if (statement instanceof WhileStatement) {
-			// Add guard instruction
+			WhileStatement ws = (WhileStatement)statement;
 
 			Block whileGuard = new Block("WhileGuard" + Integer.toString(labelCounter));
 			labelCounter += 1;
@@ -117,6 +117,27 @@ public class CFG {
 			blocks.add(whileBody);
 			Edge whileLoop = new Edge(whileBody, whileGuard);
 			edges.add(whileLoop);
+
+			Block join = new Block("Join" + Integer.toString(labelCounter)); 
+			Edge toJoin = new Edge(whileGuard, join);
+			blocks.add(join);
+			edges.add(toJoin);
+
+			InstructionTranslator.setWhileGuardInstruction(currBlock, join, whileBody, ws.getGuard());
+
+			// Branch whilebody
+			this.updateCurr(whileBody);
+			Optional<Block> opt = Optional.ofNullable(createCFG(ws.getBody()));
+			
+			if (opt.isPresent()) {
+				Block bodyRes = opt.get();
+				//Branh isntructions here
+				//InstructionTranslator.setWhileGuardInstruction(currBlock, join, bodyRes, ws.getGuard());
+				Edge bodyJoin = new Edge(bodyRes, join);
+				edges.add(bodyJoin);
+			}
+
+			this.updateCurr(join);
 
 			// Recurse here
 			return currBlock;

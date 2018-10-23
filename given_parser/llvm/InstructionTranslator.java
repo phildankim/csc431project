@@ -166,7 +166,12 @@ public class InstructionTranslator {
 		String guardReg = InstructionTranslator.parseExpression(curr, e);
 		InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
 		curr.addInstruction(instr);
+	}
 
+	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e) {
+		String guardReg = InstructionTranslator.parseExpression(curr, e);
+		InstructionBrCond instr = new InstructionBrCond(guardReg, body.getLabel(), join.getLabel());
+		curr.addInstruction(instr);
 	}
 
 }
