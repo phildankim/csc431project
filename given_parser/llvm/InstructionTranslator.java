@@ -121,7 +121,29 @@ public class InstructionTranslator {
 				arguments.add(InstructionTranslator.parseExpression(b,arg, p));
 			}
 
+			String retType = "";
+			for (Function f : p.getFuncs()) {
+				if (ie.getName().equals(f.getName()){
+					Type t = f.getType();
 
+					if (t instanceof IntType) {
+						retType = "i32";
+					}
+					else {
+						retType = "void";
+					}
+				}
+			}
+
+			if (!retType.equals("void")) {
+				String result = Register.getRegName();
+				InstructionCall ic = new InstructionCall(result, retType, ie.getName(), arguments);
+				b.addInstruction(ic);
+			}
+			else {
+				InstructionCall ic = new InstructionCall("VOID", retType, ie.getName(), arguments);
+				b.addInstruction(ic);
+			}
 		}
 		return "";
 	}
