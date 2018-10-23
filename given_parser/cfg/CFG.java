@@ -170,7 +170,7 @@ public class CFG {
 		}
 		else {
 			// Add instructions to currBlock
-			InstructionTranslator.translate(currBlock, statement);
+			InstructionTranslator.translate(currBlock, statement, p);
 			return currBlock;
 		}
 	}
