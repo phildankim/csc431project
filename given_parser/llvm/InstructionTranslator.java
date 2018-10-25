@@ -168,7 +168,32 @@ public class InstructionTranslator {
 			}
 		}
 
+		else if (e instanceof NewExpression) {
 
+			NewExpression ne = (NewExpression)e;
+
+			String regForMalloc = Register.getRegName();
+			String regForBitcast = Register.getRegName();
+			String structName = ne.getId();
+
+			// count the number of fields inside the struct:
+			int numFields = 0;
+			int bytesToAllocate = 0;
+			for (TypeDeclaration td : p.getTypes()) {
+				if (structName.equals(td.getName())) {
+					numFields = td.getFields().size();
+				}
+			}
+
+			bytesToAllocate = numFields * 8;
+			Instruction ma = new InstructionMalloc(regForMalloc,bytesToAllocate);
+			b.addInstruction(ma);
+
+			Instruction bc = new InstructionBitcast(regForBitcast,regForMalloc,structName);
+			b.addInstruction(bc);
+			return regForBitcast;
+
+		}
 
 		return "";
 	}
