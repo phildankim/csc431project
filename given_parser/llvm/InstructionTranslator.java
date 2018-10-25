@@ -17,18 +17,46 @@ public class InstructionTranslator {
 			} 
 		}
 		else if (s instanceof AssignmentStatement) {
-			System.out.println(b);
 			AssignmentStatement as = (AssignmentStatement)s;
+			
 			String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p);
-			String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
-			InstructionStore instr = new InstructionStore(target, source);
-			b.addInstruction(instr);
+
+			if (as.getSource() instanceof ReadExpression) {
+				InstructionScan ir = new InstructionScan(target);
+				b.addInstruction(ir);
+			}
+			else {
+				String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
+				InstructionStore instr = new InstructionStore(target, source);
+				b.addInstruction(instr);
+			}
 		}
 
 		else if (s instanceof InvocationStatement) {
 			InvocationStatement is = (InvocationStatement)s;
 			InstructionTranslator.parseExpression(b, is.getExpression(), p);
 		}
+
+		else if (s instanceof PrintStatement) {
+			PrintStatement ps = (PrintStatement)s;
+			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p);
+			InstructionPrint ip = new InstructionPrint(psResult);
+			b.addInstruction(ip);
+		}
+
+		else if (s instanceof PrintLnStatement) {
+			PrintLnStatement ps = (PrintLnStatement)s;
+			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p);
+			InstructionPrint ip = new InstructionPrint(psResult);
+			b.addInstruction(ip);
+		}
+
+		// need to implement deletestatement
+
+		//else if (s instanceof DeleteStatement) {
+		//	DeleteStatement ds = (DeleteStatement)s;
+		//
+		//}
 		else {
 
 		}
@@ -121,8 +149,59 @@ public class InstructionTranslator {
 				arguments.add(InstructionTranslator.parseExpression(b,arg, p));
 			}
 
+			String retType = "";
+			for (Function f : p.getFuncs()) {
+				if (ie.getName().equals(f.getName())){
+					Type t = f.getType();
+
+					if (t instanceof IntType) {
+						retType = "i32";
+					}
+					else {
+						retType = "void";
+					}
+				}
+			}
+
+			if (!retType.equals("void")) {
+				String result = Register.getRegName();
+				InstructionCall ic = new InstructionCall(result, retType, ie.getName(), arguments);
+				b.addInstruction(ic);
+				return result;
+			}
+			else {
+				InstructionCall ic = new InstructionCall("VOID", retType, ie.getName(), arguments);
+				b.addInstruction(ic);
+			}
+		}
+
+		else if (e instanceof NewExpression) {
+
+			NewExpression ne = (NewExpression)e;
+
+			String regForMalloc = Register.getRegName();
+			String regForBitcast = Register.getRegName();
+			String structName = ne.getId();
+
+			// count the number of fields inside the struct:
+			int numFields = 0;
+			int bytesToAllocate = 0;
+			for (TypeDeclaration td : p.getTypes()) {
+				if (structName.equals(td.getName())) {
+					numFields = td.getFields().size();
+				}
+			}
+
+			bytesToAllocate = numFields * 8;
+			Instruction ma = new InstructionMalloc(regForMalloc,bytesToAllocate);
+			b.addInstruction(ma);
+
+			Instruction bc = new InstructionBitcast(regForBitcast,regForMalloc,structName, true);
+			b.addInstruction(bc);
+			return regForBitcast;
 
 		}
+
 		return "";
 	}
 
