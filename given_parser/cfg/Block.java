@@ -1,6 +1,9 @@
 package cfg;
 
 import java.util.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import ast.*;
 import llvm.*;
 
@@ -38,16 +41,21 @@ public class Block {
 		instructions.add(instr);
 	}
 
-	public void printInstructions() {
-		System.out.println(this.getLabel() + ":");
+	public void printInstructions(BufferedWriter writer) throws IOException {
+		if (this.getLabel().equals("Exit")) {
+				return;
+		}
+		writer.write(this.getLabel() + ":" + "\n");
 		for (Instruction i : instructions) {
-			System.out.println("\t" + i.toString());
+			writer.write("\t" + i.toString() + "\n");
 		}
 	}
 
 	public void printBlock() {
 		System.out.println("Block label: " + this.getLabel());
-		this.printInstructions();
+		for (Instruction i : instructions) {
+			System.out.println("\t\t" + i.toString());
+		}
 
 		System.out.println("\tPredecessors: ");
 		for (Block b : predecessors) {

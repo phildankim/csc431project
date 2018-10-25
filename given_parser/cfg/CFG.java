@@ -2,6 +2,9 @@ package cfg;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import ast.*;
 import llvm.*;
 
@@ -47,6 +50,7 @@ public class CFG {
 	public Block createCFG(Statement statement) {
 
 		if (statement instanceof BlockStatement) { 
+			
 			List<Statement> statements = ((BlockStatement)statement).getStatements();
 
 			Block result = null;
@@ -74,6 +78,7 @@ public class CFG {
 			edges.add(toElse);
 
 			Block join = new Block("Join" + Integer.toString(labelCounter));
+			blocks.add(join);
 
 			// Add guard instruction to currBlock
 			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard(), p);
@@ -87,6 +92,13 @@ public class CFG {
 
 				//Branch instructions here
 				Edge thenJoin = new Edge(thenRes, join);
+				InstructionBr toJoin = new InstructionBr(join.getLabel());
+				ifThen.addInstruction(toJoin);
+			}
+			else {
+				// Instruction instr = new InstructionRetVoid();
+				// ifThen.addInstruction(instr);
+				//InstructionBr toJoin = new InstructionBr(join.getLabel());
 			}
 
 			// Branch IfElse
@@ -97,11 +109,12 @@ public class CFG {
 				Block elseRes = opt.get();
 				Edge elseJoin = new Edge(elseRes, join);
 				edges.add(elseJoin);
+				InstructionBr toJoin = new InstructionBr(join.getLabel());
+				ifElse.addInstruction(toJoin);
 			}
+			else {
 
-			InstructionBr toJoin = new InstructionBr(join.getLabel());
-			ifThen.addInstruction(toJoin);
-			ifElse.addInstruction(toJoin);
+			}
 
 			this.updateCurr(join);
 			return currBlock;
@@ -159,25 +172,32 @@ public class CFG {
 			return currBlock;
 
 		}
-		else if (statement instanceof ReturnStatement) {
-
+		else if (statement instanceof ReturnStatement || statement instanceof ReturnEmptyStatement) {
+			
 			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
+			blocks.add(returnBlock);
 			labelCounter += 1;
 
 			InstructionBr branchToReturn = new InstructionBr(returnBlock.getLabel());
 			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
-
-			String returnRegister = Register.getRegName();
-			Instruction instr = new InstructionLoad(returnRegister, "%_retval_");
-			Instruction ret = new InstructionRet(returnRegister);
-			returnBlock.addInstruction(instr);
-			returnBlock.addInstruction(ret);
+			if (f.getType() instanceof VoidType) {
+				Instruction instr = new InstructionRetVoid();
+				returnBlock.addInstruction(instr);
+			}
+			else {
+				String returnRegister = Register.getRegName();
+				Instruction instr = new InstructionLoad(returnRegister, "%_retval_");
+				Instruction ret = new InstructionRet(returnRegister);
+				returnBlock.addInstruction(instr);
+				returnBlock.addInstruction(ret);
+			}
 
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);
-			blocks.add(returnBlock);
+
+			this.updateCurr(returnBlock);
 
 			return null;
 		}
@@ -202,21 +222,21 @@ public class CFG {
 		}
 	}
 
-	public void printInstructions() {
-		System.out.println("===== LLVM FOR FUNCTION: " + this.functionName + " =====");
+	public void printInstructions(BufferedWriter writer) throws IOException {
+		//System.out.println("===== LLVM FOR FUNCTION: " + this.functionName + " =====");
 
 		//function header
 		String funcHeader = buildFuncHeader(f);
 
-		System.out.println(funcHeader);
+		writer.write(funcHeader + "\n");
 		
-		System.out.println("{");
+		writer.write("{" + "\n");
 
 		for (Block b : blocks) {
-			b.printInstructions();
+			b.printInstructions(writer);
 		}
 
-		System.out.println("}");
+		writer.write("}" + "\n");
 	}
 
 	public void printCFG() {

@@ -4,6 +4,8 @@ import ast.*;
 import cfg.*;
 
 import java.util.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class LLVM {
 
@@ -25,9 +27,9 @@ public class LLVM {
 		}
 	}
 
-	public void printInstructions() {
+	public void printInstructions(BufferedWriter writer) throws IOException {
 		for (CFG c : this.cfgs) {
-			c.printInstructions();
+			c.printInstructions(writer);
 		}
 	}
 

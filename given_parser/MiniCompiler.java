@@ -2,9 +2,11 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import java.io.*;
-import javax.json.JsonValue;
 import java.util.*;
+import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import javax.json.JsonValue;
 
 import cfg.*;
 import ast.*;
@@ -18,7 +20,7 @@ public class MiniCompiler
    private static boolean cfg = false;
    private static boolean printLLVM = false;
 
-   public static void main(String[] args) throws TypeCheckException
+   public static void main(String[] args) throws TypeCheckException, IOException
    {
       parseParameters(args);
 
@@ -27,7 +29,6 @@ public class MiniCompiler
       ParseTree tree = parser.program();
 
       ArrayList<CFG> cfgs = new ArrayList<CFG>();
-
 
       if (parser.getNumberOfSyntaxErrors() == 0)
       {
@@ -62,13 +63,16 @@ public class MiniCompiler
          // CheckRedeclarations.checkProgram(program);
          // MiniTypeChecker.checkProgram(program);
 
-         //Milestone 2 Part 1: Create CFG for each function
+         //Milestone 2 
          LLVM llvm = new LLVM(program);
          if (cfg) {
             llvm.printProgram();
          }
          if (printLLVM) {
-            llvm.printInstructions();
+            String fileName = "output.ll";
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            llvm.printInstructions(writer);
+            writer.close();
          }
       }
    }

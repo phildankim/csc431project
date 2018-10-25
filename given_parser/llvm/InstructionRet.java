@@ -2,12 +2,10 @@ package llvm;
 
 public class InstructionRet implements Instruction {
 	
-
 	String register;
 
 	public InstructionRet (String register) {
 		this.register = register;
-
 	}
 
 	@Override
