@@ -38,12 +38,16 @@ public class Block {
 		instructions.add(instr);
 	}
 
+	public void printInstructions() {
+		System.out.println(this.getLabel() + ":");
+		for (Instruction i : instructions) {
+			System.out.println("\t" + i.toString());
+		}
+	}
+
 	public void printBlock() {
 		System.out.println("Block label: " + this.getLabel());
-		System.out.println("\tInstructions: ");
-		for (Instruction i : instructions) {
-			System.out.println("\t\t" + i.toString());
-		}
+		this.printInstructions();
 
 		System.out.println("\tPredecessors: ");
 		for (Block b : predecessors) {

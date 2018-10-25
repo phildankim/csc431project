@@ -16,6 +16,7 @@ public class MiniCompiler
    private static boolean stack = false;
    private static boolean jsonPrint = false;
    private static boolean cfg = false;
+   private static boolean printLLVM = false;
 
    public static void main(String[] args) throws TypeCheckException
    {
@@ -66,6 +67,9 @@ public class MiniCompiler
          if (cfg) {
             llvm.printProgram();
          }
+         if (printLLVM) {
+            llvm.printInstructions();
+         }
       }
    }
 
@@ -88,6 +92,9 @@ public class MiniCompiler
 
             else if (args[i].equals("-cfg")) {
                cfg = true;
+            }
+            else if (args[i].equals("-printLLVM")) {
+               printLLVM = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);

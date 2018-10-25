@@ -75,10 +75,8 @@ public class CFG {
 
 			Block join = new Block("Join" + Integer.toString(labelCounter));
 
-
 			// Add guard instruction to currBlock
 			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard(), p);
-			
 
 			// Branch IfThen
 			this.updateCurr(ifThen);
@@ -86,12 +84,9 @@ public class CFG {
 			
 			if (opt.isPresent()) {
 				Block thenRes = opt.get();
+
 				//Branch instructions here
 				Edge thenJoin = new Edge(thenRes, join);
-				edges.add(thenJoin);
-
-				// InstructionBr branchToJoin = new InstructionBr(thenRes.getLabel());
-				// currBlock.addInstruction(branchToJoin);
 			}
 
 			// Branch IfElse
@@ -103,6 +98,10 @@ public class CFG {
 				Edge elseJoin = new Edge(elseRes, join);
 				edges.add(elseJoin);
 			}
+
+			InstructionBr toJoin = new InstructionBr(join.getLabel());
+			ifThen.addInstruction(toJoin);
+			ifElse.addInstruction(toJoin);
 
 			this.updateCurr(join);
 			return currBlock;
@@ -126,8 +125,6 @@ public class CFG {
 			Edge toBody = new Edge(whileGuard, whileBody);
 			edges.add(toBody);
 			blocks.add(whileBody);
-			// Edge whileLoop = new Edge(whileBody, whileGuard);
-			// edges.add(whileLoop);
 
 			Block join = new Block("Join" + Integer.toString(labelCounter)); 
 			Edge toJoin = new Edge(whileGuard, join);
@@ -205,6 +202,23 @@ public class CFG {
 		}
 	}
 
+	public void printInstructions() {
+		System.out.println("===== LLVM FOR FUNCTION: " + this.functionName + " =====");
+
+		//function header
+		String funcHeader = buildFuncHeader(f);
+
+		System.out.println(funcHeader);
+		
+		System.out.println("{");
+
+		for (Block b : blocks) {
+			b.printInstructions();
+		}
+
+		System.out.println("}");
+	}
+
 	public void printCFG() {
 		
 		System.out.println("===== CFG FOR FUNCTION: " + this.functionName + " =====");
@@ -271,6 +285,48 @@ public class CFG {
 		header += ")";
 
 		return header;
-
 	}
+
+	// public void topologicalSortUtil(int v, boolean visited[], Stack stack) 
+ //    { 
+ //        // Mark the current node as visited. 
+ //        visited[v] = true; 
+ //        Integer i; 
+  
+ //        // Recur for all the vertices adjacent to this 
+ //        // vertex 
+ //        Iterator<Integer> it = adj[v].iterator(); 
+ //        while (it.hasNext()) 
+ //        { 
+ //            i = it.next(); 
+ //            if (!visited[i]) 
+ //                topologicalSortUtil(i, visited, stack); 
+ //        } 
+  
+ //        // Push current vertex to stack which stores result 
+ //        stack.push(new Integer(v)); 
+ //    } 
+  
+ //    // The function to do Topological Sort. It uses 
+ //    // recursive topologicalSortUtil() 
+ //    public void topologicalSort() 
+ //    { 
+ //    	int numEdges = this.edges.size();
+ //        Stack stack = new Stack(); 
+	//     boolean visited[] = new boolean[numEdges]; 
+
+ //        for (int i = 0; i < numEdges; i++) {
+ //            visited[i] = false; 
+ //        }
+  
+ //        for (int i = 0; i < V; i++) {
+ //            if (visited[i] == false) {
+ //                topologicalSortUtil(i, visited, stack); 
+ //            }
+ //        }
+  
+ //        // Print contents of stack 
+ //        while (stack.empty()==false) 
+ //            System.out.print(stack.pop() + " "); 
+ //    } 
 }

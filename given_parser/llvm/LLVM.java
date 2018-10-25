@@ -25,6 +25,12 @@ public class LLVM {
 		}
 	}
 
+	public void printInstructions() {
+		for (CFG c : this.cfgs) {
+			c.printInstructions();
+		}
+	}
+
 	public void setDeclInstructions() {
 		for (Declaration d : this.p.getDecls()) {
 	 		this.globalDecls.add(InstructionTranslator.setDeclInstruction(d));

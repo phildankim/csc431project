@@ -164,14 +164,16 @@ public class InstructionTranslator {
 			}
 
 			if (!retType.equals("void")) {
+				InstructionCall ic = new InstructionCall("VOID", retType, ie.getName(), arguments);
+				b.addInstruction(ic);
+			}
+			else {
+				
+
 				String result = Register.getRegName();
 				InstructionCall ic = new InstructionCall(result, retType, ie.getName(), arguments);
 				b.addInstruction(ic);
 				return result;
-			}
-			else {
-				InstructionCall ic = new InstructionCall("VOID", retType, ie.getName(), arguments);
-				b.addInstruction(ic);
 			}
 		}
 
