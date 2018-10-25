@@ -172,11 +172,20 @@ public class CFG {
 			return currBlock;
 
 		}
-		else if (statement instanceof ReturnStatement || statement instanceof ReturnEmptyStatement) {
+		else if (statement instanceof ReturnStatement) {
 			
 			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
 			blocks.add(returnBlock);
 			labelCounter += 1;
+
+			ReturnStatement rs = (ReturnStatement)statement;
+
+			String toRetVal = Register.getRegName();
+			Expression targetExp = rs.getExpression();
+			String resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p);
+
+			Instruction storeToRetVal = new InstructionStore("%_retval_", resultReg);
+			currBlock.addInstruction(storeToRetVal);
 
 			InstructionBr branchToReturn = new InstructionBr(returnBlock.getLabel());
 			currBlock.addInstruction(branchToReturn);
@@ -193,6 +202,27 @@ public class CFG {
 				returnBlock.addInstruction(instr);
 				returnBlock.addInstruction(ret);
 			}
+
+			Edge toReturn = new Edge(currBlock, returnBlock);
+			edges.add(toReturn);
+
+			this.updateCurr(returnBlock);
+
+			return null;
+		}
+
+		else if (statement instanceof ReturnEmptyStatement) {
+			
+			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
+			blocks.add(returnBlock);
+			labelCounter += 1;
+
+			InstructionBr branchToReturn = new InstructionBr(returnBlock.getLabel());
+			currBlock.addInstruction(branchToReturn);
+
+			Instruction instr = new InstructionRetVoid();
+			returnBlock.addInstruction(instr);
+
 
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);

@@ -202,6 +202,10 @@ public class InstructionTranslator {
 
 		}
 
+
+		// need to do DOT
+		// how to do NULLExpression
+
 		return "";
 	}
 
