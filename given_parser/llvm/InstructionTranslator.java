@@ -50,6 +50,13 @@ public class InstructionTranslator {
 			InstructionPrint ip = new InstructionPrint(psResult);
 			b.addInstruction(ip);
 		}
+
+		// need to implement deletestatement
+
+		//else if (s instanceof DeleteStatement) {
+		//	DeleteStatement ds = (DeleteStatement)s;
+		//
+		//}
 		else {
 
 		}
@@ -189,7 +196,7 @@ public class InstructionTranslator {
 			Instruction ma = new InstructionMalloc(regForMalloc,bytesToAllocate);
 			b.addInstruction(ma);
 
-			Instruction bc = new InstructionBitcast(regForBitcast,regForMalloc,structName);
+			Instruction bc = new InstructionBitcast(regForBitcast,regForMalloc,structName, true);
 			b.addInstruction(bc);
 			return regForBitcast;
 
