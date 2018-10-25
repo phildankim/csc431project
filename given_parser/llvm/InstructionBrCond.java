@@ -14,6 +14,6 @@ public class InstructionBrCond implements Instruction{
 
 	@Override
 	public String toString() {
-		return "br i1 " + condition + ", label " + labelTrue + ", label " + labelFalse; 
+		return "br i1 " + condition + ", label %" + labelTrue + ", label %" + labelFalse; 
 	}
 }

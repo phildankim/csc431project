@@ -9,6 +9,6 @@ public class InstructionBr implements Instruction{
 
 	@Override
 	public String toString() {
-		return "br label " + destination;
+		return "br label %" + destination;
 	}
 }
