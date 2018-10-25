@@ -28,6 +28,9 @@ public class LLVM {
 	}
 
 	public void printInstructions(BufferedWriter writer) throws IOException {
+		for (Instruction i : globalDecls) {
+			writer.write(i.toString() + "\n");
+		}
 		for (CFG c : this.cfgs) {
 			c.printInstructions(writer);
 		}
