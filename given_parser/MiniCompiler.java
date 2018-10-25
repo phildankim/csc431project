@@ -18,7 +18,6 @@ public class MiniCompiler
    private static boolean stack = false;
    private static boolean jsonPrint = false;
    private static boolean cfg = false;
-   private static boolean printLLVM = false;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
@@ -68,8 +67,8 @@ public class MiniCompiler
          if (cfg) {
             llvm.printProgram();
          }
-         if (printLLVM) {
-            String fileName = "output.ll";
+         if (stack) {
+            String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             llvm.printInstructions(writer);
             writer.close();
@@ -96,9 +95,6 @@ public class MiniCompiler
 
             else if (args[i].equals("-cfg")) {
                cfg = true;
-            }
-            else if (args[i].equals("-printLLVM")) {
-               printLLVM = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);

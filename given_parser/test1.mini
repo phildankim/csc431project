@@ -13,5 +13,6 @@ fun main() int
 			n = 4;
 		}
 	}
+	n = null;
 	return n;
 }
