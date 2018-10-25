@@ -51,14 +51,35 @@ public class InstructionTranslator {
 			b.addInstruction(ip);
 		}
 
-		// need to implement deletestatement
+		else if (s instanceof DeleteStatement) {
+			DeleteStatement ds = (DeleteStatement)s;
 
-		//else if (s instanceof DeleteStatement) {
-		//	DeleteStatement ds = (DeleteStatement)s;
-		//
-		//}
+			// find struct name for expression:
+			String structName = "UNIMPLEMENTED";
+
+			if (ds.getExpression() instanceof IdentifierExpression) {
+				IdentifierExpression ie = (IdentifierExpression)ds.getExpression();
+				String id = ie.getId();
+
+			}
+
+
+			String regForLoad = InstructionTranslator.parseExpression(b, ds.getExpression(),p);
+			String regForBitcast = Register.getRegName();
+
+			Instruction bc = new InstructionBitcast(regForBitcast,regForLoad,structName, false);
+			b.addInstruction(bc);
+
+			Instruction callvoid = new InstructionFree(regForBitcast);
+			b.addInstruction(callvoid);
+
+			// %u82 = load %struct.foo** %math1
+			// %u83 = bitcast %struct.foo* %u82 to i8*
+			// call void @free(i8* %u83)
+		}
+
 		else {
-
+			System.out.println ("InstructionTranslator.Java....YOURE NOT SUPPOSED TO END UP HERE!");
 		}
 }
 
