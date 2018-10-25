@@ -17,12 +17,19 @@ public class InstructionTranslator {
 			} 
 		}
 		else if (s instanceof AssignmentStatement) {
-			System.out.println(b);
 			AssignmentStatement as = (AssignmentStatement)s;
+			
 			String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p);
-			String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
-			InstructionStore instr = new InstructionStore(target, source);
-			b.addInstruction(instr);
+
+			if (as.getSource() instanceof ReadExpression) {
+				InstructionScan ir = new InstructionScan(target);
+				b.addInstruction(ir);
+			}
+			else {
+				String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
+				InstructionStore instr = new InstructionStore(target, source);
+				b.addInstruction(instr);
+			}
 		}
 
 		else if (s instanceof InvocationStatement) {
@@ -160,6 +167,9 @@ public class InstructionTranslator {
 				b.addInstruction(ic);
 			}
 		}
+
+
+
 		return "";
 	}
 
