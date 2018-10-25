@@ -29,6 +29,20 @@ public class InstructionTranslator {
 			InvocationStatement is = (InvocationStatement)s;
 			InstructionTranslator.parseExpression(b, is.getExpression(), p);
 		}
+
+		else if (s instanceof PrintStatement) {
+			PrintStatement ps = (PrintStatement)s;
+			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p);
+			InstructionPrint ip = new InstructionPrint(psResult);
+			b.addInstruction(ip);
+		}
+
+		else if (s instanceof PrintLnStatement) {
+			PrintLnStatement ps = (PrintLnStatement)s;
+			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p);
+			InstructionPrint ip = new InstructionPrint(psResult);
+			b.addInstruction(ip);
+		}
 		else {
 
 		}
@@ -139,6 +153,7 @@ public class InstructionTranslator {
 				String result = Register.getRegName();
 				InstructionCall ic = new InstructionCall(result, retType, ie.getName(), arguments);
 				b.addInstruction(ic);
+				return result;
 			}
 			else {
 				InstructionCall ic = new InstructionCall("VOID", retType, ie.getName(), arguments);
