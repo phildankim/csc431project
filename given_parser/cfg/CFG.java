@@ -75,8 +75,10 @@ public class CFG {
 
 			Block join = new Block("Join" + Integer.toString(labelCounter));
 
+
 			// Add guard instruction to currBlock
 			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard(), p);
+			
 
 			// Branch IfThen
 			this.updateCurr(ifThen);
@@ -84,9 +86,12 @@ public class CFG {
 			
 			if (opt.isPresent()) {
 				Block thenRes = opt.get();
-				//Branh isntructions here
+				//Branch instructions here
 				Edge thenJoin = new Edge(thenRes, join);
 				edges.add(thenJoin);
+
+				// InstructionBr branchToJoin = new InstructionBr(thenRes.getLabel());
+				// currBlock.addInstruction(branchToJoin);
 			}
 
 			// Branch IfElse
@@ -110,6 +115,10 @@ public class CFG {
 			Edge toGuard = new Edge(currBlock, whileGuard);
 			edges.add(toGuard);
 			blocks.add(whileGuard);
+
+			InstructionBr toThisBlock = new InstructionBr(whileGuard.getLabel());
+			currBlock.addInstruction(toThisBlock);
+
 			this.updateCurr(whileGuard);
 
 			Block whileBody = new Block("WhileBody" + Integer.toString(labelCounter));
@@ -117,8 +126,8 @@ public class CFG {
 			Edge toBody = new Edge(whileGuard, whileBody);
 			edges.add(toBody);
 			blocks.add(whileBody);
-			Edge whileLoop = new Edge(whileBody, whileGuard);
-			edges.add(whileLoop);
+			// Edge whileLoop = new Edge(whileBody, whileGuard);
+			// edges.add(whileLoop);
 
 			Block join = new Block("Join" + Integer.toString(labelCounter)); 
 			Edge toJoin = new Edge(whileGuard, join);
@@ -131,17 +140,21 @@ public class CFG {
 			this.updateCurr(whileBody);
 			Block bodyRes = createCFG(ws.getBody());
 
+			InstructionBr instr = new InstructionBr(whileGuard.getLabel());
+
 			if (this.isJoin(bodyRes)) {
 				//Branch isntructions here
-				//InstructionTranslator.setWhileGuardInstruction(currBlock, join, bodyRes, ws.getGuard());
-				InstructionBr instr = new InstructionBr(join.getLabel());
 				bodyRes.addInstruction(instr);
-				Edge bodyJoin = new Edge(bodyRes, join);
+
+				Edge bodyJoin = new Edge(bodyRes, whileGuard);
 				edges.add(bodyJoin);
 			}
+			else {
+				whileBody.addInstruction(instr);
 
-			InstructionBr instr = new InstructionBr(whileGuard.getLabel());
-			whileBody.addInstruction(instr);
+				Edge whileLoop = new Edge(whileBody, whileGuard);
+				edges.add(whileLoop);
+			}
 
 			this.updateCurr(join);
 
@@ -153,6 +166,9 @@ public class CFG {
 
 			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
 			labelCounter += 1;
+
+			InstructionBr branchToReturn = new InstructionBr(returnBlock.getLabel());
+			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
 

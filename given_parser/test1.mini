@@ -1,27 +1,18 @@
 fun main() int
 {
 	int n;
-
-	if (1 < 2) 
+	n = 0;
+	while (n < 2) 
 	{
-
-		n = 0;
-
-		if (2 < 3) 
+		if (n < 2) 
 		{
-			n = 3;
+			n = n + 1;
 		}
 		else 
 		{
 			n = 4;
 		}
-
-		return n;
 	}
-	else 
-	{
-		n = 2;
-		return n;
-	}
+	return n;
 
 }
