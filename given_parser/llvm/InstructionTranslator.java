@@ -123,7 +123,7 @@ public class InstructionTranslator {
 
 			String retType = "";
 			for (Function f : p.getFuncs()) {
-				if (ie.getName().equals(f.getName()){
+				if (ie.getName().equals(f.getName())){
 					Type t = f.getType();
 
 					if (t instanceof IntType) {
