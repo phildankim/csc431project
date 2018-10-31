@@ -19,6 +19,7 @@ public class CFGFactory {
 			cfg.connectToExit();
 			cfgs.add(cfg);
 			cfg.addPredecessorsAndSuccessors();
+			cfg.clearStructs();
 		}
 
 		return cfgs;

@@ -12,6 +12,7 @@ public class CFG {
 
 	public ArrayList<Block> blocks = new ArrayList<Block>();
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
+	private static HashMap<String, LLVMObject> structs = new HashMap<String, LLVMObject>();
 
 	public Block entryBlock;
 	public Block exitBlock;
@@ -36,7 +37,14 @@ public class CFG {
 
 		InstructionTranslator.setFunctionReturnInstruction(entryBlock,f.getType());
 		InstructionTranslator.setLocalParamInstruction(entryBlock,f.getParams());
-		InstructionTranslator.setLocalDeclInstruction(entryBlock, f.getLocals());
+		InstructionTranslator.setLocalDeclInstruction(structs, entryBlock, f.getLocals());
+	}
+
+	public static void printStructs() {
+		System.out.println("--Currently in CFG.Structs");
+		for (String key : CFG.structs.keySet()) {
+			System.out.println("Key: " + key + "\tValue: " + CFG.getObj(key));
+		}
 	}
 
 	public void updateCurr(Block newCurr) {
@@ -45,6 +53,18 @@ public class CFG {
 
 	public int numEdges() {
 		return this.edges.size();
+	}
+
+	public void clearStructs() {
+		CFG.structs.clear();
+	}
+
+	public static void addToLocals(String s, LLVMObject o) {
+		CFG.structs.put(s, o);
+	}
+
+	public static LLVMObject getObj(String id) {
+		return CFG.structs.get(id);
 	}
 
 	public Block createCFG(Statement statement) {
@@ -183,6 +203,8 @@ public class CFG {
 			String toRetVal = Register.getRegName();
 			Expression targetExp = rs.getExpression();
 			String resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p);
+			// LLVMObject type = CFG.getObj(resultReg);
+			// System.out.println("in return, type: " + resultReg);
 
 			Instruction storeToRetVal = new InstructionStore("%_retval_", resultReg);
 			currBlock.addInstruction(storeToRetVal);
@@ -191,17 +213,9 @@ public class CFG {
 			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
-			if (f.getType() instanceof VoidType) {
-				Instruction instr = new InstructionRetVoid();
-				returnBlock.addInstruction(instr);
-			}
-			else {
-				String returnRegister = Register.getRegName();
-				Instruction instr = new InstructionLoad(returnRegister, "%_retval_");
-				Instruction ret = new InstructionRet(returnRegister);
-				returnBlock.addInstruction(instr);
-				returnBlock.addInstruction(ret);
-			}
+			IntObject type = new IntObject();
+			InstructionTranslator.setReturnInstruction(returnBlock, type);
+
 
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);
@@ -336,47 +350,4 @@ public class CFG {
 
 		return header;
 	}
-
-	// public void topologicalSortUtil(int v, boolean visited[], Stack stack) 
- //    { 
- //        // Mark the current node as visited. 
- //        visited[v] = true; 
- //        Integer i; 
-  
- //        // Recur for all the vertices adjacent to this 
- //        // vertex 
- //        Iterator<Integer> it = adj[v].iterator(); 
- //        while (it.hasNext()) 
- //        { 
- //            i = it.next(); 
- //            if (!visited[i]) 
- //                topologicalSortUtil(i, visited, stack); 
- //        } 
-  
- //        // Push current vertex to stack which stores result 
- //        stack.push(new Integer(v)); 
- //    } 
-  
- //    // The function to do Topological Sort. It uses 
- //    // recursive topologicalSortUtil() 
- //    public void topologicalSort() 
- //    { 
- //    	int numEdges = this.edges.size();
- //        Stack stack = new Stack(); 
-	//     boolean visited[] = new boolean[numEdges]; 
-
- //        for (int i = 0; i < numEdges; i++) {
- //            visited[i] = false; 
- //        }
-  
- //        for (int i = 0; i < V; i++) {
- //            if (visited[i] == false) {
- //                topologicalSortUtil(i, visited, stack); 
- //            }
- //        }
-  
- //        // Print contents of stack 
- //        while (stack.empty()==false) 
- //            System.out.print(stack.pop() + " "); 
- //    } 
 }

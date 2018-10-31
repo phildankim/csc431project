@@ -12,8 +12,7 @@ public class LLVM {
 	private Program p;
 	private ArrayList<CFG> cfgs = new ArrayList<CFG>();
 	private ArrayList<Instruction> globalDecls = new ArrayList<Instruction>();
-
-	public HashMap<String, LinkedList<StructField>> structs = new HashMap<String, LinkedList<StructField>>();
+	private HashMap<String, TypeDeclaration> structs = new HashMap<String, TypeDeclaration>();
 
 	public LLVM(Program p) {
 		this.p = p;
@@ -61,8 +60,6 @@ public class LLVM {
 	public void setTypeDeclInstructions() {
 		for (TypeDeclaration td : this.p.getTypes()) {
 			this.globalDecls.add(InstructionTranslator.setTypeDeclInstruction(td));
-
-			//InstructionTranslator.convertFieldsToTypes(structs, )
 		}
 	}
 

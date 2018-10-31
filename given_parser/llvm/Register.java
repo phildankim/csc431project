@@ -4,23 +4,24 @@ import java.util.*;
 
 public class Register {
 
-	public String reg;
-	//public String type;
+	public String num;
+	public LLVMObject type;
 	private static int counter = 0;
 	// needed for SSA
 	// after done using for each function, maybe clear out so we don't run into any scope issues?
-	private static HashMap<String, String> registers = new HashMap<String, String>();
+	// key: Register, val: String identifier associated with register
+	private static HashMap<Register, String> registers = new HashMap<Register, String>();
 
-	public Register(String reg) {
-		this.reg = reg;
-		//this.type = type;
+	public Register(String num, LLVMObject type) {
+		this.num = num;
+		this.type = type;
 	}
 
-	public static void addToRegisters(String r, String s) {
+	public static void addToRegisters(Register r, String s) {
 		Register.registers.put(r, s);
 	}
 
-	public static boolean containsRegKey(String r) {
+	public static boolean containsRegKey(Register r) {
 		return Register.registers.containsKey(r);
 	}
 
@@ -28,8 +29,8 @@ public class Register {
 		return Register.registers.containsValue(s);
 	}
 
-	public static String getRegVal(String s) {
-		return Register.registers.get(s);
+	public static String getRegVal(Register r) {
+		return Register.registers.get(r);
 	}
 
 	public static String getRegName() {
