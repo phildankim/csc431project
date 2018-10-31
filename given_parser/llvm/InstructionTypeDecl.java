@@ -39,6 +39,8 @@ public class InstructionTypeDecl implements Instruction {
 		} 
 	}
 
+	
+
 	@Override
 	public String toString() {
 		String pre = "%struct." + this.name + " = type ";	

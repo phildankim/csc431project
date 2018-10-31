@@ -94,8 +94,12 @@ public class InstructionTranslator {
 
 		else if (e instanceof IdentifierExpression) {
 			IdentifierExpression ie = (IdentifierExpression)e;
+
 			String register = Register.getRegName();
-			InstructionLoad load = new InstructionLoad (register, "%" + ie.getId());
+			String id = ie.getId();
+			Register.addToRegisters(register, id);
+
+			InstructionLoad load = new InstructionLoad(register, "%" + id);
 			b.addInstruction(load);
 
 			return register;
@@ -223,6 +227,23 @@ public class InstructionTranslator {
 
 		}
 
+		else if (e instanceof DotExpression) {
+			DotExpression de = (DotExpression)e;
+
+			String left = InstructionTranslator.parseExpression(b, de.getLeft(), p);
+			System.out.println("fuccucucucuk   " + de.getLeft());
+			String structName = Register.getRegVal(left);
+			System.out.println("register " + left + " contains " + structName);
+
+
+			// InstructionGetElementPtr gep = new InstructionGetElementPtr(Register.getRegName());
+			// b.addInstruction(br);
+			String register = Register.getRegName();
+			// InstructionLoad load = new InstructionLoad(register, "%" + de.getId());
+			// b.addInstruction(load);
+			return register;
+		}
+
 
 		// need to do DOT
 		// how to do NULLExpression
@@ -242,6 +263,37 @@ public class InstructionTranslator {
 			String lft = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p);
 			return lft;
 		}
+	}
+
+	public static void convertFieldsToTypes(LinkedList<StructField> fields, TypeDeclaration td) {
+		for (Declaration d : td.getFields()) {
+			Type t = d.getType();
+
+			StructField field;
+
+			if (t instanceof IntType) {
+				field = new StructField(d.getName(), fields.size() + 1);
+				fields.add(field);
+			}
+			else if (t instanceof BoolType) {
+				field = new StructField(d.getName(), fields.size() + 1);
+				fields.add(field);
+			}
+			else if (t instanceof StructType) {
+				StructType st = (StructType)t;
+
+				String structName = st.getName();
+				field = new StructField(structName, fields.size() + 1);
+				fields.add(field);
+			}
+			else if (t instanceof VoidType) {
+
+			}
+			else {
+
+			}
+
+		} 
 	}
 
 	// global/program level type declarations such as structs
