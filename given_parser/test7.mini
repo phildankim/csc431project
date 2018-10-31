@@ -1,11 +1,18 @@
+struct foo
+{
+    int bar;
+    bool cool;
+    int simp;
+};
+
 fun main() int
 {
 	int n;
 	struct foo f;
 	f = new foo;
 
-	f.simp = new simple;
-	f.simp.one = 1;
-	n = f.simp.one;
+	f.simp = 1;
+	n = f.simp;
+	return n;
 }
 

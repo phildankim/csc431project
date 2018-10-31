@@ -65,6 +65,7 @@ public class MiniCompiler
          //Milestone 2 
          LLVM llvm = new LLVM(program);
          if (cfg) {
+            //LLVM.printStructs();
             llvm.printProgram();
          }
          if (stack) {

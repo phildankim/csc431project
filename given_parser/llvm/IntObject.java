@@ -2,7 +2,14 @@ package llvm;
 
 public class IntObject implements LLVMObject {
 
-	public IntObject() {
+	String id;
+
+	public IntObject(String id) {
+		this.id = id;
+	}
+
+	public String getId() {
+		return this.id;
 	}
 
 	public String toString() {

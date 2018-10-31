@@ -1,12 +1,30 @@
+struct simple
+{
+    int one;
+};
+
+struct foo
+{
+    int bar;
+    bool cool;
+    struct simple simp;
+};
+
 fun main() int
 {
 	int n;
+	struct foo f;
+	f = new foo;
+
+	f.simp = new simple;
+	f.simp.one = 1;
+
 	n = 0;
 	while (n < 2) 
 	{
 		if (n < 2) 
 		{
-			n = n + 1;
+			n = f.simp.one;
 		}
 		else 
 		{
@@ -15,3 +33,4 @@ fun main() int
 	}
 	return n;
 }
+

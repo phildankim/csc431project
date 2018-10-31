@@ -2,6 +2,7 @@ package cfg;
 
 import java.util.*;
 import ast.*;
+import llvm.*;
 
 public class CFGFactory {
 
@@ -19,6 +20,7 @@ public class CFGFactory {
 			cfg.connectToExit();
 			cfgs.add(cfg);
 			cfg.addPredecessorsAndSuccessors();
+			//Register.printRegisters();
 			cfg.clearStructs();
 		}
 

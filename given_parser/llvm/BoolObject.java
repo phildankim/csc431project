@@ -2,7 +2,13 @@ package llvm;
 
 public class BoolObject implements LLVMObject {
 
-	public BoolObject() {
+	String id;
+
+	public BoolObject(String id) {
+		this.id = id;
+	}
+	public String getId() {
+		return this.id;
 	}
 
 	public String toString() {

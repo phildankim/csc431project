@@ -12,19 +12,33 @@ public class LLVM {
 	private Program p;
 	private ArrayList<CFG> cfgs = new ArrayList<CFG>();
 	private ArrayList<Instruction> globalDecls = new ArrayList<Instruction>();
-	private HashMap<String, TypeDeclaration> structs = new HashMap<String, TypeDeclaration>();
+
+	// Key: struct name, Val: struct Object
+	private static HashMap<String, LLVMObject> globalStructs = new HashMap<String, LLVMObject>();
 
 	public LLVM(Program p) {
 		this.p = p;
-		this.cfgs = CFGFactory.createAllCFG(p);
 		setDeclInstructions();
 		setTypeDeclInstructions();
+		this.cfgs = CFGFactory.createAllCFG(p);
 	}
 
 	public void printProgram() {
 		this.printTypes();
 		for (CFG c : this.cfgs) {
 			c.printCFG();
+		}
+	}
+
+	public static void printStructs() {
+		System.out.println("--Currently in LLVM.Structs");
+		for (String key : globalStructs.keySet()) {
+			StructObject struct = (StructObject)LLVM.getObj(key);
+			System.out.println("Key: " + key + "\tValue: " + struct.toString());
+			System.out.println("\tFields:");
+			for (LLVMObject o : struct.getFields()) {
+				System.out.println("\t\t" + o.toString() + " " + o.getId());
+			}
 		}
 	}
 
@@ -67,5 +81,22 @@ public class LLVM {
 		for (Instruction i : this.globalDecls) {
 			System.out.println(i.toString());
 		}
+	}
+
+	public HashMap<String, LLVMObject> getHashMap() {
+		return this.globalStructs;
+	}
+
+	public void clearStructs() {
+		this.globalStructs.clear();
+		System.out.println("Global Struct cleared");
+	}
+
+	public static void addToLocals(String s, LLVMObject o) {
+		globalStructs.put(s, o);
+	}
+
+	public static LLVMObject getObj(String id) {
+		return globalStructs.get(id);
 	}
 }

@@ -12,7 +12,9 @@ public class CFG {
 
 	public ArrayList<Block> blocks = new ArrayList<Block>();
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
-	private static HashMap<String, LLVMObject> structs = new HashMap<String, LLVMObject>();
+
+	// Key: struct id, Val: struct object
+	private static HashMap<String, LLVMObject> localStructs = new HashMap<String, LLVMObject>();
 
 	public Block entryBlock;
 	public Block exitBlock;
@@ -37,12 +39,12 @@ public class CFG {
 
 		InstructionTranslator.setFunctionReturnInstruction(entryBlock,f.getType());
 		InstructionTranslator.setLocalParamInstruction(entryBlock,f.getParams());
-		InstructionTranslator.setLocalDeclInstruction(structs, entryBlock, f.getLocals());
+		InstructionTranslator.setLocalDeclInstruction(localStructs, entryBlock, f.getLocals());
 	}
 
 	public static void printStructs() {
 		System.out.println("--Currently in CFG.Structs");
-		for (String key : CFG.structs.keySet()) {
+		for (String key : CFG.localStructs.keySet()) {
 			System.out.println("Key: " + key + "\tValue: " + CFG.getObj(key));
 		}
 	}
@@ -56,15 +58,15 @@ public class CFG {
 	}
 
 	public void clearStructs() {
-		CFG.structs.clear();
+		CFG.localStructs.clear();
 	}
 
 	public static void addToLocals(String s, LLVMObject o) {
-		CFG.structs.put(s, o);
+		CFG.localStructs.put(s, o);
 	}
 
 	public static LLVMObject getObj(String id) {
-		return CFG.structs.get(id);
+		return CFG.localStructs.get(id);
 	}
 
 	public Block createCFG(Statement statement) {
@@ -200,7 +202,7 @@ public class CFG {
 
 			ReturnStatement rs = (ReturnStatement)statement;
 
-			String toRetVal = Register.getRegName();
+			String toRetVal = Register.getNewRegNum();
 			Expression targetExp = rs.getExpression();
 			String resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p);
 			// LLVMObject type = CFG.getObj(resultReg);
@@ -213,7 +215,7 @@ public class CFG {
 			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
-			IntObject type = new IntObject();
+			IntObject type = new IntObject("%_retval_");
 			InstructionTranslator.setReturnInstruction(returnBlock, type);
 
 

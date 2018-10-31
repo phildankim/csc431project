@@ -65,7 +65,7 @@ public class InstructionTranslator {
 
 
 			String regForLoad = InstructionTranslator.parseExpression(b, ds.getExpression(),p);
-			String regForBitcast = Register.getRegName();
+			String regForBitcast = Register.getNewRegNum();
 
 			Instruction bc = new InstructionBitcast(regForBitcast,regForLoad,structName, false);
 			b.addInstruction(bc);
@@ -97,20 +97,14 @@ public class InstructionTranslator {
 
 			String id = ie.getId();
 			LLVMObject type = CFG.getObj(id);
-			String regNum = Register.getRegName();
-			Register reg = new Register(regNum, type);
-
-			//create new Register
-				//take ID and do a lookup on declarations, create new Type
-				//generate new register num
-				//new Register(num, type)
-			//put Register in Register Hashmap
-				//key: new Register, val: identifier ID
+			String regNum = Register.getNewRegNum();
+			Register reg = new Register(regNum, type, id);
+			Register.addToRegisters(regNum, reg);
 
 			InstructionLoad load = new InstructionLoad(regNum, "%" + id, type);
 			b.addInstruction(load);
 
-			return id;
+			return reg.getRegNum();
 		}
 
 		else if (e instanceof BinaryExpression) {
@@ -119,7 +113,7 @@ public class InstructionTranslator {
 			String right = parseExpression(b, be.getRight(), p);
 
 			Instruction instr;
-			String reg = Register.getRegName();
+			String reg = Register.getNewRegNum();
 
 			switch (be.getOperator()) {
 				case PLUS:
@@ -197,7 +191,7 @@ public class InstructionTranslator {
 			}
 
 			if (!retType.equals("void")) {
-				String result = Register.getRegName();
+				String result = Register.getNewRegNum();
 				InstructionCall ic = new InstructionCall(result, retType, ie.getName(), arguments);
 				b.addInstruction(ic);
 				return result;
@@ -212,8 +206,8 @@ public class InstructionTranslator {
 
 			NewExpression ne = (NewExpression)e;
 
-			String regForMalloc = Register.getRegName();
-			String regForBitcast = Register.getRegName();
+			String regForMalloc = Register.getNewRegNum();
+			String regForBitcast = Register.getNewRegNum();
 			String structName = ne.getId();
 
 			// count the number of fields inside the struct:
@@ -239,23 +233,25 @@ public class InstructionTranslator {
 			DotExpression de = (DotExpression)e;
 
 			String left = InstructionTranslator.parseExpression(b, de.getLeft(), p);
-			LLVMObject type = CFG.getObj(left);
-			System.out.println("in dot expression, left is of type: " + type);
-			//String ptrval = Register.getRegVal(left);
-			//System.out.println("register " + left + " contains " + ptrval);
+			Register reg = Register.getReg(left);
+			LLVMObject type = CFG.getObj(reg.id);
+
+			StructObject structGlobalDecl = (StructObject)LLVM.getObj(type.toString());
+			LLVMObject field = structGlobalDecl.getField(de.getId());
+			int index = structGlobalDecl.getFieldIndex(field);
+
+			// not storing new register into hashmap currently
+			Register res = new Register(Register.getNewRegNum(), field, field.getId());
 
 
-			// InstructionGetElementPtr gep = new InstructionGetElementPtr(Register.getRegName());
-			// b.addInstruction(br);
-			String register = Register.getRegName();
-			// InstructionLoad load = new InstructionLoad(register, "%" + de.getId(), ptrval);
-			// b.addInstruction(load);
-			return register;
+			InstructionGetElementPtr gep = new InstructionGetElementPtr(res.getRegNum(), type.toString(), reg.getRegNum(), Integer.toString(index));
+			b.addInstruction(gep);
+
+			return res.getRegNum();
 		}
 
-
-		// need to do DOT
 		// how to do NULLExpression
+		// no fucking clue
 
 		return "";
 	}
@@ -264,10 +260,10 @@ public class InstructionTranslator {
 		Type t = d.getType();
 
 		if (t instanceof IntType) {
-			return new IntObject();
+			return new IntObject(d.getName());
 		}
 		else if (t instanceof BoolType) {
-			return new BoolObject();
+			return new BoolObject(d.getName());
 		}
 		else if (t instanceof StructType) {
 			StructType st = (StructType)t;
@@ -276,7 +272,7 @@ public class InstructionTranslator {
 			return new StructObject(structName);
 		}
 		else if (t instanceof VoidType) {
-			return new VoidObject();
+			return new VoidObject("void");
 		}
 		else {
 			return null;
@@ -298,6 +294,7 @@ public class InstructionTranslator {
 	}
 
 	// global/program level type declarations such as structs
+	// need to use objects
 	public static InstructionDecl setDeclInstruction(Declaration decl) {
 	 	InstructionDecl here = new InstructionDecl(decl);
 	 	return here;
@@ -305,17 +302,22 @@ public class InstructionTranslator {
 
 	public static InstructionTypeDecl setTypeDeclInstruction(TypeDeclaration type) {
 		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
+		StructObject struct = new StructObject(type.getName());
+		for (Declaration d : type.getFields()) {
+			struct.addField(InstructionTranslator.convertTypeToObject(d));
+		}
+		LLVM.addToLocals(struct.toString(), struct);
 		return typeDecl;
 	}
 
-	public static void setLocalDeclInstruction(HashMap<String, LLVMObject> structs, Block b, List<Declaration> locals) {
+	public static void setLocalDeclInstruction(HashMap<String, LLVMObject> localStructs, Block b, List<Declaration> locals) {
 		for (Declaration d : locals) {
 			LLVMObject obj = InstructionTranslator.convertTypeToObject(d);
 			InstructionAlloca localDecl = new InstructionAlloca(obj, d.getName());
-			CFG.addToLocals(d.getName(), obj);
+			CFG.addToLocals(d.getName(), obj);	
 			b.addInstruction(localDecl);
 		}
-		CFG.printStructs();
+		//CFG.printStructs();
 	}
 
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
@@ -340,7 +342,7 @@ public class InstructionTranslator {
 	}
 
 	public static void setReturnInstruction(Block b, LLVMObject type) {
-		String returnRegister = Register.getRegName();
+		String returnRegister = Register.getNewRegNum();
 
 		Instruction instr = new InstructionLoad(returnRegister, "%_retval_", type);
 		Instruction ret = new InstructionRet(returnRegister);
