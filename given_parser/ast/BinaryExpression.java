@@ -2,7 +2,6 @@ package ast;
 
 public class BinaryExpression
    extends AbstractExpression
-   implements Visitable
 {
    private final Operator operator;
    private final Expression left;
@@ -15,10 +14,6 @@ public class BinaryExpression
       this.operator = operator;
       this.left = left;
       this.right = right;
-   }
-
-   public void accept(Visitor visitor) {
-      visitor.visit(this);
    }
 
    public Operator getOperator() {

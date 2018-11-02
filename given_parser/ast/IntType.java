@@ -1,16 +1,17 @@
 package ast;
 
 public class IntType
-   implements Type, Visitable
+   implements Type
 {
 
 	// Added for Milestone 1:
-	@Override
+	// @Override
+	// public String toString() {
+	// 	return "IntType";
+	// }
+
 	public String toString() {
-		return "IntType";
+		return "i32";
 	}
 
-	public void accept(Visitor visitor) {
-		visitor.visit(this);
-	}
 }

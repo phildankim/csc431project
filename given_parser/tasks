@@ -1,10 +1,9 @@
 things to do:
 -dot expressions (daniel)
--delete statements (michael)
-	DONE	-create .ll header and footer (michael)
 
 unassigned:
 -null expressions
 -hash tables for using param values stored in registers
 	-register hashtables
 -misc instructions
+-return instructions need to allow for more than just int

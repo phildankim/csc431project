@@ -1,7 +1,7 @@
 package ast;
 
 public class StructType
-   implements Type, Visitable
+   implements Type
 {
    private final int lineNum;
    private final String name;
@@ -14,15 +14,17 @@ public class StructType
 
    // added for Milestone 1:
 
-   @Override
+   // @Override
+   // public String toString() {
+   // 	return "StructType";
+   // }
+
    public String toString() {
-   	return "StructType";
+      return "%struct." + name + "*";
    }
 
    public String getName() {
       return name;
    }
-   public void accept(Visitor visitor) {
-      visitor.visit(this);
-   }
+
 }

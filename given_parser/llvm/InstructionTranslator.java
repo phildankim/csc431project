@@ -91,20 +91,20 @@ public class InstructionTranslator {
 			return ie.getValue();
 		}
 
-
 		else if (e instanceof IdentifierExpression) {
 			IdentifierExpression ie = (IdentifierExpression)e;
 
 			String id = ie.getId();
-			LLVMObject type = CFG.getObj(id);
+			Type type = CFG.getType(id);
+
 			String regNum = Register.getNewRegNum();
-			Register reg = new Register(regNum, type, id);
+			Register reg = new Register(regNum, type);
 			Register.addToRegisters(regNum, reg);
 
 			InstructionLoad load = new InstructionLoad(regNum, "%" + id, type);
 			b.addInstruction(load);
 
-			return reg.getRegNum();
+			return regNum;
 		}
 
 		else if (e instanceof BinaryExpression) {
@@ -234,15 +234,12 @@ public class InstructionTranslator {
 
 			String left = InstructionTranslator.parseExpression(b, de.getLeft(), p);
 			Register reg = Register.getReg(left);
-			LLVMObject type = CFG.getObj(reg.id);
+			StructType type = (StructType)reg.getType();
+			System.out.println("left: " + left);
+			int index = LLVM.getFieldIndex(p, type.getName(), de.getId());
 
-			StructObject structGlobalDecl = (StructObject)LLVM.getObj(type.toString());
-			LLVMObject field = structGlobalDecl.getField(de.getId());
-			int index = structGlobalDecl.getFieldIndex(field);
-
-			// not storing new register into hashmap currently
-			Register res = new Register(Register.getNewRegNum(), field, field.getId());
-
+			Register res = new Register(Register.getNewRegNum(), type);
+			Register.addToRegisters(res.getRegNum(), res);
 
 			InstructionGetElementPtr gep = new InstructionGetElementPtr(res.getRegNum(), type.toString(), reg.getRegNum(), Integer.toString(index));
 			b.addInstruction(gep);
@@ -256,28 +253,28 @@ public class InstructionTranslator {
 		return "";
 	}
 
-	public static LLVMObject convertTypeToObject(Declaration d) {
-		Type t = d.getType();
+	// public static LLVMObject convertTypeToObject(Declaration d) {
+	// 	Type t = d.getType();
 
-		if (t instanceof IntType) {
-			return new IntObject(d.getName());
-		}
-		else if (t instanceof BoolType) {
-			return new BoolObject(d.getName());
-		}
-		else if (t instanceof StructType) {
-			StructType st = (StructType)t;
+	// 	if (t instanceof IntType) {
+	// 		return new IntObject(d.getName());
+	// 	}
+	// 	else if (t instanceof BoolType) {
+	// 		return new BoolObject(d.getName());
+	// 	}
+	// 	else if (t instanceof StructType) {
+	// 		StructType st = (StructType)t;
 
-			String structName = st.getName();
-			return new StructObject(structName);
-		}
-		else if (t instanceof VoidType) {
-			return new VoidObject("void");
-		}
-		else {
-			return null;
-		}
-	}
+	// 		String structName = st.getName();
+	// 		return new StructObject(structName);
+	// 	}
+	// 	else if (t instanceof VoidType) {
+	// 		return new VoidObject("void");
+	// 	}
+	// 	else {
+	// 		return null;
+	// 	}
+	// }
 
 	public static String parseLvalue(Block b, Lvalue lv, Program p) {
 		if (lv instanceof LvalueId) {
@@ -302,29 +299,25 @@ public class InstructionTranslator {
 
 	public static InstructionTypeDecl setTypeDeclInstruction(TypeDeclaration type) {
 		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
-		StructObject struct = new StructObject(type.getName());
-		for (Declaration d : type.getFields()) {
-			struct.addField(InstructionTranslator.convertTypeToObject(d));
-		}
-		LLVM.addToLocals(struct.toString(), struct);
 		return typeDecl;
 	}
 
-	public static void setLocalDeclInstruction(HashMap<String, LLVMObject> localStructs, Block b, List<Declaration> locals) {
+	public static void setLocalDeclInstruction(Block b, List<Declaration> locals) {
 		for (Declaration d : locals) {
-			LLVMObject obj = InstructionTranslator.convertTypeToObject(d);
-			InstructionAlloca localDecl = new InstructionAlloca(obj, d.getName());
-			CFG.addToLocals(d.getName(), obj);	
+			Type type = d.getType();
+			Register reg = new Register(Register.getNewRegNum(), type);
+			Register.addToRegisters(reg.getRegNum(), reg);
+			InstructionAlloca localDecl = new InstructionAlloca(type, reg.getRegNum());
+			CFG.addToLocals(d.getName(), type);	
 			b.addInstruction(localDecl);
 		}
-		//CFG.printStructs();
+		CFG.printStructs();
 	}
 
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
 		for (Declaration param : params) {
 			Declaration d = new Declaration(0, param.getType(), "_P_" + param.getName());
-			LLVMObject obj = InstructionTranslator.convertTypeToObject(d);
-			InstructionAlloca pAlloc = new InstructionAlloca(obj, d.getName());
+			InstructionAlloca pAlloc = new InstructionAlloca(d.getType(), d.getName());
 			b.addInstruction(pAlloc);
 
 			Instruction instruction = new InstructionStore("%_P_" + param.getName(), "%"+param.getName());
@@ -335,13 +328,12 @@ public class InstructionTranslator {
 	public static void setFunctionReturnInstruction(Block b, Type returnType ) {
 		if (returnType instanceof IntType) {
 			Declaration d = new Declaration(0, returnType, "_retval_");
-			LLVMObject obj = InstructionTranslator.convertTypeToObject(d);
-			InstructionAlloca returnAlloc = new InstructionAlloca(obj, d.getName());
+			InstructionAlloca returnAlloc = new InstructionAlloca(returnType, d.getName());
 			b.addInstruction(returnAlloc);
 		}
 	}
 
-	public static void setReturnInstruction(Block b, LLVMObject type) {
+	public static void setReturnInstruction(Block b, Type type) {
 		String returnRegister = Register.getNewRegNum();
 
 		Instruction instr = new InstructionLoad(returnRegister, "%_retval_", type);

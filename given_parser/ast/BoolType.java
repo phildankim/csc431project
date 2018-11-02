@@ -1,16 +1,19 @@
 package ast;
 
 public class BoolType
-   implements Type, Visitable
+   implements Type
 {
 
 	// Added for Milestone 1:
-	@Override
+	// @Override
+	// public String toString() {
+	// 	return "BoolType";
+	// }
+
 	public String toString() {
-		return "BoolType";
+		return "i32";
 	}
 
-	public void accept(Visitor visitor) {
-		visitor.visit(this);
-	}
+
+
 }

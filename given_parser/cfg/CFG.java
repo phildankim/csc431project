@@ -13,8 +13,8 @@ public class CFG {
 	public ArrayList<Block> blocks = new ArrayList<Block>();
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
 
-	// Key: struct id, Val: struct object
-	private static HashMap<String, LLVMObject> localStructs = new HashMap<String, LLVMObject>();
+	// Key: id, Val: type object
+	private static HashMap<String, Type> locals = new HashMap<String, Type>();
 
 	public Block entryBlock;
 	public Block exitBlock;
@@ -39,13 +39,13 @@ public class CFG {
 
 		InstructionTranslator.setFunctionReturnInstruction(entryBlock,f.getType());
 		InstructionTranslator.setLocalParamInstruction(entryBlock,f.getParams());
-		InstructionTranslator.setLocalDeclInstruction(localStructs, entryBlock, f.getLocals());
+		InstructionTranslator.setLocalDeclInstruction(entryBlock, f.getLocals());
 	}
 
 	public static void printStructs() {
 		System.out.println("--Currently in CFG.Structs");
-		for (String key : CFG.localStructs.keySet()) {
-			System.out.println("Key: " + key + "\tValue: " + CFG.getObj(key));
+		for (String key : CFG.locals.keySet()) {
+			System.out.println("Key: " + key + "\tValue: " + CFG.getType(key));
 		}
 	}
 
@@ -58,15 +58,15 @@ public class CFG {
 	}
 
 	public void clearStructs() {
-		CFG.localStructs.clear();
+		CFG.locals.clear();
 	}
 
-	public static void addToLocals(String s, LLVMObject o) {
-		CFG.localStructs.put(s, o);
+	public static void addToLocals(String s, Type t) {
+		CFG.locals.put(s, t);
 	}
 
-	public static LLVMObject getObj(String id) {
-		return CFG.localStructs.get(id);
+	public static Type getType(String id) {
+		return CFG.locals.get(id);
 	}
 
 	public Block createCFG(Statement statement) {
@@ -215,8 +215,7 @@ public class CFG {
 			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
-			IntObject type = new IntObject("%_retval_");
-			InstructionTranslator.setReturnInstruction(returnBlock, type);
+			InstructionTranslator.setReturnInstruction(returnBlock, new IntType());
 
 
 			Edge toReturn = new Edge(currBlock, returnBlock);

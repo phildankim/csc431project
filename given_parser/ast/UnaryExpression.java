@@ -2,7 +2,6 @@ package ast;
 
 public class UnaryExpression
    extends AbstractExpression
-   implements Visitable
 {
    private final Operator operator;
    private final Expression operand;
@@ -13,11 +12,7 @@ public class UnaryExpression
       this.operator = operator;
       this.operand = operand;
    }
-
-   public void accept(Visitor visitor) {
-      visitor.visit(this);
-   }
-
+   
    public Operator getOperator() {
       return operator;
    }

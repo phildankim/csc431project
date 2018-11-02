@@ -6,10 +6,10 @@ import java.util.*;
 public class InstructionAlloca implements Instruction {
 
 	String result;
-	Object type;
+	Type type;
 
-	public InstructionAlloca(LLVMObject obj, String res) {
-		this.type = obj;
+	public InstructionAlloca(Type type, String res) {
+		this.type = type;
 		this.result = "%" + res;
 	}
 

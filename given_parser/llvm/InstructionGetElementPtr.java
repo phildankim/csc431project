@@ -9,7 +9,7 @@ public class InstructionGetElementPtr implements Instruction{
 
 	public InstructionGetElementPtr (String result, String type, String ptrval, String index) {
 		this.result = result;
-		this.type = type;;
+		this.type = type;
 		this.ptrval = ptrval;
 		this.index = index;
 	}
