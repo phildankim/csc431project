@@ -20,7 +20,7 @@ public class CFGFactory {
 			cfg.connectToExit();
 			cfgs.add(cfg);
 			cfg.addPredecessorsAndSuccessors();
-			//Register.printRegisters();
+			Register.printRegisters();
 			cfg.clearStructs();
 		}
 

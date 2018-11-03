@@ -253,29 +253,6 @@ public class InstructionTranslator {
 		return "";
 	}
 
-	// public static LLVMObject convertTypeToObject(Declaration d) {
-	// 	Type t = d.getType();
-
-	// 	if (t instanceof IntType) {
-	// 		return new IntObject(d.getName());
-	// 	}
-	// 	else if (t instanceof BoolType) {
-	// 		return new BoolObject(d.getName());
-	// 	}
-	// 	else if (t instanceof StructType) {
-	// 		StructType st = (StructType)t;
-
-	// 		String structName = st.getName();
-	// 		return new StructObject(structName);
-	// 	}
-	// 	else if (t instanceof VoidType) {
-	// 		return new VoidObject("void");
-	// 	}
-	// 	else {
-	// 		return null;
-	// 	}
-	// }
-
 	public static String parseLvalue(Block b, Lvalue lv, Program p) {
 		if (lv instanceof LvalueId) {
 			LvalueId lvid = (LvalueId)lv;
