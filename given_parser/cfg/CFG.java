@@ -208,14 +208,16 @@ public class CFG {
 			// LLVMObject type = CFG.getObj(resultReg);
 			// System.out.println("in return, type: " + resultReg);
 
-			Instruction storeToRetVal = new InstructionStore("%_retval_", resultReg);
+			Register r = Register.getReg(resultReg);
+
+			Instruction storeToRetVal = new InstructionStore("%_retval_", resultReg, r.getType());
 			currBlock.addInstruction(storeToRetVal);
 
 			InstructionBr branchToReturn = new InstructionBr(returnBlock.getLabel());
 			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
-			InstructionTranslator.setReturnInstruction(returnBlock, new IntType());
+			InstructionTranslator.setReturnInstruction(returnBlock, r.getType());
 
 
 			Edge toReturn = new Edge(currBlock, returnBlock);

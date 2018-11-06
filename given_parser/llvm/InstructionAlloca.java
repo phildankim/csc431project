@@ -10,7 +10,7 @@ public class InstructionAlloca implements Instruction {
 
 	public InstructionAlloca(Type type, String res) {
 		this.type = type;
-		this.result = "%" + res;
+		this.result = res;
 	}
 
 

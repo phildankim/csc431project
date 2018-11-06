@@ -27,7 +27,7 @@ public class InstructionTranslator {
 			}
 			else {
 				String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
-				InstructionStore instr = new InstructionStore(target, source);
+				InstructionStore instr = new InstructionStore(target, source,Register.getReg(source).getType());
 				b.addInstruction(instr);
 			}
 		}
@@ -314,7 +314,7 @@ public class InstructionTranslator {
 		String returnRegister = Register.getNewRegNum();
 
 		Instruction instr = new InstructionLoad(returnRegister, "%_retval_", type);
-		Instruction ret = new InstructionRet(returnRegister);
+		Instruction ret = new InstructionRet(returnRegister, type);
 		b.addInstruction(instr);
 		b.addInstruction(ret);
 	}
