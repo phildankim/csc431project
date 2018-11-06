@@ -5,6 +5,7 @@ public class StructType
 {
    private final int lineNum;
    private final String name;
+   //private ArrayList<Type> fields = new ArrayList<Type>();
 
    public StructType(int lineNum, String name)
    {
@@ -26,5 +27,9 @@ public class StructType
    public String getName() {
       return name;
    }
+
+   // public void addField(Type t) {
+   //    this.fields.add(t);
+   // }
 
 }

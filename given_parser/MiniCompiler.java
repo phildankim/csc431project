@@ -59,8 +59,8 @@ public class MiniCompiler
          *.    NEED TO FINISH!!
          */
 
-         // CheckRedeclarations.checkProgram(program);
-         // MiniTypeChecker.checkProgram(program);
+         //CheckRedeclarations.checkProgram(program);
+         //MiniTypeChecker.checkProgram(program);
 
          //Milestone 2 
          LLVM llvm = new LLVM(program);

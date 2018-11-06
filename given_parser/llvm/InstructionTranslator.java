@@ -27,7 +27,7 @@ public class InstructionTranslator {
 			}
 			else {
 				String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
-				InstructionStore instr = new InstructionStore(target, source,Register.getReg(source).getType());
+				InstructionStore instr = new InstructionStore(target, source, Register.getReg(source).getType());
 				b.addInstruction(instr);
 			}
 		}
@@ -62,7 +62,6 @@ public class InstructionTranslator {
 				String id = ie.getId();
 
 			}
-
 
 			String regForLoad = InstructionTranslator.parseExpression(b, ds.getExpression(),p);
 			String regForBitcast = Register.getNewRegNum();
@@ -210,6 +209,12 @@ public class InstructionTranslator {
 			String regForBitcast = Register.getNewRegNum();
 			String structName = ne.getId();
 
+			Register regBitcast = new Register(regForBitcast, new StructType(-1, structName));
+			Register regMalloc = new Register(regForMalloc, new StructType(-1, structName));
+
+			Register.addToRegisters(regForMalloc, regMalloc);
+			Register.addToRegisters(regForBitcast, regBitcast);
+
 			// count the number of fields inside the struct:
 			int numFields = 0;
 			int bytesToAllocate = 0;
@@ -225,6 +230,8 @@ public class InstructionTranslator {
 
 			Instruction bc = new InstructionBitcast(regForBitcast,regForMalloc,structName, true);
 			b.addInstruction(bc);
+
+			
 			return regForBitcast;
 
 		}
@@ -232,16 +239,21 @@ public class InstructionTranslator {
 		else if (e instanceof DotExpression) {
 			DotExpression de = (DotExpression)e;
 
+			// parse left until receive register num
 			String left = InstructionTranslator.parseExpression(b, de.getLeft(), p);
 			Register reg = Register.getReg(left);
 			StructType type = (StructType)reg.getType();
 			System.out.println("left: " + left);
+
+			
 			int index = LLVM.getFieldIndex(p, type.getName(), de.getId());
 
+			// not storing the correct type
 			Register res = new Register(Register.getNewRegNum(), type);
 			Register.addToRegisters(res.getRegNum(), res);
 
-			InstructionGetElementPtr gep = new InstructionGetElementPtr(res.getRegNum(), type.toString(), reg.getRegNum(), Integer.toString(index));
+			InstructionGetElementPtr gep = new InstructionGetElementPtr(res.getRegNum(), type.toString(), 
+				reg.getRegNum(), Integer.toString(index));
 			b.addInstruction(gep);
 
 			return res.getRegNum();
@@ -276,15 +288,18 @@ public class InstructionTranslator {
 
 	public static InstructionTypeDecl setTypeDeclInstruction(TypeDeclaration type) {
 		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
+		// for (TypeDeclaration td : type.getFields()) {
+
+		// }
 		return typeDecl;
 	}
 
 	public static void setLocalDeclInstruction(Block b, List<Declaration> locals) {
 		for (Declaration d : locals) {
 			Type type = d.getType();
-			Register reg = new Register(Register.getNewRegNum(), type);
-			Register.addToRegisters(reg.getRegNum(), reg);
-			InstructionAlloca localDecl = new InstructionAlloca(type, reg.getRegNum());
+			// Register reg = new Register(Register.getNewRegNum(), type);
+			// Register.addToRegisters(reg.getRegNum(), reg);
+			InstructionAlloca localDecl = new InstructionAlloca(type, d.getName());
 			CFG.addToLocals(d.getName(), type);	
 			b.addInstruction(localDecl);
 		}
