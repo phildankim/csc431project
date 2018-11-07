@@ -5,10 +5,14 @@ struct foo
     int simp;
 };
 
-fun main() struct foo
+fun main() int
 {
+	int n;
 	struct foo f;
 	f = new foo;
-	return f;
+
+	f.simp = 1;
+	n = f.simp;
+	return n;
 }
 

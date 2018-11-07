@@ -49,7 +49,6 @@ public class MiniTypeChecker {
 
 			checkFunction (func, funcSymbolTable, funcParamsTable, structTable);
 		}
-		MiniTypeChecker.displayData(symbolTable,funcParamsTable,structTable);
 	}
 
 	public static void checkFunction (Function func,

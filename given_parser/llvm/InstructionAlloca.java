@@ -16,6 +16,6 @@ public class InstructionAlloca implements Instruction {
 
 	@Override
 	public String toString() {
-		return "%" + this.result + " = alloca " + this.type.toString();
+		return this.result + " = alloca " + this.type.toString();
 	}
 }
