@@ -1,14 +1,14 @@
 package llvm;
 
-import ast.*;
+import llvm.*;
 
 public class InstructionLoad implements Instruction{
 	
 	String result;
 	String pointer;
-	Type type;
+	LLVMObject type;
 
-	public InstructionLoad (String result, String pointer, Type type) {
+	public InstructionLoad (String result, String pointer, LLVMObject type) {
 		this.result = result;
 		this.pointer = pointer;
 		this.type = type;

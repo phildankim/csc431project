@@ -2,7 +2,12 @@ struct foo
 {
     int bar;
     bool cool;
-    int simp;
+    struct simp s;
+};
+
+struct simp
+{
+	int one;
 };
 
 fun main() int
@@ -11,8 +16,9 @@ fun main() int
 	struct foo f;
 	f = new foo;
 
-	f.simp = 1;
-	n = f.simp;
+	f.s = new simp;
+	f.s.one = 1;
 	return n;
 }
+
 

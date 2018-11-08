@@ -1,14 +1,14 @@
 package llvm;
 
-import ast.*;
+import llvm.*;
 import java.util.*;
 
 public class InstructionAlloca implements Instruction {
 
 	String result;
-	Type type;
+	LLVMObject type;
 
-	public InstructionAlloca(Type type, String res) {
+	public InstructionAlloca(LLVMObject type, String res) {
 		this.type = type;
 		this.result = res;
 	}
@@ -16,6 +16,6 @@ public class InstructionAlloca implements Instruction {
 
 	@Override
 	public String toString() {
-		return this.result + " = alloca " + this.type.toString();
+		return "%" + this.result + " = alloca " + this.type.toString();
 	}
 }

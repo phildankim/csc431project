@@ -2,6 +2,7 @@ package llvm;
 
 import ast.*;
 import cfg.*;
+import llvm.*;
 
 import java.util.*;
 import java.io.BufferedWriter;
@@ -13,11 +14,15 @@ public class LLVM {
 	private ArrayList<CFG> cfgs = new ArrayList<CFG>();
 	private ArrayList<Instruction> globalDecls = new ArrayList<Instruction>();
 	private List<TypeDeclaration> types;
+	// key: name of struct, value: list of fields
+	private static HashMap<String, ArrayList<LLVMObject>> structTable = new HashMap<String, ArrayList<LLVMObject>>();
 
 	public LLVM(Program p) {
 		this.p = p;
 		setDeclInstructions();
 		setTypeDeclInstructions();
+		LLVM.printStructTable();
+		System.out.println("structTable size: " + LLVM.structTable.size());
 		this.cfgs = CFGFactory.createAllCFG(p);
 	}
 
@@ -27,7 +32,6 @@ public class LLVM {
 			c.printCFG();
 		}
 	}
-
 
 	public void printInstructions(BufferedWriter writer) throws IOException {
 
@@ -70,24 +74,43 @@ public class LLVM {
 		}
 	}
 
-	public static TypeDeclaration getStruct(Program p, String struct) {
-		for (TypeDeclaration td : p.getTypes()) {
-			if (td.getName().equals(struct)) {
-				return td;
+	public static void addStruct(String s, LLVMObject field) {
+		ArrayList<LLVMObject> fieldsList = LLVM.structTable.get(s);
+
+		if (fieldsList == null) {
+			fieldsList = new ArrayList<LLVMObject>();
+			fieldsList.add(field);
+			LLVM.structTable.put(s, fieldsList);
+		}
+		else {
+			if (!fieldsList.contains(field))
+				fieldsList.add(field);
+		}
+	}
+
+	public static LLVMObject getStructField(String structName, String fieldId) {
+		ArrayList<LLVMObject> fields = LLVM.structTable.get(structName);
+
+		for (LLVMObject field : fields) {
+			if (field.getId().equals(fieldId)) {
+				return field;
 			}
 		}
 		return null;
 	}
 
-	public static int getFieldIndex(Program p, String struct, String field) {
-		TypeDeclaration td = LLVM.getStruct(p, struct);
-		int counter = 0;
-		for (Declaration d : td.getFields()) {
-			if (d.getName().equals(field)) {
-				return counter;
-			}
-			counter++;
-		}
-		return -1;
+	public static int getFieldIndex(String structName, String fieldName) {
+		ArrayList<LLVMObject> fields = LLVM.structTable.get(structName);
+		LLVMObject field = LLVM.getStructField(structName, fieldName);
+		return fields.indexOf(field);
+	}
+
+	public static void printStructTable() {
+		System.out.println("--Currently in LLVM.structTable");
+		Iterator it = LLVM.structTable.entrySet().iterator();
+    	while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        System.out.println(pair.getKey() + " = " + pair.getValue());
+    	}
 	}
 }

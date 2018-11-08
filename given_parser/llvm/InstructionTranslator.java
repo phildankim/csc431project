@@ -20,6 +20,8 @@ public class InstructionTranslator {
 			AssignmentStatement as = (AssignmentStatement)s;
 			
 			String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p);
+			Register targetReg = Register.getReg(target);
+			targetReg.printRegister();
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
@@ -27,7 +29,13 @@ public class InstructionTranslator {
 			}
 			else {
 				String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
-				InstructionStore instr = new InstructionStore(target, source,Register.getReg(source).getType());
+				Register sourceReg = Register.getReg(source);
+				LLVMObject sourceType = sourceReg.getType();
+				if (sourceType instanceof IntObject) {
+					IntObject obj = (IntObject)sourceType;
+					source = obj.getValue();
+				}
+				InstructionStore instr = new InstructionStore(target, source, sourceType);
 				b.addInstruction(instr);
 			}
 		}
@@ -85,17 +93,23 @@ public class InstructionTranslator {
 
 	// Returns register or literal
 	public static String parseExpression(Block b, Expression e, Program p) {
+
 		if (e instanceof IntegerExpression) {
 			IntegerExpression ie = (IntegerExpression)e;
+			IntObject i = new IntObject();
+			i.setValue(ie.getValue());
+			Register reg = new Register(Register.getNewRegNum(), i);
+			Register.addToRegisters(reg.getRegNum(), reg);
 
-			return ie.getValue();
+			return reg.getRegNum();
 		}
 
 		else if (e instanceof IdentifierExpression) {
 			IdentifierExpression ie = (IdentifierExpression)e;
 
 			String id = ie.getId();
-			Type type = CFG.getType(id);
+			System.out.println("in idexp, id is: " + id);
+			LLVMObject type = CFG.getType(id);
 
 			String regNum = Register.getNewRegNum();
 			Register reg = new Register(regNum, type);
@@ -225,26 +239,31 @@ public class InstructionTranslator {
 
 			Instruction bc = new InstructionBitcast(regForBitcast,regForMalloc,structName, true);
 			b.addInstruction(bc);
+
+			Register reg = new Register(regForBitcast, new StructObject(structName));
+			Register.addToRegisters(reg.getRegNum(), reg);
 			return regForBitcast;
 
 		}
 
 		else if (e instanceof DotExpression) {
 			DotExpression de = (DotExpression)e;
+			String dotId = de.getId();
 
-			String left = InstructionTranslator.parseExpression(b, de.getLeft(), p);
-			Register reg = Register.getReg(left);
-			StructType type = (StructType)reg.getType();
-			System.out.println("left: " + left);
-			int index = LLVM.getFieldIndex(p, type.getName(), de.getId());
+			String leftRegNum = InstructionTranslator.parseExpression(b, de.getLeft(), p);
+			Register leftReg = Register.getReg(leftRegNum);
+			StructObject leftType = (StructObject)leftReg.getType();
 
-			Register res = new Register(Register.getNewRegNum(), type);
-			Register.addToRegisters(res.getRegNum(), res);
+			LLVMObject idStruct = LLVM.getStructField(leftType.getName(), dotId);
 
-			InstructionGetElementPtr gep = new InstructionGetElementPtr(res.getRegNum(), type.toString(), reg.getRegNum(), Integer.toString(index));
+			Register idRes = new Register(Register.getNewRegNum(), idStruct);
+			Register.addToRegisters(idRes.getRegNum(), idRes);
+
+			int index = LLVM.getFieldIndex(leftType.getName(), de.getId());
+
+			InstructionGetElementPtr gep = new InstructionGetElementPtr(idRes.getRegNum(), leftType.toString(), leftReg.getRegNum(), Integer.toString(index));
 			b.addInstruction(gep);
-
-			return res.getRegNum();
+			return idRes.getRegNum();
 		}
 
 		// how to do NULLExpression
@@ -253,17 +272,81 @@ public class InstructionTranslator {
 		return "";
 	}
 
+	public static LLVMObject convertDeclarationToObject(Declaration d) {
+		Type t = d.getType();
+
+		if (t instanceof IntType) {
+			return new IntObject(d.getName());
+		}
+		else if (t instanceof BoolType) {
+			return new BoolObject(d.getName());
+		}
+		else if (t instanceof StructType) {
+			StructType st = (StructType)t;
+			String structName = st.getName();
+			return new StructObject(structName, d.getName());
+		}
+		else {
+			return new VoidObject();
+		}
+
+	}
+
+	public static LLVMObject convertTypeToObject(Type t) {
+		if (t instanceof IntType) {
+			return new IntObject();
+		}
+		else if (t instanceof BoolType) {
+			return new BoolObject();
+		}
+		else if (t instanceof StructType) {
+			StructType st = (StructType)t;
+			String structName = st.getName();
+			return new StructObject(structName);
+		}
+		else {
+			return new VoidObject();
+		}
+
+	}
+
 	public static String parseLvalue(Block b, Lvalue lv, Program p) {
 		if (lv instanceof LvalueId) {
 			LvalueId lvid = (LvalueId)lv;
+			String id = lvid.getId();
+			LLVMObject type = CFG.getType(id);
 
-			return "%" + lvid.getId();
+			String regNum = Register.getNewRegNum();
+			Register reg = new Register(regNum, type);
+			Register.addToRegisters(regNum, reg);
+
+			InstructionLoad load = new InstructionLoad(regNum, "%" + id, type);
+			b.addInstruction(load);
+			return regNum;
 		}
 		else { // otherwise, it's an lvaluedot
-			LvalueDot lvdot = (LvalueDot)lv;
-
+			LvalueDot lvdot = (LvalueDot)lv;	
+			String lvId = lvdot.getId();
 			String lft = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p);
-			return lft;
+
+			Register regLeft = Register.getReg(lft);
+			StructObject dotType = (StructObject)regLeft.getType();
+			Register dotRes = new Register(Register.getNewRegNum(), dotType);
+			Register.addToRegisters(dotRes.getRegNum(), dotRes);
+
+			LLVMObject idObj = LLVM.getStructField(dotType.getName(), lvId);
+			Register idRes = new Register(Register.getNewRegNum(), idObj);
+			Register.addToRegisters(idRes.getRegNum(), idRes);
+
+			int index = LLVM.getFieldIndex(dotType.getName(), lvId);
+
+			// instruction to load dottype into new register
+			InstructionLoad load = new InstructionLoad(dotRes.getRegNum(), lft, dotType);
+			b.addInstruction(load);
+
+			InstructionGetElementPtr gep = new InstructionGetElementPtr(idRes.getRegNum(), dotType.toString(), regLeft.getRegNum(), Integer.toString(index));
+			b.addInstruction(gep);
+			return idRes.getRegNum();
 		}
 	}
 
@@ -276,16 +359,21 @@ public class InstructionTranslator {
 
 	public static InstructionTypeDecl setTypeDeclInstruction(TypeDeclaration type) {
 		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
+		for (Declaration d : type.getFields()) {
+			System.out.println("Struct: " + type.getName() + " Field: " + d.getName());
+			LLVMObject field = InstructionTranslator.convertDeclarationToObject(d);
+			LLVM.addStruct(type.getName(), field);
+		}
 		return typeDecl;
 	}
 
 	public static void setLocalDeclInstruction(Block b, List<Declaration> locals) {
 		for (Declaration d : locals) {
-			Type type = d.getType();
-			Register reg = new Register(Register.getNewRegNum(), type);
+			LLVMObject obj = InstructionTranslator.convertDeclarationToObject(d);
+			Register reg = new Register(Register.getNewRegNum(), obj);
 			Register.addToRegisters(reg.getRegNum(), reg);
-			InstructionAlloca localDecl = new InstructionAlloca(type, reg.getRegNum());
-			CFG.addToLocals(d.getName(), type);	
+			InstructionAlloca localDecl = new InstructionAlloca(obj, d.getName());
+			CFG.addToLocals(d.getName(), obj);	
 			b.addInstruction(localDecl);
 		}
 		CFG.printStructs();
@@ -293,8 +381,8 @@ public class InstructionTranslator {
 
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
 		for (Declaration param : params) {
-			Declaration d = new Declaration(0, param.getType(), "_P_" + param.getName());
-			InstructionAlloca pAlloc = new InstructionAlloca(d.getType(), d.getName());
+			LLVMObject obj = InstructionTranslator.convertDeclarationToObject(param);
+			InstructionAlloca pAlloc = new InstructionAlloca(obj, param.getName());
 			b.addInstruction(pAlloc);
 
 			Instruction instruction = new InstructionStore("%_P_" + param.getName(), "%"+param.getName());
@@ -302,15 +390,13 @@ public class InstructionTranslator {
 		}
 	}
 
-	public static void setFunctionReturnInstruction(Block b, Type returnType ) {
-		if (returnType instanceof IntType) {
-			Declaration d = new Declaration(0, returnType, "_retval_");
-			InstructionAlloca returnAlloc = new InstructionAlloca(returnType, d.getName());
-			b.addInstruction(returnAlloc);
-		}
+	public static void setFunctionReturnInstruction(Block b, Type returnType) {
+		LLVMObject returnObj = InstructionTranslator.convertTypeToObject(returnType);
+		InstructionAlloca returnAlloc = new InstructionAlloca(returnObj, "_retval_");
+		b.addInstruction(returnAlloc);
 	}
 
-	public static void setReturnInstruction(Block b, Type type) {
+	public static void setReturnInstruction(Block b, LLVMObject type) {
 		String returnRegister = Register.getNewRegNum();
 
 		Instruction instr = new InstructionLoad(returnRegister, "%_retval_", type);

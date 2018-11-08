@@ -1,18 +1,16 @@
 package llvm;
 
-import ast.*;
-
 public class InstructionRet implements Instruction {
 	
 	String register;
-	Type type;
+	LLVMObject type;
 
 	public InstructionRet (String register) {
 		this.register = register;
-		this.type = new IntType();
+		this.type = new IntObject();
 	}
 
-	public InstructionRet (String register, Type type) {
+	public InstructionRet (String register, LLVMObject type) {
 		this.register = register;
 		this.type = type;
 	}

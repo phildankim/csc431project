@@ -14,7 +14,7 @@ public class CFG {
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
 
 	// Key: id, Val: type object
-	private static HashMap<String, Type> locals = new HashMap<String, Type>();
+	private static HashMap<String, LLVMObject> locals = new HashMap<String, LLVMObject>();
 
 	public Block entryBlock;
 	public Block exitBlock;
@@ -61,11 +61,11 @@ public class CFG {
 		CFG.locals.clear();
 	}
 
-	public static void addToLocals(String s, Type t) {
+	public static void addToLocals(String s, LLVMObject t) {
 		CFG.locals.put(s, t);
 	}
 
-	public static Type getType(String id) {
+	public static LLVMObject getType(String id) {
 		return CFG.locals.get(id);
 	}
 
@@ -218,7 +218,6 @@ public class CFG {
 
 			//return instruction loads from _retval_ and calls return:
 			InstructionTranslator.setReturnInstruction(returnBlock, r.getType());
-
 
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);

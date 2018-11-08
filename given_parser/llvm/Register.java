@@ -6,14 +6,14 @@ import ast.*;
 public class Register {
 
 	public String num;
-	public Type type;
+	public LLVMObject type;
 	private static int counter = 0;
 	// needed for SSA
 	// after done using for each function, maybe clear out so we don't run into any scope issues?
 	// key: Register number (String), val: Register
 	private static HashMap<String, Register> registers = new HashMap<String, Register>();
 
-	public Register(String num, Type type) {
+	public Register(String num, LLVMObject type) {
 		this.num = num;
 		this.type = type;
 	}
@@ -42,7 +42,7 @@ public class Register {
 		return this.num;
 	}
 
-	public Type getType() {
+	public LLVMObject getType() {
 		return this.type;
 	}
 
@@ -55,5 +55,9 @@ public class Register {
 
 	public String toString() {
 		return "Register " + this.getRegNum() + " contains object " + this.type;
+	}
+
+	public void printRegister() {
+		System.out.println("Register " + this.getRegNum() + " contains " + this.getType());
 	}
 }

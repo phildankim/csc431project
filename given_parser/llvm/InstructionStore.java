@@ -1,20 +1,20 @@
 package llvm;
 
-import ast.*;
+import cfg.*;
 
 public class InstructionStore implements Instruction {
 
 	String value; //target
 	String pointer; //source
-	Type type;
+	LLVMObject type;
 
 	public InstructionStore (String target, String source) {
 		this.value = source;
 		this.pointer = target;
-		this.type = new IntType();
+		this.type = new IntObject();
 	}
 
-	public InstructionStore (String target, String source, Type type) {
+	public InstructionStore (String target, String source, LLVMObject type) {
 		this.value = source;
 		this.type = type;
 		this.pointer = target;
