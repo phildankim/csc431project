@@ -63,12 +63,17 @@ public class InstructionTranslator {
 			DeleteStatement ds = (DeleteStatement)s;
 
 			// find struct name for expression:
-			String structName = "UNIMPLEMENTED";
+			String structName = "IDIDNTFINDIT";
 
 			if (ds.getExpression() instanceof IdentifierExpression) {
 				IdentifierExpression ie = (IdentifierExpression)ds.getExpression();
 				String id = ie.getId();
 
+
+				LLVMObject so = CFG.getType(id);
+				if (so instanceof StructObject) {
+					structName = ((StructObject)so).getName();
+				}
 			}
 
 

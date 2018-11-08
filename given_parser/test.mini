@@ -1,0 +1,21 @@
+struct simple
+{
+    int one;
+};
+
+struct foo
+{
+    int bar;
+    bool cool;
+    struct simple simp;
+};
+
+fun main() int
+{
+	int n;
+	struct foo f;
+	f = new foo;
+
+	delete f;
+}
+
