@@ -23,6 +23,6 @@ public class InstructionStore implements Instruction {
 
 	@Override
 	public String toString() {
-		return "store " + type + " " + value + ", " + type.toString() +"* " + pointer;
+		return "store " + type + " " + value + ", " + type +"* " + pointer;
 	}
 }

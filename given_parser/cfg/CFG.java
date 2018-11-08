@@ -204,6 +204,7 @@ public class CFG {
 
 			String toRetVal = Register.getNewRegNum();
 			Expression targetExp = rs.getExpression();
+			System.out.println("in returnSTatem:" + targetExp);
 			String resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p);
 			// LLVMObject type = CFG.getObj(resultReg);
 			// System.out.println("in return, type: " + resultReg);

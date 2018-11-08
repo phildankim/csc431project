@@ -16,6 +16,6 @@ public class InstructionLoad implements Instruction{
 
 	@Override
 	public String toString() {
-		return result.toString() + " = load " + this.type.toString() + "* " + pointer; 
+		return result.toString() + " = load " + type + "* " + pointer; 
 	}
 }

@@ -69,7 +69,6 @@ public class InstructionTranslator {
 				IdentifierExpression ie = (IdentifierExpression)ds.getExpression();
 				String id = ie.getId();
 
-
 				LLVMObject so = CFG.getType(id);
 				if (so instanceof StructObject) {
 					structName = ((StructObject)so).getName();
@@ -103,6 +102,7 @@ public class InstructionTranslator {
 			IntegerExpression ie = (IntegerExpression)e;
 			IntObject i = new IntObject();
 			i.setValue(ie.getValue());
+
 			Register reg = new Register(Register.getNewRegNum(), i);
 			Register.addToRegisters(reg.getRegNum(), reg);
 
@@ -113,7 +113,6 @@ public class InstructionTranslator {
 			IdentifierExpression ie = (IdentifierExpression)e;
 
 			String id = ie.getId();
-			System.out.println("in idexp, id is: " + id);
 			LLVMObject type = CFG.getType(id);
 
 			String regNum = Register.getNewRegNum();
@@ -133,53 +132,91 @@ public class InstructionTranslator {
 
 			Instruction instr;
 			String reg = Register.getNewRegNum();
+			LLVMObject type;
+			Register r;
 
 			switch (be.getOperator()) {
 				case PLUS:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionAdd(reg, left, right);
 					b.addInstruction(instr);
 					return reg;
 				case MINUS:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionSub(reg, left, right);
 					b.addInstruction(instr);
 					return reg;
 				case DIVIDE:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionSdiv(reg, left, right);
 					b.addInstruction(instr);
 					return reg;
 				case TIMES:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionMul(reg, left, right);
 					b.addInstruction(instr);
 					return reg;
 				case LT:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionIcmp(reg, "slt", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case GT:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionIcmp(reg, "sgt", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case GE:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionIcmp(reg, "sge", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case LE:
+					type = new IntObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionIcmp(reg, "sle", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case EQ:
+					type = new BoolObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionIcmp(reg, "eq", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case NE:
+					type = new BoolObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionIcmp(reg, "ne", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case AND:
+					type = new BoolObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionAnd(reg, left, right);
 					b.addInstruction(instr);
 					return reg;
 				case OR:
+					type = new BoolObject();
+					r = new Register(reg, type);
+					Register.addToRegisters(reg, r);
 					instr = new InstructionOr(reg, left, right);
 					b.addInstruction(instr);
 					return reg;
@@ -195,22 +232,29 @@ public class InstructionTranslator {
 				arguments.add(InstructionTranslator.parseExpression(b,arg, p));
 			}
 
-			String retType = "";
+			LLVMObject retType = new VoidObject();
 			for (Function f : p.getFuncs()) {
 				if (ie.getName().equals(f.getName())){
 					Type t = f.getType();
 
+					// expand for all types
 					if (t instanceof IntType) {
-						retType = "i32";
+						retType = new IntObject();
+					}
+					else if (t instanceof BoolType) {
+						retType = new BoolObject();
 					}
 					else {
-						retType = "void";
+						retType = new VoidObject();
 					}
 				}
 			}
 
-			if (!retType.equals("void")) {
+			// if not void, then store in register and return reg
+			if (!(retType instanceof VoidObject)) {
 				String result = Register.getNewRegNum();
+				Register r = new Register(result, retType);
+				Register.addToRegisters(result, r);
 				InstructionCall ic = new InstructionCall(result, retType, ie.getName(), arguments);
 				b.addInstruction(ic);
 				return result;
@@ -365,7 +409,6 @@ public class InstructionTranslator {
 	public static InstructionTypeDecl setTypeDeclInstruction(TypeDeclaration type) {
 		InstructionTypeDecl typeDecl = new InstructionTypeDecl(type);
 		for (Declaration d : type.getFields()) {
-			System.out.println("Struct: " + type.getName() + " Field: " + d.getName());
 			LLVMObject field = InstructionTranslator.convertDeclarationToObject(d);
 			LLVM.addStruct(type.getName(), field);
 		}

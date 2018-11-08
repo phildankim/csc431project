@@ -5,12 +5,12 @@ import java.util.*;
 public class InstructionCall implements Instruction {
 
 	String result;
-	String type;
+	LLVMObject type;
 	String funcptr;
 	ArrayList<String> args;
 	String argList;
 
-	public InstructionCall (String result, String type, String funcptr, ArrayList<String> args) {
+	public InstructionCall (String result, LLVMObject type, String funcptr, ArrayList<String> args) {
 		this.result= result;
 		this.type = type;
 		this.funcptr = funcptr;
@@ -22,7 +22,7 @@ public class InstructionCall implements Instruction {
 		String returnString = "(";
 
 		for (int i = 0; i < args.size(); i++) {
-			returnString += "i32 " + args.get(i);
+			returnString += (type + " " + args.get(i));
 
 			if (i != (args.size() -1)) {
 				returnString += ", ";
@@ -42,7 +42,7 @@ public class InstructionCall implements Instruction {
 			return "call void @" + funcptr + argList;
 		}
 		else {
-			return result + " = call i32 @" + funcptr + argList;
+			return result + " = call " + type + " @" + funcptr + argList;
 		}
 	}
 }
