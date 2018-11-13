@@ -118,9 +118,8 @@ public class CFG {
 				ifThen.addInstruction(toJoin);
 			}
 			else {
-				// Instruction instr = new InstructionRetVoid();
-				// ifThen.addInstruction(instr);
-				//InstructionBr toJoin = new InstructionBr(join.getLabel());
+				InstructionBr toJoin = new InstructionBr(join.getLabel());
+				ifThen.addInstruction(toJoin);
 			}
 
 			// Branch IfElse
@@ -135,7 +134,8 @@ public class CFG {
 				ifElse.addInstruction(toJoin);
 			}
 			else {
-
+				InstructionBr toJoin = new InstructionBr(join.getLabel());
+				ifElse.addInstruction(toJoin);
 			}
 
 			this.updateCurr(join);
