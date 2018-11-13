@@ -210,6 +210,9 @@ public class CFG {
 			// System.out.println("in return, type: " + resultReg);
 
 			Register r = Register.getReg(resultReg);
+			if (r == null) {
+				r = new Register ("", new IntObject());
+			}
 
 			Instruction storeToRetVal = new InstructionStore("%_retval_", resultReg, r.getType());
 			currBlock.addInstruction(storeToRetVal);

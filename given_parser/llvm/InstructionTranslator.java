@@ -30,10 +30,17 @@ public class InstructionTranslator {
 			else {
 				String source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
 				Register sourceReg = Register.getReg(source);
-				LLVMObject sourceType = sourceReg.getType();
-				if (sourceType instanceof IntObject) {
-					IntObject obj = (IntObject)sourceType;
-					source = obj.getValue();
+				LLVMObject sourceType;
+
+				if (sourceReg != null) {
+					sourceType = sourceReg.getType();
+					if (sourceType instanceof IntObject) {
+						IntObject obj = (IntObject)sourceType;
+						source = obj.getValue();
+					}
+				}
+				else {
+					sourceType = new IntObject();
 				}
 				InstructionStore instr = new InstructionStore(target, source, sourceType);
 				b.addInstruction(instr);
@@ -103,6 +110,8 @@ public class InstructionTranslator {
 			IntObject i = new IntObject();
 			i.setValue(ie.getValue());
 
+			/*
+
 			Register reg = new Register(Register.getNewRegNum(), i);
 			Register.addToRegisters(reg.getRegNum(), reg);
 
@@ -110,6 +119,9 @@ public class InstructionTranslator {
 			b.addInstruction(is);
 
 			return reg.getRegNum();
+			*/
+
+			return ie.getValue();
 		}
 
 		else if (e instanceof IdentifierExpression) {
