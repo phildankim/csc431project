@@ -315,9 +315,6 @@ public class InstructionTranslator {
 			return idRes.getRegNum();
 		}
 
-		// how to do NULLExpression
-		// no fucking clue
-
 		return "";
 	}
 
