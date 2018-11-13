@@ -7,19 +7,19 @@ import cfg.*;
 
 public class InstructionTranslator {
 
-	public static void translate(Block b, Statement s, Program p) {
+	public static void translate(Block b, Statement s, Program p, Function f) {
 		
 		if (s instanceof BlockStatement) { 
 			List<Statement> statements = ((BlockStatement)s).getStatements();
 
 			for (Statement stmt : statements) {
-				InstructionTranslator.translate(b, stmt, p);
+				InstructionTranslator.translate(b, stmt, p, f);
 			} 
 		}
 		else if (s instanceof AssignmentStatement) {
 			AssignmentStatement as = (AssignmentStatement)s;
 			
-			String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p);
+			String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
 			Register targetReg = Register.getReg(target);
 			targetReg.printRegister();
 
@@ -28,7 +28,7 @@ public class InstructionTranslator {
 				b.addInstruction(ir);
 			}
 			else {
-				String source = InstructionTranslator.parseExpression(b, as.getSource(), p);
+				String source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
 				Register sourceReg = Register.getReg(source);
 				LLVMObject sourceType = sourceReg.getType();
 				if (sourceType instanceof IntObject) {
@@ -42,20 +42,20 @@ public class InstructionTranslator {
 
 		else if (s instanceof InvocationStatement) {
 			InvocationStatement is = (InvocationStatement)s;
-			InstructionTranslator.parseExpression(b, is.getExpression(), p);
+			InstructionTranslator.parseExpression(b, is.getExpression(), p, f);
 		}
 
 		else if (s instanceof PrintStatement) {
 			PrintStatement ps = (PrintStatement)s;
-			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p);
+			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p, f);
 			InstructionPrint ip = new InstructionPrint(psResult);
 			b.addInstruction(ip);
 		}
 
 		else if (s instanceof PrintLnStatement) {
 			PrintLnStatement ps = (PrintLnStatement)s;
-			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p);
-			InstructionPrint ip = new InstructionPrint(psResult);
+			String psResult = InstructionTranslator.parseExpression(b, ps.getExpression(), p, f);
+			InstructionPrintLn ip = new InstructionPrintLn(psResult);
 			b.addInstruction(ip);
 		}
 
@@ -76,7 +76,7 @@ public class InstructionTranslator {
 			}
 
 
-			String regForLoad = InstructionTranslator.parseExpression(b, ds.getExpression(),p);
+			String regForLoad = InstructionTranslator.parseExpression(b, ds.getExpression(),p, f);
 			String regForBitcast = Register.getNewRegNum();
 
 			Instruction bc = new InstructionBitcast(regForBitcast,regForLoad,structName, false);
@@ -96,7 +96,7 @@ public class InstructionTranslator {
 }
 
 	// Returns register or literal
-	public static String parseExpression(Block b, Expression e, Program p) {
+	public static String parseExpression(Block b, Expression e, Program p, Function f) {
 
 		if (e instanceof IntegerExpression) {
 			IntegerExpression ie = (IntegerExpression)e;
@@ -119,7 +119,17 @@ public class InstructionTranslator {
 			Register reg = new Register(regNum, type);
 			Register.addToRegisters(regNum, reg);
 
-			InstructionLoad load = new InstructionLoad(regNum, "%" + id, type);
+			InstructionLoad load;
+
+			for (Declaration param : f.getParams()) {
+				if (id.equals(param.getName())) {
+					load = new InstructionLoad(regNum, "%_P_" + id, type);
+					b.addInstruction(load);
+					return regNum;
+				}
+ 			}
+
+			load = new InstructionLoad(regNum, "%" + id, type);
 			b.addInstruction(load);
 
 			return regNum;
@@ -127,8 +137,8 @@ public class InstructionTranslator {
 
 		else if (e instanceof BinaryExpression) {
 			BinaryExpression be = (BinaryExpression)e;
-			String left = parseExpression(b, be.getLeft(), p);
-			String right = parseExpression(b, be.getRight(), p);
+			String left = parseExpression(b, be.getLeft(), p, f);
+			String right = parseExpression(b, be.getRight(), p, f);
 
 			Instruction instr;
 			String reg = Register.getNewRegNum();
@@ -229,13 +239,13 @@ public class InstructionTranslator {
 			InvocationExpression ie = (InvocationExpression)e;
 			ArrayList<String> arguments = new ArrayList<String>();
 			for (Expression arg : ie.getArgs()) {
-				arguments.add(InstructionTranslator.parseExpression(b,arg, p));
+				arguments.add(InstructionTranslator.parseExpression(b,arg, p, f));
 			}
 
 			LLVMObject retType = new VoidObject();
-			for (Function f : p.getFuncs()) {
-				if (ie.getName().equals(f.getName())){
-					Type t = f.getType();
+			for (Function func : p.getFuncs()) {
+				if (ie.getName().equals(func.getName())){
+					Type t = func.getType();
 
 					// expand for all types
 					if (t instanceof IntType) {
@@ -299,7 +309,7 @@ public class InstructionTranslator {
 			DotExpression de = (DotExpression)e;
 			String dotId = de.getId();
 
-			String leftRegNum = InstructionTranslator.parseExpression(b, de.getLeft(), p);
+			String leftRegNum = InstructionTranslator.parseExpression(b, de.getLeft(), p, f);
 			Register leftReg = Register.getReg(leftRegNum);
 			StructObject leftType = (StructObject)leftReg.getType();
 
@@ -356,7 +366,7 @@ public class InstructionTranslator {
 
 	}
 
-	public static String parseLvalue(Block b, Lvalue lv, Program p) {
+	public static String parseLvalue(Block b, Lvalue lv, Program p, Function f) {
 		if (lv instanceof LvalueId) {
 			LvalueId lvid = (LvalueId)lv;
 			String id = lvid.getId();
@@ -373,7 +383,7 @@ public class InstructionTranslator {
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;	
 			String lvId = lvdot.getId();
-			String lft = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p);
+			String lft = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
 
 			Register regLeft = Register.getReg(lft);
 			StructObject dotType = (StructObject)regLeft.getType();
@@ -428,6 +438,7 @@ public class InstructionTranslator {
 		for (Declaration param : params) {
 			LLVMObject obj = InstructionTranslator.convertDeclarationToObject(param);
 			InstructionAlloca pAlloc = new InstructionAlloca(obj, param.getName());
+			CFG.addToLocals(param.getName(), obj);
 			b.addInstruction(pAlloc);
 
 			Instruction instruction = new InstructionStore("%_P_" + param.getName(), "%"+param.getName());
@@ -436,9 +447,12 @@ public class InstructionTranslator {
 	}
 
 	public static void setFunctionReturnInstruction(Block b, Type returnType) {
-		LLVMObject returnObj = InstructionTranslator.convertTypeToObject(returnType);
-		InstructionAlloca returnAlloc = new InstructionAlloca(returnObj, "_retval_");
-		b.addInstruction(returnAlloc);
+
+		if (!(returnType instanceof VoidType)){
+				LLVMObject returnObj = InstructionTranslator.convertTypeToObject(returnType);
+				InstructionAlloca returnAlloc = new InstructionAlloca(returnObj, "_retval_");
+				b.addInstruction(returnAlloc);
+			}
 	}
 
 	public static void setReturnInstruction(Block b, LLVMObject type) {
@@ -450,14 +464,14 @@ public class InstructionTranslator {
 		b.addInstruction(ret);
 	}
 
-	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e, Program p) {
-		String guardReg = InstructionTranslator.parseExpression(curr, e, p);
+	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e, Program p, Function f) {
+		String guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
 		InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
 		curr.addInstruction(instr);
 	}
 
-	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e, Program p) {
-		String guardReg = InstructionTranslator.parseExpression(curr, e, p);
+	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e, Program p, Function f) {
+		String guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
 		InstructionBrCond instr = new InstructionBrCond(guardReg, body.getLabel(), join.getLabel());
 		curr.addInstruction(instr);
 	}

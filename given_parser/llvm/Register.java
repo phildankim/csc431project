@@ -3,7 +3,7 @@ package llvm;
 import java.util.*;
 import ast.*;
 
-public class Register {
+public class Register implements Value {
 
 	public String num;
 	public LLVMObject type;
@@ -35,7 +35,7 @@ public class Register {
 	}
 
 	public static String getNewRegNum() {
-		return "%r" + Integer.toString(counter++);
+		return "%u" + Integer.toString(counter++);
 	}
 
 	public String getRegNum() {

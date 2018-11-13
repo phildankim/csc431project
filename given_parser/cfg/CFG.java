@@ -103,7 +103,7 @@ public class CFG {
 			blocks.add(join);
 
 			// Add guard instruction to currBlock
-			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard(), p);
+			InstructionTranslator.setGuardInstruction(currBlock, ifThen, ifElse, cs.getGuard(), p, f);
 
 			// Branch IfThen
 			this.updateCurr(ifThen);
@@ -166,7 +166,7 @@ public class CFG {
 			blocks.add(join);
 			edges.add(toJoin);
 
-			InstructionTranslator.setWhileGuardInstruction(currBlock, join, whileBody, ws.getGuard(), p);
+			InstructionTranslator.setWhileGuardInstruction(currBlock, join, whileBody, ws.getGuard(), p, f);
 
 			// Branch whilebody
 			this.updateCurr(whileBody);
@@ -205,7 +205,7 @@ public class CFG {
 			String toRetVal = Register.getNewRegNum();
 			Expression targetExp = rs.getExpression();
 			System.out.println("in returnSTatem:" + targetExp);
-			String resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p);
+			String resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p, f);
 			// LLVMObject type = CFG.getObj(resultReg);
 			// System.out.println("in return, type: " + resultReg);
 
@@ -250,7 +250,7 @@ public class CFG {
 		}
 		else {
 			// Add instructions to currBlock
-			InstructionTranslator.translate(currBlock, statement, p);
+			InstructionTranslator.translate(currBlock, statement, p, f);
 			return currBlock;
 		}
 	}

@@ -11,6 +11,6 @@ public class InstructionPrint implements Instruction {
 
 	@Override
 	public String toString() {
-		return "call i32 (i8*, ...)* @printf (i8* getelementptr inbounds ([5 x i8]* @.println, i32 0), i32 " + register + ")";
+		return "call i32 (i8*, ...)* @printf (i8* getelementptr inbounds ([5 x i8]* @.print, i32 0), i32 " + register + ")";
 	}
 }
