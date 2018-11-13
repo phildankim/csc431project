@@ -7,10 +7,10 @@ public class InstructionCall implements Instruction {
 	String result;
 	LLVMObject type;
 	String funcptr;
-	ArrayList<String> args;
+	ArrayList<Register> args;
 	String argList;
 
-	public InstructionCall (String result, LLVMObject type, String funcptr, ArrayList<String> args) {
+	public InstructionCall (String result, LLVMObject type, String funcptr, ArrayList<Register> args) {
 		this.result= result;
 		this.type = type;
 		this.funcptr = funcptr;
@@ -18,11 +18,13 @@ public class InstructionCall implements Instruction {
 		this.argList = buildArgList(args);
 	}
 
-	public String buildArgList(ArrayList<String> args) {
+	public String buildArgList(ArrayList<Register> args) {
 		String returnString = "(";
 
 		for (int i = 0; i < args.size(); i++) {
-			returnString += (type + " " + args.get(i));
+			// returnString += (type + " " + args.get(i));
+			Register reg = args.get(i);
+			returnString += (reg.getType() + " " + reg.getRegNum());
 
 			if (i != (args.size() -1)) {
 				returnString += ", ";

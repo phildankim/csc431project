@@ -14,6 +14,7 @@ public class CFG {
 	public ArrayList<Edge> edges = new ArrayList<Edge>();
 
 	// Key: id, Val: type object
+	// basically a symbol table
 	private static HashMap<String, LLVMObject> locals = new HashMap<String, LLVMObject>();
 
 	public Block entryBlock;

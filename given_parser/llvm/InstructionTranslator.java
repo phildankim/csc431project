@@ -21,7 +21,6 @@ public class InstructionTranslator {
 			
 			String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
 			Register targetReg = Register.getReg(target);
-			targetReg.printRegister();
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
@@ -110,18 +109,18 @@ public class InstructionTranslator {
 			IntObject i = new IntObject();
 			i.setValue(ie.getValue());
 
-			/*
+			
 
 			Register reg = new Register(Register.getNewRegNum(), i);
 			Register.addToRegisters(reg.getRegNum(), reg);
 
-			InstructionStore is = new InstructionStore(reg.getRegNum(), ie.getValue());
-			b.addInstruction(is);
+			// InstructionStore is = new InstructionStore(reg.getRegNum(), ie.getValue());
+			// b.addInstruction(is);
 
 			return reg.getRegNum();
-			*/
+			
 
-			return ie.getValue();
+			//return ie.getValue();
 		}
 
 		else if (e instanceof IdentifierExpression) {
@@ -252,9 +251,10 @@ public class InstructionTranslator {
 
 		else if (e instanceof InvocationExpression) {
 			InvocationExpression ie = (InvocationExpression)e;
-			ArrayList<String> arguments = new ArrayList<String>();
+			ArrayList<Register> arguments = new ArrayList<Register>();
 			for (Expression arg : ie.getArgs()) {
-				arguments.add(InstructionTranslator.parseExpression(b,arg, p, f));
+				String argReg = InstructionTranslator.parseExpression(b,arg, p, f);
+				arguments.add(Register.getReg(argReg));
 			}
 
 			LLVMObject retType = new VoidObject();
@@ -297,6 +297,7 @@ public class InstructionTranslator {
 			String regForMalloc = Register.getNewRegNum();
 			String regForBitcast = Register.getNewRegNum();
 			String structName = ne.getId();
+			System.out.println("ne: " + structName);
 
 			// count the number of fields inside the struct:
 			int numFields = 0;
@@ -391,9 +392,9 @@ public class InstructionTranslator {
 			Register reg = new Register(regNum, type);
 			Register.addToRegisters(regNum, reg);
 
-			InstructionLoad load = new InstructionLoad(regNum, "%" + id, type);
-			b.addInstruction(load);
-			return regNum;
+			// InstructionStore store = new InstructionStore(regNum, "%" + id, type);
+			// b.addInstruction(store);
+			return "%" + id;
 		}
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;	

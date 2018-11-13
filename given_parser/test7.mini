@@ -10,7 +10,7 @@ struct simp
 	int one;
 };
 
-fun main() int
+fun domath() int
 {
 	int n;
 	struct foo f;
@@ -18,7 +18,14 @@ fun main() int
 
 	f.s = new simp;
 	f.s.one = 1;
+	n = f.s.one;
 	return n;
 }
 
+fun main() int
+{
+	print domath() endl;
+
+	return 0;
+}
 
