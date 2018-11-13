@@ -106,6 +106,9 @@ public class InstructionTranslator {
 			Register reg = new Register(Register.getNewRegNum(), i);
 			Register.addToRegisters(reg.getRegNum(), reg);
 
+			InstructionStore is = new InstructionStore(reg.getRegNum(), ie.getValue());
+			b.addInstruction(is);
+
 			return reg.getRegNum();
 		}
 
@@ -437,7 +440,7 @@ public class InstructionTranslator {
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
 		for (Declaration param : params) {
 			LLVMObject obj = InstructionTranslator.convertDeclarationToObject(param);
-			InstructionAlloca pAlloc = new InstructionAlloca(obj, param.getName());
+			InstructionAlloca pAlloc = new InstructionAlloca(obj, "_P_" + param.getName());
 			CFG.addToLocals(param.getName(), obj);
 			b.addInstruction(pAlloc);
 
