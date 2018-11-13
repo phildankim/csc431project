@@ -19,15 +19,50 @@ public class InstructionTranslator {
 		else if (s instanceof AssignmentStatement) {
 			AssignmentStatement as = (AssignmentStatement)s;
 			
-			String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
-			Register targetReg = Register.getReg(target);
-			targetReg.printRegister();
+
 
 			if (as.getSource() instanceof ReadExpression) {
+
+				String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
+				Register targetReg = Register.getReg(target);
+				targetReg.printRegister();
+
 				InstructionScan ir = new InstructionScan(target);
 				b.addInstruction(ir);
 			}
+
+			else if (as.getSource() instanceof NewExpression) {
+
+				String source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
+				Register sourceReg = Register.getReg(source);
+				LLVMObject sourceType;
+
+				if (sourceReg != null) {
+					sourceType = sourceReg.getType();
+					if (sourceType instanceof IntObject) {
+						IntObject obj = (IntObject)sourceType;
+						source = obj.getValue();
+					}
+				}
+				else {
+					sourceType = new IntObject();
+				}
+
+				String target="";
+
+				if (as.getTarget() instanceof LvalueId) {
+					target = ((LvalueId)as.getTarget()).getId();
+				}
+
+				InstructionStore instr = new InstructionStore("%"+target, source, sourceType);
+				b.addInstruction(instr);
+			}
 			else {
+
+				String target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
+				Register targetReg = Register.getReg(target);
+				targetReg.printRegister();
+
 				String source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
 				Register sourceReg = Register.getReg(source);
 				LLVMObject sourceType;
