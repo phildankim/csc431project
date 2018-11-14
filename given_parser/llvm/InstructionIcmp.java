@@ -3,11 +3,11 @@ package llvm;
 public class InstructionIcmp implements Instruction 
 {
 	String condition;
-	String operand1;
-	String operand2;
-	String result;
+	Value operand1;
+	Value operand2;
+	Value result;
 
-	public InstructionIcmp (String result, String condition, String operand1, String operand2) {
+	public InstructionIcmp (Value result, String condition, Value operand1, Value operand2) {
 		this.result = result;
 		this.condition = condition;
 		this.operand1 = operand1;

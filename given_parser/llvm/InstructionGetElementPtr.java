@@ -2,12 +2,12 @@ package llvm;
 
 public class InstructionGetElementPtr implements Instruction{
 	
-	String result;
-	String type;
-	String ptrval;
+	Value result;
+	LLVMObject type;
+	Value ptrval;
 	String index;
 
-	public InstructionGetElementPtr (String result, String type, String ptrval, String index) {
+	public InstructionGetElementPtr (Value result, LLVMObject type, Value ptrval, String index) {
 		this.result = result;
 		this.type = type;
 		this.ptrval = ptrval;

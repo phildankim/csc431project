@@ -4,13 +4,13 @@ import java.util.*;
 
 public class InstructionCall implements Instruction {
 
-	String result;
+	Value result;
 	LLVMObject type;
 	String funcptr;
-	ArrayList<Register> args;
+	ArrayList<Value> args;
 	String argList;
 
-	public InstructionCall (String result, LLVMObject type, String funcptr, ArrayList<Register> args) {
+	public InstructionCall (Value result, LLVMObject type, String funcptr, ArrayList<Value> args) {
 		this.result= result;
 		this.type = type;
 		this.funcptr = funcptr;
@@ -18,13 +18,21 @@ public class InstructionCall implements Instruction {
 		this.argList = buildArgList(args);
 	}
 
-	public String buildArgList(ArrayList<Register> args) {
+
+	public InstructionCall (LLVMObject type, String funcptr, ArrayList<Value> args) {
+		this.result= new Immediate("VOID", new IntObject());
+		this.type = type;
+		this.funcptr = funcptr;
+		this.args = args;
+		this.argList = buildArgList(args);
+	}
+
+	public String buildArgList(ArrayList<Value> args) {
 		String returnString = "(";
 
 		for (int i = 0; i < args.size(); i++) {
-			// returnString += (type + " " + args.get(i));
-			Register reg = args.get(i);
-			returnString += (reg.getType() + " " + reg.getRegNum());
+			Value reg = args.get(i);
+			returnString += (reg.getType() + " " + reg.getName());
 
 			if (i != (args.size() -1)) {
 				returnString += ", ";
@@ -40,7 +48,8 @@ public class InstructionCall implements Instruction {
 
 	@Override
 	public String toString() {
-		if (result.equals("VOID")) {
+
+		if (result instanceof Immediate) {
 			return "call void @" + funcptr + argList;
 		}
 		else {

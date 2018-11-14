@@ -203,26 +203,22 @@ public class CFG {
 
 			ReturnStatement rs = (ReturnStatement)statement;
 
-			String toRetVal = Register.getNewRegNum();
 			Expression targetExp = rs.getExpression();
 			System.out.println("in returnSTatem:" + targetExp);
-			String resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p, f);
+			Value resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p, f);
 			// LLVMObject type = CFG.getObj(resultReg);
 			// System.out.println("in return, type: " + resultReg);
 
-			Register r = Register.getReg(resultReg);
-			if (r == null) {
-				r = new Register ("", new IntObject());
-			}
+			Value returnReg = new Register(resultReg.getType(), "_retval_");
 
-			Instruction storeToRetVal = new InstructionStore("%_retval_", resultReg, r.getType());
+			Instruction storeToRetVal = new InstructionStore(returnReg, resultReg, resultReg.getType());
 			currBlock.addInstruction(storeToRetVal);
 
 			InstructionBr branchToReturn = new InstructionBr(returnBlock.getLabel());
 			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
-			InstructionTranslator.setReturnInstruction(returnBlock, r.getType());
+			InstructionTranslator.setReturnInstruction(returnBlock, resultReg.getType());
 
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);

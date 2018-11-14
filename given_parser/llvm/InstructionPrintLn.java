@@ -3,9 +3,9 @@ package llvm;
 public class InstructionPrintLn implements Instruction {
 	
 
-	String register;
+	Value register;
 
-	public InstructionPrintLn (String register) {
+	public InstructionPrintLn (Value register) {
 		this.register = register;
 	}
 

@@ -2,11 +2,11 @@ package llvm;
 
 public class InstructionSub implements Instruction {
 	
-	String operand1;
-	String operand2;
-	String register;
+	Value operand1;
+	Value operand2;
+	Value register;
 
-	public InstructionSub (String register, String operand1, String operand2) {
+	public InstructionSub (Value register, Value operand1, Value operand2) {
 		this.register = register;
 		this.operand1 = operand1;
 		this.operand2 = operand2;

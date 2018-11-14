@@ -4,17 +4,17 @@ import cfg.*;
 
 public class InstructionStore implements Instruction {
 
-	String value; //target
-	String pointer; //source
+	Value value; //target
+	Value pointer; //source
 	LLVMObject type;
 
-	public InstructionStore (String target, String source) {
+	public InstructionStore (Value target, Value source) {
 		this.value = source;
 		this.pointer = target;
 		this.type = new IntObject();
 	}
 
-	public InstructionStore (String target, String source, LLVMObject type) {
+	public InstructionStore (Value target, Value source, LLVMObject type) {
 		this.value = source;
 		this.type = type;
 		this.pointer = target;

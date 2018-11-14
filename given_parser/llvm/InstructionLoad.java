@@ -4,11 +4,11 @@ import llvm.*;
 
 public class InstructionLoad implements Instruction{
 	
-	String result;
-	String pointer;
+	Value result;
+	Value pointer;
 	LLVMObject type;
 
-	public InstructionLoad (String result, String pointer, LLVMObject type) {
+	public InstructionLoad (Value result, Value pointer, LLVMObject type) {
 		this.result = result;
 		this.pointer = pointer;
 		this.type = type;

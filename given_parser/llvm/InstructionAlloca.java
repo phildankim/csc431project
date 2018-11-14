@@ -5,10 +5,10 @@ import java.util.*;
 
 public class InstructionAlloca implements Instruction {
 
-	String result;
+	Value result;
 	LLVMObject type;
 
-	public InstructionAlloca(LLVMObject type, String res) {
+	public InstructionAlloca(LLVMObject type, Value res) {
 		this.type = type;
 		this.result = res;
 	}
@@ -16,6 +16,6 @@ public class InstructionAlloca implements Instruction {
 
 	@Override
 	public String toString() {
-		return "%" + this.result + " = alloca " + this.type.toString();
+		return this.result + " = alloca " + this.type.toString();
 	}
 }

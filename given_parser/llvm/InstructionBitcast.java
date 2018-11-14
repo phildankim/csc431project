@@ -2,12 +2,12 @@ package llvm;
 
 public class InstructionBitcast implements Instruction {
 	
-	String result;
-	String register;
+	Value result;
+	Value register;
 	String structName;
 	Boolean isMalloc;
 
-	public InstructionBitcast (String result, String register, String structName, Boolean isMalloc) {
+	public InstructionBitcast (Value result, Value register, String structName, Boolean isMalloc) {
 		this.result = result;
 		this.register = register;
 		this.structName = structName;

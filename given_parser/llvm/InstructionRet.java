@@ -2,15 +2,15 @@ package llvm;
 
 public class InstructionRet implements Instruction {
 	
-	String register;
+	Value register;
 	LLVMObject type;
 
-	public InstructionRet (String register) {
+	public InstructionRet (Value register) {
 		this.register = register;
 		this.type = new IntObject();
 	}
 
-	public InstructionRet (String register, LLVMObject type) {
+	public InstructionRet (Value register, LLVMObject type) {
 		this.register = register;
 		this.type = type;
 	}

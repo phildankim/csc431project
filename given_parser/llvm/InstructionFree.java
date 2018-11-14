@@ -2,9 +2,9 @@ package llvm;
 
 public class InstructionFree implements Instruction {
 	
-	String register;
+	Value register;
 
-	public InstructionFree (String register) {
+	public InstructionFree (Value register) {
 		this.register = register;
 	}
 

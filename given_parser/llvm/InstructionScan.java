@@ -3,9 +3,9 @@ package llvm;
 public class InstructionScan implements Instruction {
 	
 
-	String register;
+	Value register;
 
-	public InstructionScan (String register) {
+	public InstructionScan (Value register) {
 		this.register = register;
 	}
 

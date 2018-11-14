@@ -5,7 +5,7 @@ import ast.*;
 
 public class Register implements Value {
 
-	public String num;
+	public String name;
 	public LLVMObject type;
 	private static int counter = 0;
 	// needed for SSA
@@ -13,9 +13,18 @@ public class Register implements Value {
 	// key: Register number (String), val: Register
 	private static HashMap<String, Register> registers = new HashMap<String, Register>();
 
-	public Register(String num, LLVMObject type) {
-		this.num = num;
+	public Register(LLVMObject type) {
+		this.name = "%u" + counter;
+		counter = counter + 1;
 		this.type = type;
+
+		addToRegisters(name, this);
+	}
+
+	public Register(LLVMObject type, String name) {
+		this.name = "%" + name;
+		this.type = type;
+		addToRegisters(name, this);
 	}
 
 	public static void addToRegisters(String s, Register reg) {
@@ -34,12 +43,8 @@ public class Register implements Value {
 		return Register.registers.get(r);
 	}
 
-	public static String getNewRegNum() {
-		return "%u" + Integer.toString(counter++);
-	}
-
-	public String getRegNum() {
-		return this.num;
+	public String getName() {
+		return name;
 	}
 
 	public LLVMObject getType() {
@@ -54,10 +59,10 @@ public class Register implements Value {
 	}
 
 	public String toString() {
-		return "Register " + this.getRegNum() + " contains object " + this.type;
+		return name;
 	}
 
 	public void printRegister() {
-		System.out.println("Register " + this.getRegNum() + " contains " + this.getType());
+		System.out.println("Register " + name + " contains " + this.getType());
 	}
 }
