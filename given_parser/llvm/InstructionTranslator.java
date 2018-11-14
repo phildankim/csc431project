@@ -97,9 +97,9 @@ public class InstructionTranslator {
 			IntegerExpression ie = (IntegerExpression)e;
 
 			IntObject i = new IntObject();
-			i.setValue(ie.getValue());			
+			i.setValue(ie.getValue());
 
-			Immediate immed = new Immediate (ie.getValue(), i);
+			Immediate immed = new Immediate(ie.getValue(), i);
 
 			return immed;
 		}

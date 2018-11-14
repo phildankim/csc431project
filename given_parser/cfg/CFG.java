@@ -318,6 +318,15 @@ public class CFG {
 		}
 	}
 
+	public void removeEmptyBlocks() {
+		for (int i = 0; i < this.blocks.size(); i++) {
+			Block b = this.blocks.get(i);
+			if (b.instructions.size() == 0) {
+				this.blocks.remove(i);
+			}
+		}
+	}
+
 	public boolean isJoin(Block b) {
 		String regex = "Join\\d+";
 		if (Pattern.matches(regex, b.getLabel())) {
