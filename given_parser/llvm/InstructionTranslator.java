@@ -434,7 +434,7 @@ public class InstructionTranslator {
 	public static void setReturnInstruction(Block b, LLVMObject type) {
 		Register returnRegister = new Register(type);
 
-		Instruction instr = new InstructionLoad(returnRegister, new Register(type,"%_retval_"), type);
+		Instruction instr = new InstructionLoad(returnRegister, new Register(type,"_retval_"), type);
 		Instruction ret = new InstructionRet(returnRegister, type);
 		b.addInstruction(instr);
 		b.addInstruction(ret);
