@@ -190,8 +190,6 @@ public class CFG {
 			}
 
 			this.updateCurr(join);
-
-			// Recurse here
 			return currBlock;
 
 		}
@@ -201,13 +199,13 @@ public class CFG {
 			blocks.add(returnBlock);
 			labelCounter += 1;
 
+			InstructionBr toRet = new InstructionBr(returnBlock.getLabel());
+			currBlock.addInstruction(toRet);
+
 			ReturnStatement rs = (ReturnStatement)statement;
 
 			Expression targetExp = rs.getExpression();
-			System.out.println("in returnSTatem:" + targetExp);
 			Value resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p, f);
-			// LLVMObject type = CFG.getObj(resultReg);
-			// System.out.println("in return, type: " + resultReg);
 
 			Value returnReg = new Register(resultReg.getType(), "_retval_");
 
@@ -240,7 +238,6 @@ public class CFG {
 			Instruction instr = new InstructionRetVoid();
 			returnBlock.addInstruction(instr);
 
-
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);
 
@@ -267,6 +264,16 @@ public class CFG {
 			from.addSucc(to);
 			to.addPred(from);
 		}
+	}
+
+	public Block getBlock(String label) {
+		for (Block b : this.blocks) {
+			if (b.getLabel().equals(label)) {
+				return b;
+			}
+		}
+
+		return null;
 	}
 
 	public void printInstructions(BufferedWriter writer) throws IOException {
@@ -326,6 +333,17 @@ public class CFG {
 			}
 		}
 	}
+
+	public void addTerminationInstructionToExit() {
+		if (f.getType() instanceof VoidType) {
+			InstructionBr toExit = new InstructionBr(this.exitBlock.getLabel());
+			currBlock.addInstruction(toExit);
+
+			Instruction instr = new InstructionRetVoid();
+			this.exitBlock.addInstruction(instr);
+		}
+	}
+
 
 	public boolean isJoin(Block b) {
 		String regex = "Join\\d+";

@@ -16,7 +16,7 @@ public class Block {
 	public ArrayList<Instruction> instructions = new ArrayList<Instruction>();
 
 	public Block(String label) {
-		this.label = label;
+		this.label = (label);
 	}
 
 	public String getLabel() {

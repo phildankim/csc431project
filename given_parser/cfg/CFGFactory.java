@@ -18,11 +18,12 @@ public class CFGFactory {
 			CFG cfg = new CFG(f, p);
 			cfg.createCFG(f.getBody());
 			cfg.connectToExit();
+			cfg.addTerminationInstructionToExit();
 			cfgs.add(cfg);
 			cfg.addPredecessorsAndSuccessors();
-			Register.printRegisters();
+			//Register.printRegisters();
 			cfg.clearStructs();
-			cfg.removeEmptyBlocks();
+			//cfg.removeEmptyBlocks();
 		}
 
 		return cfgs;

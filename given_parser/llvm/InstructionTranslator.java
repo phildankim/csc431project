@@ -401,7 +401,7 @@ public class InstructionTranslator {
 			CFG.addToLocals(d.getName(), obj);	
 			b.addInstruction(localDecl);
 		}
-		CFG.printStructs();
+		//CFG.printStructs();
 	}
 
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
