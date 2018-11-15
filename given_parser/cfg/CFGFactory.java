@@ -23,7 +23,7 @@ public class CFGFactory {
 			cfg.addPredecessorsAndSuccessors();
 			//Register.printRegisters();
 			cfg.clearStructs();
-			//cfg.removeEmptyBlocks();
+			cfg.removeEmptyBlocks();
 		}
 
 		return cfgs;

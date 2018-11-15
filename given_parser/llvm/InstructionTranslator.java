@@ -27,7 +27,9 @@ public class InstructionTranslator {
 			}
 			else {
 
+				System.out.println("in assign, boutta fuck up a check " + as.getSource());
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
+				System.out.println("we fucked that check up");
 
 				InstructionStore instr = new InstructionStore(target, source, source.getType());
 				b.addInstruction(instr);
@@ -121,7 +123,7 @@ public class InstructionTranslator {
 					return reg;
 				}
  			}
-
+ 			System.out.println("here in idexp");
 			load = new InstructionLoad(reg, new Register(type,id), type);
 			b.addInstruction(load);
 
@@ -256,13 +258,12 @@ public class InstructionTranslator {
 
 		else if (e instanceof NewExpression) {
 
+			System.out.println("currently fucking it up");
 			NewExpression ne = (NewExpression)e;
 			String structName = ne.getId();
 
 			Value regForMalloc = new Register(new StructObject(structName));
 			Value regForBitcast = new Register(new StructObject(structName));
-
-			System.out.println("ne: " + structName);
 
 			// count the number of fields inside the struct:
 			int numFields = 0;
@@ -356,6 +357,7 @@ public class InstructionTranslator {
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;	
 			String lvId = lvdot.getId();
+			System.out.println("in parseLvalue, lvId: " + lvId);
 
 			Value regLeft = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
 

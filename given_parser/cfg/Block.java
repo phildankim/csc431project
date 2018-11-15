@@ -42,9 +42,9 @@ public class Block {
 	}
 
 	public void printInstructions(BufferedWriter writer) throws IOException {
-		if (this.getLabel().equals("Exit")) {
-				return;
-		}
+		// if (this.getLabel().equals("Exit")) {
+		// 		return;
+		// }
 		writer.write(this.getLabel() + ":" + "\n");
 		for (Instruction i : instructions) {
 			writer.write("\t" + i.toString() + "\n");
