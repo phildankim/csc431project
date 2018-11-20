@@ -25,12 +25,12 @@
 hs_err_pid*
 
 .DS_Store
-csc431project/Mini.tokens
-csc431project/MiniBaseListener.java
-csc431project/MiniBaseVisitor.java
-csc431project/MiniLexer.java
-csc431project/MiniLexer.tokens
-csc431project/MiniListener.java
-csc431project/MiniParser.java
-csc431project/MiniVisitor.java
-csc431project/antlr.generated
+Mini.tokens
+MiniBaseListener.java
+MiniBaseVisitor.java
+MiniLexer.java
+MiniLexer.tokens
+MiniListener.java
+MiniParser.java
+MiniVisitor.java
+antlr.generated
