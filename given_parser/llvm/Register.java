@@ -22,7 +22,16 @@ public class Register implements Value {
 	}
 
 	public Register(LLVMObject type, String name) {
-		this.name = "%" + name;
+
+		if (!name.isEmpty()) {
+			if (name.charAt(0) == '@') {
+				this.name = name;
+			}
+			else {
+				this.name = "%" + name;
+			}
+		}
+
 		this.type = type;
 		addToRegisters(name, this);
 	}

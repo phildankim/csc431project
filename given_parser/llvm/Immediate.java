@@ -12,6 +12,11 @@ public class Immediate implements Value {
 		this.type = type;
 	}
 
+	public Immediate (String value) {
+		this.value = value;
+		this.type = new IntObject();
+	}
+
 	public LLVMObject getType() {
 		return type;
 	}

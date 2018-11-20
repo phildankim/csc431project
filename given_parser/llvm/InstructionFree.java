@@ -10,6 +10,6 @@ public class InstructionFree implements Instruction {
 
 	@Override
 	public String toString() {
-		return "call void i8* @free(i32 " + register + ")";
+		return "call void @free(i8* " + register + ")";
 	}
 }

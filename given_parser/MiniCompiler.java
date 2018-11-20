@@ -18,6 +18,7 @@ public class MiniCompiler
    private static boolean stack = false;
    private static boolean jsonPrint = false;
    private static boolean cfg = false;
+   private static boolean ssa = false;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
@@ -74,6 +75,12 @@ public class MiniCompiler
             llvm.printInstructions(writer);
             writer.close();
          }
+
+         if (ssa) {
+            String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
+            CFGBuilder cb = new CFGBuilder(program, fileName);
+            cb.build();
+         }
       }
    }
 
@@ -96,6 +103,9 @@ public class MiniCompiler
 
             else if (args[i].equals("-cfg")) {
                cfg = true;
+            }
+            else if (args[i].equals("-llvm")) {
+               ssa = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);

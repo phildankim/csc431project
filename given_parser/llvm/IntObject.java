@@ -6,6 +6,8 @@ public class IntObject implements LLVMObject {
 	public String id;
 
 	public IntObject() {
+		value = "0";
+		id = "";
 	}
 
 	public IntObject(String id) {

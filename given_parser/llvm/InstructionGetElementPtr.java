@@ -16,6 +16,6 @@ public class InstructionGetElementPtr implements Instruction{
 
 	@Override
 	public String toString() {
-		return result + " = getelementptr " + type + "* " + ptrval + ", i1 0, i32 " + index;
+		return result + " = getelementptr " + type + " " + ptrval + ", i1 0, i32 " + index;
 	}
 }
