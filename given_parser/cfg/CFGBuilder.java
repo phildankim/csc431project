@@ -82,6 +82,11 @@ public class CFGBuilder {
 	        }
 
 			writer.write("}\n");
+
+			System.out.println("This is function " + func.getName());
+			for (String name : localParamTable.keySet()) {
+				System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
+			}
 		}
 
 		writer.write("declare i8* @malloc(i32)\n");
@@ -166,6 +171,7 @@ public class CFGBuilder {
 					Instruction store = new InstructionStore(result,sourceRegister,type);
 					currentBlock.addInstruction(store);
 				}
+				else throw new RuntimeException("lvalueid missing, AssignmentStatement");
 			}
 			else if (target instanceof LvalueDot) {
 				Expression left = ((LvalueDot)target).getLeft();
@@ -177,12 +183,13 @@ public class CFGBuilder {
 				String structName = ((StructObject)type).getName();
 
 				Integer fieldIndex = findIndex(structName, field);
+				LLVMObject fieldType = findFieldType(structName,field);
 
 				Value forGetElementPtr = new Register(sourceRegister.getType());
 				Instruction gep = new InstructionGetElementPtr(forGetElementPtr, type, leftRegister, fieldIndex.toString());
 				currentBlock.addInstruction(gep);
 
-				currentBlock.addInstruction(new InstructionStore(forGetElementPtr, sourceRegister,forGetElementPtr.getType()));
+				currentBlock.addInstruction(new InstructionStore(forGetElementPtr, sourceRegister,fieldType));
 
 			}
 
@@ -520,6 +527,8 @@ public class CFGBuilder {
 
 		else if (e instanceof DotExpression) {
 			DotExpression de = (DotExpression)e;
+
+			/* OLD STUFF 
 			String dotId = de.getId();
 
 			Value leftReg = buildExpression(de.getLeft(), b);
@@ -538,6 +547,43 @@ public class CFGBuilder {
 			InstructionLoad il = new InstructionLoad(result, idRes, result.getType());
 			b.addInstruction(il);
 			return result;
+
+			
+
+
+				Value leftRegister = buildExpression(de.getLeft(), b);
+				LLVMObject type = leftRegister.getType();
+
+				String field = de.getId();
+				String structName = ((StructObject)type).getName();
+
+				Integer fieldIndex = findIndex(structName, field);
+
+				Value forGetElementPtr = new Register(sourceRegister.getType());
+				Instruction gep = new InstructionGetElementPtr(forGetElementPtr, type, leftRegister, fieldIndex.toString());
+				b.addInstruction(gep);
+
+				b.addInstruction(new InstructionStore(forGetElementPtr, sourceRegister,forGetElementPtr.getType()));
+
+			*/
+
+
+			Value left = buildExpression(de.getLeft(), b);
+
+			String structName = ((StructObject)left.getType()).getName();
+			String fieldName = de.getId();
+			Integer fieldIndex = findIndex(structName, fieldName);
+			LLVMObject fieldType = findFieldType(structName,fieldName);
+
+			Value forField = new Register(fieldType);
+			Instruction gep = new InstructionGetElementPtr(forField, left.getType(), left, fieldIndex.toString());
+			b.addInstruction(gep);
+
+			Value forLoad = new Register(fieldType);
+			Instruction il = new InstructionLoad(forLoad, forField, fieldType);
+			b.addInstruction(il);
+
+			return forLoad;
 		}
 
 		else if (e instanceof ReadExpression) {
@@ -562,6 +608,21 @@ public class CFGBuilder {
 			for (int i = 0; i < fields.size(); i++) {
 				if (fields.get(i).getName().equals(fieldName)) {
 					return i;
+				}
+			}
+			throw new RuntimeException("found the structname " + structName + " but cant find field " + fieldName);
+		}
+		else {
+			throw new RuntimeException("did not find structname " + structName + " in structtable");
+		}
+	}
+
+	public LLVMObject findFieldType(String structName, String fieldName) {
+		List<Declaration> fields = structTable.get(structName);
+		if (fields != null) {
+			for (int i = 0; i < fields.size(); i++) {
+				if (fields.get(i).getName().equals(fieldName)) {
+					return toLLVMObject(fields.get(i).getType());
 				}
 			}
 			throw new RuntimeException("found the structname " + structName + " but cant find field " + fieldName);
