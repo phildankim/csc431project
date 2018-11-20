@@ -1,5 +1,7 @@
 things to do:
 -dot expressions (daniel)
+-guess we're doing SSA
+-parseLValue
 
 unassigned:
 -null expressions
