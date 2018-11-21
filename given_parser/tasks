@@ -3,6 +3,11 @@ things to do:
 -guess we're doing SSA
 -parseLValue
 
+Milestone 2:
+	- true expression
+	- false expression
+	- unary expressions
+
 unassigned:
 -null expressions
 -hash tables for using param values stored in registers

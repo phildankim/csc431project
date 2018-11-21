@@ -64,12 +64,14 @@ public class MiniCompiler
          // MiniTypeChecker.checkProgram(program);
 
          //Milestone 2 
-         LLVM llvm = new LLVM(program);
          if (cfg) {
+            LLVM llvm = new LLVM(program);
             //LLVM.printStructs();
             llvm.printProgram();
          }
          if (stack) {
+                     LLVM llvm = new LLVM(program);
+
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             llvm.printInstructions(writer);

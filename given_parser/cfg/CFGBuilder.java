@@ -368,6 +368,35 @@ public class CFGBuilder {
 
 			return immed;
 		}
+		else if (e instanceof TrueExpression) {
+
+			IntObject i = new IntObject();
+			i.setValue("1");
+
+			Immediate immed = new Immediate("1", i);
+
+			return immed;
+		}
+		else if (e instanceof FalseExpression) {
+
+			IntObject i = new IntObject();
+			i.setValue("0");
+
+			Immediate immed = new Immediate("0", i);
+
+			return immed;
+		}
+
+		else if (e instanceof UnaryExpression) {
+			UnaryExpression ue = (UnaryExpression)e;
+
+			if (ue.getOperator().equals(UnaryExpression.Operator.NOT)) {
+				throw new RuntimeException("unary not unimplemented");
+			}
+			else if (ue.getOperator().equals(UnaryExpression.Operator.MINUS)) {
+				throw new RuntimeException("unary minus");
+			}
+		}
 
 		else if (e instanceof IdentifierExpression) {
 			IdentifierExpression ie = (IdentifierExpression)e;
@@ -599,7 +628,7 @@ public class CFGBuilder {
 		}
 
 
-		throw new RuntimeException ("buildexpression error: should not reach here");
+		throw new RuntimeException ("buildexpression error: should not reach here " + e.toString());
 	}
 
 	public Integer findIndex(String structName, String fieldName) {
