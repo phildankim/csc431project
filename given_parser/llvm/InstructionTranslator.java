@@ -17,6 +17,10 @@ public class InstructionTranslator {
 			} 
 		}
 		else if (s instanceof AssignmentStatement) {
+			// the given mixed.ll parses the source before the target
+			// as a result, the instructions are in slightly different orders
+			// but it shouldn't matter as the resulting store instructions 
+			// should still have the correct register values
 			AssignmentStatement as = (AssignmentStatement)s;
 			
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
@@ -25,11 +29,8 @@ public class InstructionTranslator {
 				InstructionScan ir = new InstructionScan(target);
 				b.addInstruction(ir);
 			}
-			else {
-
-				System.out.println("in assign, boutta fuck up a check " + as.getSource());
+			else {				
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
-				System.out.println("we fucked that check up");
 
 				InstructionStore instr = new InstructionStore(target, source, source.getType());
 				b.addInstruction(instr);
@@ -110,6 +111,7 @@ public class InstructionTranslator {
 			IdentifierExpression ie = (IdentifierExpression)e;
 
 			String id = ie.getId();
+			System.out.println("in identexp, id is: " + id);
 			LLVMObject type = CFG.getType(id);
 
 			Register reg = new Register(type);
@@ -123,7 +125,6 @@ public class InstructionTranslator {
 					return reg;
 				}
  			}
- 			System.out.println("here in idexp");
 			load = new InstructionLoad(reg, new Register(type,id), type);
 			b.addInstruction(load);
 
@@ -257,8 +258,7 @@ public class InstructionTranslator {
 		}
 
 		else if (e instanceof NewExpression) {
-
-			System.out.println("currently fucking it up");
+			// fix this shit
 			NewExpression ne = (NewExpression)e;
 			String structName = ne.getId();
 
@@ -289,7 +289,9 @@ public class InstructionTranslator {
 			DotExpression de = (DotExpression)e;
 			String dotId = de.getId();
 
+			System.out.println("in dotexpr, left is: " + de.getLeft());
 			Value leftReg = InstructionTranslator.parseExpression(b, de.getLeft(), p, f);
+			System.out.println("in dotexpr, return from parseExpr, leftReg is: " + leftReg.getName());	
 			StructObject leftType = (StructObject)leftReg.getType();
 
 			LLVMObject idStruct = LLVM.getStructField(leftType.getName(), dotId);
@@ -349,7 +351,6 @@ public class InstructionTranslator {
 			LvalueId lvid = (LvalueId)lv;
 			String id = lvid.getId();
 			LLVMObject type = CFG.getType(id);
-
 			// InstructionStore store = new InstructionStore(regNum, "%" + id, type);
 			// b.addInstruction(store);
 			return new Register(type,id);
@@ -357,23 +358,20 @@ public class InstructionTranslator {
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;	
 			String lvId = lvdot.getId();
-			System.out.println("in parseLvalue, lvId: " + lvId);
+			System.out.println("in parseLvalue, lvid is: " + lvId + " and left is: " + lvdot.getLeft());
 
-			Value regLeft = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
+			Value regLeftNum = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
+			StructObject regObject = (StructObject)regLeftNum.getType();
+		
+			LLVMObject idObj = LLVM.getStructField(regObject.getName(), lvId);
+			Register idRes = new Register(idObj); //automatically adds to hashmap
 
-			StructObject dotType = (StructObject)regLeft.getType();
-			Register dotRes = new Register(dotType);
+			int index = LLVM.getFieldIndex(regObject.getName(), lvId);
 
-			LLVMObject idObj = LLVM.getStructField(dotType.getName(), lvId);
-			Register idRes = new Register(idObj);
 
-			int index = LLVM.getFieldIndex(dotType.getName(), lvId);
-
-			// instruction to load dottype into new register
-			InstructionLoad load = new InstructionLoad(dotRes, regLeft, dotType);
-			b.addInstruction(load);
-
-			InstructionGetElementPtr gep = new InstructionGetElementPtr(idRes, dotType, regLeft, Integer.toString(index));
+			// this instruction needs to be preceded by a LOAD
+			// refer to domath() in mixed.ll
+			InstructionGetElementPtr gep = new InstructionGetElementPtr(idRes, regObject, regLeftNum, Integer.toString(index));
 			b.addInstruction(gep);
 
 			return idRes;

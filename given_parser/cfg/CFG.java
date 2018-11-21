@@ -199,8 +199,8 @@ public class CFG {
 			blocks.add(returnBlock);
 			labelCounter += 1;
 
-			InstructionBr toRet = new InstructionBr(returnBlock.getLabel());
-			currBlock.addInstruction(toRet);
+			// InstructionBr toRet = new InstructionBr(returnBlock.getLabel());
+			// currBlock.addInstruction(toRet);
 
 			ReturnStatement rs = (ReturnStatement)statement;
 
