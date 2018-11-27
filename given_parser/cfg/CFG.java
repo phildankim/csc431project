@@ -116,11 +116,18 @@ public class CFG {
 				//Branch instructions here
 				Edge thenJoin = new Edge(thenRes, join);
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				ifThen.addInstruction(toJoin);
+
+				if (!hasBranch(ifThen)) {
+					ifThen.addInstruction(toJoin);
+				}
+
 			}
 			else {
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				ifThen.addInstruction(toJoin);
+
+				if (!hasBranch(ifThen)) {
+					ifThen.addInstruction(toJoin);
+				}
 			}
 
 			// Branch IfElse
@@ -132,11 +139,17 @@ public class CFG {
 				Edge elseJoin = new Edge(elseRes, join);
 				edges.add(elseJoin);
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				ifElse.addInstruction(toJoin);
+
+				if (!hasBranch(ifElse)) {
+					ifElse.addInstruction(toJoin);
+				}
 			}
 			else {
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				ifElse.addInstruction(toJoin);
+
+				if (!hasBranch(ifElse)) {
+					ifElse.addInstruction(toJoin);
+				}
 			}
 
 			this.updateCurr(join);
@@ -379,5 +392,15 @@ public class CFG {
 		header += ")";
 
 		return header;
+	}
+
+	public boolean hasBranch(Block b) {
+		for (int i = 0; i < b.instructions.size(); i++) {
+			if(b.instructions.get(i) instanceof InstructionBr) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
