@@ -24,6 +24,7 @@ public class InstructionTranslator {
 			AssignmentStatement as = (AssignmentStatement)s;
 			
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
+			
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
@@ -31,6 +32,14 @@ public class InstructionTranslator {
 			}
 			else {				
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
+
+				// for (Declaration param : f.getParams()) {
+				// if (id.equals(param.getName())) {
+				// 		load = new InstructionLoad(reg, new Register(type,"_P_" + id), type);
+				// 		b.addInstruction(load);
+				// 		return reg;
+				// 	}
+	 		// 	}
 
 				InstructionStore instr = new InstructionStore(target, source, source.getType());
 				b.addInstruction(instr);
@@ -74,7 +83,7 @@ public class InstructionTranslator {
 
 
 			Value regForLoad = InstructionTranslator.parseExpression(b, ds.getExpression(),p, f);
-			Value regForBitcast = new Register(new StructObject(structName),structName);
+			Value regForBitcast = new Register(new StructObject(structName));
 
 			Instruction bc = new InstructionBitcast(regForBitcast,regForLoad,structName, false);
 			b.addInstruction(bc);
@@ -111,7 +120,6 @@ public class InstructionTranslator {
 			IdentifierExpression ie = (IdentifierExpression)e;
 
 			String id = ie.getId();
-			System.out.println("in identexp, id is: " + id);
 			LLVMObject type = CFG.getType(id);
 
 			Register reg = new Register(type);
@@ -289,9 +297,7 @@ public class InstructionTranslator {
 			DotExpression de = (DotExpression)e;
 			String dotId = de.getId();
 
-			System.out.println("in dotexpr, left is: " + de.getLeft());
 			Value leftReg = InstructionTranslator.parseExpression(b, de.getLeft(), p, f);
-			System.out.println("in dotexpr, return from parseExpr, leftReg is: " + leftReg.getName());	
 			StructObject leftType = (StructObject)leftReg.getType();
 
 			LLVMObject idStruct = LLVM.getStructField(leftType.getName(), dotId);
@@ -302,7 +308,12 @@ public class InstructionTranslator {
 
 			InstructionGetElementPtr gep = new InstructionGetElementPtr(idRes, leftType, leftReg, Integer.toString(index));
 			b.addInstruction(gep);
-			return idRes;
+
+			Register loadReg = new Register(idStruct);
+			InstructionLoad load = new InstructionLoad(loadReg, idRes, idStruct);
+			b.addInstruction(load);
+
+			return loadReg;
 		}
 
 		return null;
@@ -351,30 +362,39 @@ public class InstructionTranslator {
 			LvalueId lvid = (LvalueId)lv;
 			String id = lvid.getId();
 			LLVMObject type = CFG.getType(id);
-			// InstructionStore store = new InstructionStore(regNum, "%" + id, type);
-			// b.addInstruction(store);
+
+			for (Declaration param : f.getParams()) {
+				if (id.equals(param.getName())) {
+					Register paramId = new Register(type,"_P_" + id);
+					return paramId;
+				}
+ 			}
+			
 			return new Register(type,id);
 		}
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;	
 			String lvId = lvdot.getId();
-			System.out.println("in parseLvalue, lvid is: " + lvId + " and left is: " + lvdot.getLeft());
-
+			
 			Value regLeftNum = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
 			StructObject regObject = (StructObject)regLeftNum.getType();
+
+			System.out.println("in lvaluedot: id is " + lvId + " and type is " + regObject);
 		
 			LLVMObject idObj = LLVM.getStructField(regObject.getName(), lvId);
 			Register idRes = new Register(idObj); //automatically adds to hashmap
 
 			int index = LLVM.getFieldIndex(regObject.getName(), lvId);
 
+			Register gepReg = new Register(idObj);
 
 			// this instruction needs to be preceded by a LOAD
 			// refer to domath() in mixed.ll
-			InstructionGetElementPtr gep = new InstructionGetElementPtr(idRes, regObject, regLeftNum, Integer.toString(index));
+			
+			InstructionGetElementPtr gep = new InstructionGetElementPtr(gepReg, regObject, regLeftNum, Integer.toString(index));
 			b.addInstruction(gep);
 
-			return idRes;
+			return gepReg;
 		}
 	}
 
@@ -401,7 +421,6 @@ public class InstructionTranslator {
 			CFG.addToLocals(d.getName(), obj);	
 			b.addInstruction(localDecl);
 		}
-		//CFG.printStructs();
 	}
 
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {
@@ -414,8 +433,6 @@ public class InstructionTranslator {
 			InstructionAlloca pAlloc = new InstructionAlloca(obj, paramReg);
 			CFG.addToLocals(param.getName(), obj);
 			b.addInstruction(pAlloc);
-
-
 
 			Instruction instruction = new InstructionStore(paramReg, reg);
 			b.addInstruction(instruction);

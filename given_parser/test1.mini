@@ -14,23 +14,16 @@ fun main() int
 {
 	int n;
 	struct foo f;
+	struct foo g;
 	f = new foo;
+	g = new foo;
 
 	f.simp = new simple;
+	g.simp = new simple;
 	f.simp.one = 1;
+	g.simp.one = f.simp.one;
 
 	n = 0;
-	while (n < 2) 
-	{
-		if (n < 2) 
-		{
-			n = f.simp.one;
-		}
-		else 
-		{
-			n = 4;
-		}
-	}
 	return n;
 }
 

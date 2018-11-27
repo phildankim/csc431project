@@ -49,7 +49,7 @@ public class CFG {
 			System.out.println("Key: " + key + "\tValue: " + CFG.getType(key));
 		}
 	}
-
+	
 	public void updateCurr(Block newCurr) {
 		this.currBlock = newCurr;
 	}
@@ -119,8 +119,8 @@ public class CFG {
 				ifThen.addInstruction(toJoin);
 			}
 			else {
-				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				ifThen.addInstruction(toJoin);
+				// InstructionBr toJoin = new InstructionBr(join.getLabel());
+				// ifThen.addInstruction(toJoin);
 			}
 
 			// Branch IfElse
@@ -135,8 +135,8 @@ public class CFG {
 				ifElse.addInstruction(toJoin);
 			}
 			else {
-				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				ifElse.addInstruction(toJoin);
+				// InstructionBr toJoin = new InstructionBr(join.getLabel());
+				// ifElse.addInstruction(toJoin);
 			}
 
 			this.updateCurr(join);
