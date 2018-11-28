@@ -390,7 +390,7 @@ public class CFGBuilder {
 		else if (e instanceof UnaryExpression) {
 			UnaryExpression ue = (UnaryExpression)e;
 
-			Value operand = buildExpression(ue.getOperand());
+			Value operand = buildExpression(ue.getOperand(), b);
 
 			if (ue.getOperator().equals(UnaryExpression.Operator.NOT)) {
 				if (operand instanceof Immediate) {
@@ -405,10 +405,39 @@ public class CFGBuilder {
 						i.setValue("0");
 						return new Immediate("0", i);
 					}
+					else {
+						throw new RuntimeException("Unary Not, operand is immediate but not 0 or 1");
+					}
+				}
+				else if (operand instanceof Register) {
+					Register reg = new Register(new BoolObject());
+
+					IntObject i = new IntObject();
+					i.setValue("1");
+
+					Instruction xor = new InstructionXor(reg, new Immediate("1",i), operand);
+
+					return reg;
 				}
 			}
 			else if (ue.getOperator().equals(UnaryExpression.Operator.MINUS)) {
-				throw new RuntimeException("unary minus");
+				if (operand instanceof Immediate) {
+					Immediate immed = (Immediate)operand;
+					IntObject i = new IntObject();
+					Integer newValue = Integer.parseInt(immed.getValue());
+					i.setValue(Integer.toString(-newValue));
+					return new Immediate(i.getValue(),i);
+
+				}
+				else if (operand instanceof Register) {
+					throw new RuntimeException("unary minus but register");
+				}
+				else throw new RuntimeException("unary minus" + ue.getOperator().toString());
+			}
+
+			else {
+				System.out.println("GETTING HERE");
+				throw new RuntimeException("UNARY ERRORRRR");
 			}
 		}
 
