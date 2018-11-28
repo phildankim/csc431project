@@ -27,9 +27,10 @@ public class InstructionTranslator {
 				InstructionScan ir = new InstructionScan(target);
 				b.addInstruction(ir);
 			}
-			else {				
+			else {
+				System.out.println("in assign, source is: " + as.getSource());				
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
-
+				System.out.println("source value is " + source);
 				InstructionStore instr = new InstructionStore(target, source, source.getType());
 				b.addInstruction(instr);
 			}
@@ -105,7 +106,15 @@ public class InstructionTranslator {
 			IdentifierExpression ie = (IdentifierExpression)e;
 
 			String id = ie.getId();
+			System.out.println("in IE, id is " + id);
 			LLVMObject type = CFG.getType(id);
+
+			// if not in function (not local), then check global
+			if (type == null) {
+
+				type = LLVM.getType(id);
+				System.out.println("in IE, type: " + type);
+			}
 
 			Register reg = new Register(type);
 
@@ -299,25 +308,24 @@ public class InstructionTranslator {
 					}
 				}
 			}
-
+			Register result = new Register(retType);
 			// if not void, then store in register and return reg
 			if (!(retType instanceof VoidObject)) {
-				Register result = new Register(retType);
 				InstructionCall ic = new InstructionCall(result, retType, ie.getName(), arguments);
 				b.addInstruction(ic);
-				return result;
 			}
 			else {
 				InstructionCall ic = new InstructionCall(retType, ie.getName(), arguments);
 				b.addInstruction(ic);
 			}
+			return result;
 		}
 
 		else if (e instanceof NewExpression) {
 			// fix this shit
 			NewExpression ne = (NewExpression)e;
 			String structName = ne.getId();
-
+			System.out.println("in NE: structName is " + structName);
 			Value regForMalloc = new Register(new StructObject(structName));
 			Value regForBitcast = new Register(new StructObject(structName));
 
@@ -369,7 +377,6 @@ public class InstructionTranslator {
 
 	public static LLVMObject convertDeclarationToObject(Declaration d) {
 		Type t = d.getType();
-
 		if (t instanceof IntType) {
 			return new IntObject(d.getName());
 		}
@@ -423,7 +430,7 @@ public class InstructionTranslator {
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;	
 			String lvId = lvdot.getId();
-			
+			System.out.println("lvdot left: " + lvdot.getLeft());
 			Value regLeftNum = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
 			StructObject regObject = (StructObject)regLeftNum.getType();
 
@@ -450,6 +457,10 @@ public class InstructionTranslator {
 	// need to use objects
 	public static InstructionDecl setDeclInstruction(Declaration decl) {
 	 	InstructionDecl here = new InstructionDecl(decl);
+	 	LLVMObject obj = InstructionTranslator.convertDeclarationToObject(decl);
+		//InstructionAlloca localDecl = new InstructionAlloca(obj, new Register(obj, d.getName()));
+		LLVM.addToGlobals(decl.getName(), obj);	
+		//b.addInstruction(localDecl);
 	 	return here;
 	}
 
