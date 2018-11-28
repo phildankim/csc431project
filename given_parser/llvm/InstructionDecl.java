@@ -23,6 +23,10 @@ public class InstructionDecl implements Instruction {
 
 			return "@" + name + " = common global %struct." + structType + "* null, align 8";
 		}
+		else if (type instanceof IntType) {
+			IntType it = (IntType)type;
+			return "@" + name + " = common global i32 0";
+		}
 		else {
 			return "";
 		}
