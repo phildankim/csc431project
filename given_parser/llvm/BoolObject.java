@@ -20,6 +20,6 @@ public class BoolObject implements LLVMObject {
 	}
 
 	public String toString() {
-		return "bool";
+		return "i32";
 	}
 }

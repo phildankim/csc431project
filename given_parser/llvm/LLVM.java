@@ -13,6 +13,7 @@ public class LLVM {
 	private Program p;
 	private ArrayList<CFG> cfgs = new ArrayList<CFG>();
 	private ArrayList<Instruction> globalDecls = new ArrayList<Instruction>();
+	private static HashMap<String, LLVMObject> globals = new HashMap<String, LLVMObject>();
 	private List<TypeDeclaration> types;
 	// key: name of struct, value: list of fields
 	private static HashMap<String, ArrayList<LLVMObject>> structTable = new HashMap<String, ArrayList<LLVMObject>>();
@@ -21,9 +22,25 @@ public class LLVM {
 		this.p = p;
 		setDeclInstructions();
 		setTypeDeclInstructions();
+		LLVM.printGlobals();
 		LLVM.printStructTable();
 		System.out.println("structTable size: " + LLVM.structTable.size());
 		this.cfgs = CFGFactory.createAllCFG(p);
+	}
+
+	public static void printGlobals() {
+		System.out.println("--Currently in LLVM.Globals");
+		for (String key : LLVM.globals.keySet()) {
+			System.out.println("Key: " + key + "\tValue: " + CFG.getType(key));
+		}
+	}
+
+	public static void addToGlobals(String s, LLVMObject t) {
+		LLVM.globals.put(s, t);
+	}
+
+	public static LLVMObject getType(String id) {
+		return LLVM.globals.get(id);
 	}
 
 	public void printProgram() {
