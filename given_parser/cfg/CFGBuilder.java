@@ -390,8 +390,22 @@ public class CFGBuilder {
 		else if (e instanceof UnaryExpression) {
 			UnaryExpression ue = (UnaryExpression)e;
 
+			Value operand = buildExpression(ue.getOperand());
+
 			if (ue.getOperator().equals(UnaryExpression.Operator.NOT)) {
-				throw new RuntimeException("unary not unimplemented");
+				if (operand instanceof Immediate) {
+					Immediate immed = (Immediate)operand;
+					if (immed.getValue().equals("0")) {
+						IntObject i = new IntObject();
+						i.setValue("1");
+						return new Immediate("1", i);
+					}
+					else if (immed.getValue().equals("1")) {
+						IntObject i = new IntObject();
+						i.setValue("0");
+						return new Immediate("0", i);
+					}
+				}
 			}
 			else if (ue.getOperator().equals(UnaryExpression.Operator.MINUS)) {
 				throw new RuntimeException("unary minus");
