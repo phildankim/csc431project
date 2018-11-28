@@ -17,14 +17,11 @@ public class InstructionTranslator {
 			} 
 		}
 		else if (s instanceof AssignmentStatement) {
-			// the given mixed.ll parses the source before the target
-			// as a result, the instructions are in slightly different orders
-			// but it shouldn't matter as the resulting store instructions 
-			// should still have the correct register values
 			AssignmentStatement as = (AssignmentStatement)s;
 			
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
-			
+			System.out.println("target: " + target);
+
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
@@ -32,14 +29,6 @@ public class InstructionTranslator {
 			}
 			else {				
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
-
-				// for (Declaration param : f.getParams()) {
-				// if (id.equals(param.getName())) {
-				// 		load = new InstructionLoad(reg, new Register(type,"_P_" + id), type);
-				// 		b.addInstruction(load);
-				// 		return reg;
-				// 	}
-	 		// 	}
 
 				InstructionStore instr = new InstructionStore(target, source, source.getType());
 				b.addInstruction(instr);
@@ -90,10 +79,6 @@ public class InstructionTranslator {
 
 			Instruction callvoid = new InstructionFree(regForBitcast);
 			b.addInstruction(callvoid);
-
-			// %u82 = load %struct.foo** %math1
-			// %u83 = bitcast %struct.foo* %u82 to i8*
-			// call void @free(i8* %u83)
 		}
 
 		else {
@@ -138,6 +123,69 @@ public class InstructionTranslator {
 
 			return reg;
 		}
+
+		else if (e instanceof TrueExpression) {
+			return new Immediate("1");
+		}
+
+		else if (e instanceof FalseExpression) {
+			return new Immediate("0");
+		}
+
+		else if (e instanceof UnaryExpression) {
+			UnaryExpression ue = (UnaryExpression)e;
+
+			Value operand = InstructionTranslator.parseExpression(b, ue.getOperand(), p, f);
+
+			if (ue.getOperator().equals(UnaryExpression.Operator.NOT)) {
+				if (operand instanceof Immediate) {
+					Immediate immed = (Immediate)operand;
+					if (immed.getValue().equals("0")) {
+						IntObject i = new IntObject();
+						i.setValue("1");
+						return new Immediate("1", i);
+					}
+					else if (immed.getValue().equals("1")) {
+						IntObject i = new IntObject();
+						i.setValue("0");
+						return new Immediate("0", i);
+					}
+					else {
+						throw new RuntimeException("Unary Not, operand is immediate but not 0 or 1");
+					}
+				}
+				else if (operand instanceof Register) {
+					Register reg = new Register(new BoolObject());
+
+					IntObject i = new IntObject();
+					i.setValue("1");
+
+					Instruction xor = new InstructionXor(reg, new Immediate("1",i), operand);
+
+					return reg;
+				}
+			}
+			else if (ue.getOperator().equals(UnaryExpression.Operator.MINUS)) {
+				if (operand instanceof Immediate) {
+					Immediate immed = (Immediate)operand;
+					IntObject i = new IntObject();
+					Integer newValue = Integer.parseInt(immed.getValue());
+					i.setValue(Integer.toString(-newValue));
+					return new Immediate(i.getValue(),i);
+
+				}
+				else if (operand instanceof Register) {
+					throw new RuntimeException("unary minus but register");
+				}
+				else throw new RuntimeException("unary minus" + ue.getOperator().toString());
+			}
+
+			else {
+				System.out.println("GETTING HERE");
+				throw new RuntimeException("UNARY ERRORRRR");
+			}
+		}	
+
 
 		else if (e instanceof BinaryExpression) {
 			BinaryExpression be = (BinaryExpression)e;
@@ -380,7 +428,7 @@ public class InstructionTranslator {
 			StructObject regObject = (StructObject)regLeftNum.getType();
 
 			System.out.println("in lvaluedot: id is " + lvId + " and type is " + regObject);
-		
+			
 			LLVMObject idObj = LLVM.getStructField(regObject.getName(), lvId);
 			Register idRes = new Register(idObj); //automatically adds to hashmap
 
