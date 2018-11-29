@@ -136,16 +136,6 @@ public class InstructionTranslator {
 					return reg;
 				}
  			}
-
- 			 for (Declaration global : p.getDecls()) {
- 				if (id.equals(global.getName())) {
- 					Register globalVar = new Register(type, "@" + id);
- 					load = new InstructionLoad(reg, globalVar,type);
- 					b.addInstruction(load);
- 					return reg;
- 				}
- 			}
-
 			load = new InstructionLoad(reg, new Register(type,id), type);
 			b.addInstruction(load);
 
