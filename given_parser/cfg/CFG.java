@@ -369,7 +369,7 @@ public class CFG {
 	public String buildFuncHeader(Function f) {
 		String header = "define ";
 
-		if (f.getType() instanceof IntType) {
+		if (f.getType() instanceof IntType || f.getType() instanceof BoolType) {
 				header += "i32";
 		}
 		else {
