@@ -16,7 +16,7 @@ public class InstructionIcmp implements Instruction
 
 	@Override
 	public String toString() {
-		return result + " = icmp " + condition + " i32 " + operand1 + ", " + operand2;
+		return result + " = icmp " + condition + " " + operand1.getType() + " " + operand1 + ", " + operand2;
 	}
 
 }

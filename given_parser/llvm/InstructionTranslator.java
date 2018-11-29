@@ -231,37 +231,37 @@ public class InstructionTranslator {
 					b.addInstruction(instr);
 					return reg;
 				case LT:
-					type = new IntObject();
+					type = new BoolObject("i1");
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "slt", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case GT:
-					type = new IntObject();
+					type = new BoolObject("i1");
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "sgt", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case GE:
-					type = new IntObject();
+					type = new BoolObject("i1");
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "sge", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case LE:
-					type = new IntObject();
+					type = new BoolObject("i1");
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "sle", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case EQ:
-					type = new BoolObject();
+					type = new BoolObject("i1");
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "eq", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case NE:
-					type = new BoolObject();
+					type = new BoolObject("i1");
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "ne", left, right);
 					b.addInstruction(instr);
@@ -525,14 +525,38 @@ public class InstructionTranslator {
 
 	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e, Program p, Function f) {
 		Value guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
-		InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
-		curr.addInstruction(instr);
+		System.out.println("guardReg type: " + guardReg.getType());
+
+		if (curr.getLastInstruction() instanceof InstructionIcmp) {
+			InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
+			curr.addInstruction(instr);	
+		}
+		else {
+			Register truncReg = new Register(new BoolObject());
+			InstructionTrunc trunc = new InstructionTrunc(truncReg, guardReg);
+			curr.addInstruction(trunc);
+			InstructionBrCond instr = new InstructionBrCond(truncReg, ifThen.getLabel(), ifElse.getLabel());
+			curr.addInstruction(instr);
+		}
+		
 	}
 
 	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e, Program p, Function f) {
 		Value guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
-		InstructionBrCond instr = new InstructionBrCond(guardReg, body.getLabel(), join.getLabel());
-		curr.addInstruction(instr);
+		System.out.println("guardReg type: " + guardReg.getType());
+
+		if (curr.getLastInstruction() instanceof InstructionIcmp) {
+			InstructionBrCond instr = new InstructionBrCond(guardReg, body.getLabel(), join.getLabel());
+			curr.addInstruction(instr);
+		}
+		else {
+			Register truncReg = new Register(new BoolObject());
+			InstructionTrunc trunc = new InstructionTrunc(truncReg, guardReg);
+			curr.addInstruction(trunc);
+			InstructionBrCond instr = new InstructionBrCond(truncReg, body.getLabel(), join.getLabel());
+			curr.addInstruction(instr);
+		}
+		
 	}
 
 }

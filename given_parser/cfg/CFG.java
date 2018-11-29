@@ -376,7 +376,8 @@ public class CFG {
 			header += "void";
 		}
 		else if (f.getType() instanceof StructType) {
-			header += "i8*";
+			StructType st = (StructType)f.getType();
+			header += "%struct." + st.getName() + "*";
 		}
 		else {
 			throw new RuntimeException("building func header but return is not int or bool or void or struct");

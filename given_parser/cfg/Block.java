@@ -33,6 +33,13 @@ public class Block {
 		return successors;
 	}
 
+	public Instruction getLastInstruction() {
+		if (instructions.size() == 0) {
+			return new InstructionStub("nope");
+		}
+		return instructions.get(instructions.size() - 1);
+	}
+
 	public void seal() {
 		sealed = true;
 		// get target variables of all incomplete phis in this block
