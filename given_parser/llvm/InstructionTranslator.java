@@ -61,19 +61,28 @@ public class InstructionTranslator {
 			// find struct name for expression:
 			String structName = "IDIDNTFINDIT";
 
-			if (ds.getExpression() instanceof IdentifierExpression) {
-				IdentifierExpression ie = (IdentifierExpression)ds.getExpression();
-				String id = ie.getId();
+			// if (ds.getExpression() instanceof IdentifierExpression) {
+			// 	IdentifierExpression ie = (IdentifierExpression)ds.getExpression();
+			// 	String id = ie.getId();
 
-				LLVMObject so = CFG.getType(id);
-				if (so instanceof StructObject) {
-					structName = ((StructObject)so).getName();
-				}
-			}
+			// 	LLVMObject so = CFG.getType(id);
+			// 	if (so == null) { // if not in local, check global
+			// 		so = LLVM.getType(id);
+			// 	}
+			// 	if (so instanceof StructObject) {
+			// 		structName = ((StructObject)so).getName();
+			// 		System.out.println("structname: " + structName);
+			// 	}
+			// }
+			// else {
+			// 	System.out.println("its not an IdentifierExpression, it's " + ds.getExpression())f;
+			// }
 
-
-			Value regForLoad = InstructionTranslator.parseExpression(b, ds.getExpression(),p, f);
-			Value regForBitcast = new Register(new StructObject(structName));
+			Value parseVal = InstructionTranslator.parseExpression(b, ds.getExpression(),p, f);
+			Register regForLoad = (Register)parseVal;
+			StructObject so = (StructObject)regForLoad.getType();
+			structName = so.getName();
+			Value regForBitcast = new Register(new StructObject(so.getName()));
 
 			Instruction bc = new InstructionBitcast(regForBitcast,regForLoad,structName, false);
 			b.addInstruction(bc);
