@@ -167,7 +167,7 @@ public class CFGBuilder {
 				}
 				else if (globalSymbolTable.containsKey(id)) {
 					LLVMObject type = toLLVMObject(globalSymbolTable.get(id));
-					Value result = new Register(type);
+					Value result = new Register(type, "@" + id);
 					Instruction store = new InstructionStore(result,sourceRegister,type);
 					currentBlock.addInstruction(store);
 				}
