@@ -389,7 +389,15 @@ public class CFG {
 		for (int i = 0; i < params.size(); i++) {
 			Declaration currDec = params.get(i);
 
-			header += "i32 %" + currDec.getName();
+			if (currDec.getType() instanceof IntType || currDec.getType() instanceof BoolType) {
+				header += "i32 %" + currDec.getName();
+			}
+			else if (currDec.getType() instanceof StructType) {
+				StructType st = (StructType)currDec.getType();
+				header += "struct " + st.getName() + " %" + currDec.getName();
+			}
+
+
 			if (i != (params.size() - 1)) {
 				header += ", ";
 			}
