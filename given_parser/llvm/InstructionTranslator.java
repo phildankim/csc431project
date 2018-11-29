@@ -146,7 +146,6 @@ public class InstructionTranslator {
 		}
 
 		else if (e instanceof TrueExpression) {
-			System.out.println("truetruetrue");
 			return new Immediate("1");
 		}
 
@@ -157,6 +156,7 @@ public class InstructionTranslator {
 		else if (e instanceof UnaryExpression) {
 			UnaryExpression ue = (UnaryExpression)e;
 
+			System.out.println("ue: " + ue.getOperand() + " opr: " + ue.getOperator());
 			Value operand = InstructionTranslator.parseExpression(b, ue.getOperand(), p, f);
 
 			if (ue.getOperator().equals(UnaryExpression.Operator.NOT)) {
@@ -183,7 +183,8 @@ public class InstructionTranslator {
 					i.setValue("1");
 
 					Instruction xor = new InstructionXor(reg, new Immediate("1",i), operand);
-
+					b.addInstruction(xor);
+					
 					return reg;
 				}
 			}
@@ -539,6 +540,7 @@ public class InstructionTranslator {
 	}
 
 	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e, Program p, Function f) {
+		System.out.println("e: " + e);
 		Value guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
 		System.out.println("guardReg type: " + guardReg.getName());
 
