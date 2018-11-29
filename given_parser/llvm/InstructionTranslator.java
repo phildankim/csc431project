@@ -115,14 +115,17 @@ public class InstructionTranslator {
 			IdentifierExpression ie = (IdentifierExpression)e;
 
 			String id = ie.getId();
-			System.out.println("in IE, id is " + id);
 			LLVMObject type = CFG.getType(id);
 
 			// if not in function (not local), then check global
 			if (type == null) {
-
 				type = LLVM.getType(id);
-				System.out.println("in IE, type: " + type);
+				Register globalReg = new Register(type, "@" + id);
+				Register reg = new Register(type);
+				InstructionLoad load = new InstructionLoad(reg, globalReg, type);
+				b.addInstruction(load);
+				System.out.println("reg num in identifier is " + reg.getName());
+				return reg;
 			}
 
 			Register reg = new Register(type);
@@ -138,11 +141,12 @@ public class InstructionTranslator {
  			}
 			load = new InstructionLoad(reg, new Register(type,id), type);
 			b.addInstruction(load);
-
+			System.out.println("reg num in identifier is " + reg.getName());
 			return reg;
 		}
 
 		else if (e instanceof TrueExpression) {
+			System.out.println("truetruetrue");
 			return new Immediate("1");
 		}
 
@@ -536,7 +540,7 @@ public class InstructionTranslator {
 
 	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e, Program p, Function f) {
 		Value guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
-		System.out.println("guardReg type: " + guardReg.getType());
+		System.out.println("guardReg type: " + guardReg.getName());
 
 		if (curr.getLastInstruction() instanceof InstructionIcmp) {
 			InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
@@ -554,7 +558,7 @@ public class InstructionTranslator {
 
 	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e, Program p, Function f) {
 		Value guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
-		System.out.println("guardReg type: " + guardReg.getType());
+		System.out.println("guardReg type: " + guardReg.getName());
 
 		if (curr.getLastInstruction() instanceof InstructionIcmp) {
 			InstructionBrCond instr = new InstructionBrCond(guardReg, body.getLabel(), join.getLabel());
