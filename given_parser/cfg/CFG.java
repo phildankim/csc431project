@@ -388,7 +388,7 @@ public class CFG {
 			}
 			else if (currDec.getType() instanceof StructType) {
 				StructType st = (StructType)currDec.getType();
-				header += "struct " + st.getName() + " %" + currDec.getName();
+				header += "%struct." + st.getName() + "* %" + currDec.getName();
 			}
 
 

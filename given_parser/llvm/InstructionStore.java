@@ -11,7 +11,7 @@ public class InstructionStore implements Instruction {
 	public InstructionStore (Value target, Value source) {
 		this.value = source;
 		this.pointer = target;
-		this.type = new IntObject();
+		this.type = target.getType();
 	}
 
 	public InstructionStore (Value target, Value source, LLVMObject type) {
