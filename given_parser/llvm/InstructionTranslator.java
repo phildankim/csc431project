@@ -306,15 +306,17 @@ public class InstructionTranslator {
 					Type t = func.getType();
 
 					// expand for all types
-					if (t instanceof IntType) {
-						retType = new IntObject();
-					}
-					else if (t instanceof BoolType) {
-						retType = new BoolObject();
-					}
-					else {
-						retType = new VoidObject();
-					}
+					// if (t instanceof IntType) {
+					// 	retType = new IntObject();
+					// }
+					// else if (t instanceof BoolType) {
+					// 	retType = new BoolObject();
+					// }
+					// else {
+					// 	retType = new VoidObject();
+					// }
+
+					retType = convertTypeToObject(t);
 				}
 			}
 			Register result = new Register(retType);

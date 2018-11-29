@@ -50,7 +50,7 @@ public class InstructionCall implements Instruction {
 	public String toString() {
 
 		if (result instanceof Immediate) {
-			return "call void @" + funcptr + argList;
+			return "call " + type + " @" + funcptr + argList;
 		}
 		else {
 			return result + " = call " + type + " @" + funcptr + argList;
