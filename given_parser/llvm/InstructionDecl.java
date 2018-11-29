@@ -27,6 +27,9 @@ public class InstructionDecl implements Instruction {
 			IntType it = (IntType)type;
 			return "@" + name + " = common global i32 0";
 		}
+		else if (type instanceof BoolType) {
+			return "@" + name + " = common global i32 0 BOOOOL";
+		}
 		else {
 			return "";
 		}
