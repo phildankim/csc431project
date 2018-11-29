@@ -424,6 +424,13 @@ public class InstructionTranslator {
 					return paramId;
 				}
  			}
+
+ 			for (Declaration global : p.getDecls()) {
+ 				if (id.equals(global.getName())) {
+ 					Register globalVar = new Register(type, "@" + id);
+ 					return globalVar;
+ 				}
+ 			}
 			
 			return new Register(type,id);
 		}
