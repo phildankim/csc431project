@@ -372,8 +372,14 @@ public class CFG {
 		if (f.getType() instanceof IntType || f.getType() instanceof BoolType) {
 				header += "i32";
 		}
-		else {
+		else if (f.getType() instanceof VoidType){
 			header += "void";
+		}
+		else if (f.getType() instanceof StructType) {
+			header += "i8*";
+		}
+		else {
+			throw new RuntimeException("building func header but return is not int or bool or void or struct");
 		}
 
 		header += " @" + f.getName() + "(";
