@@ -72,7 +72,7 @@ public class CheckRedeclarations {
 			if (func.getName().equals("main")) {
 				foundMain = true;
 
-				if (!func.getType().toString().equals("IntType")) {
+				if (!func.getType().toString().equals("i32")) {
 					System.out.println("ERROR: main function return type is " + func.getType());
 				}
 

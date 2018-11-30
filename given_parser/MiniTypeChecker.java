@@ -59,11 +59,11 @@ public class MiniTypeChecker {
 		Type funcReturnType = func.getType();
 		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable, funcReturnType);
 
-		/*
-		if (!funcReturnType.toString().equals(bodyReturnType.toString())) {
-			throw new TypeCheckException ("ERROR on Line " + func.getLine() + ": invalid return type. Expected " + funcReturnType.toString() +" but got " + bodyReturnType.toString());
-		}
-		*/
+		
+		// if (!funcReturnType.toString().equals(bodyReturnType.toString())) {
+		// 	throw new TypeCheckException ("ERROR on Line " + func.getLine() + ": invalid return type. Expected " + funcReturnType.toString() +" but got " + bodyReturnType.toString());
+		// }
+	
 	}
 
 	public static Type checkStatement (Statement statement,
@@ -85,7 +85,7 @@ public class MiniTypeChecker {
 			Type lValue = checkLValue(((AssignmentStatement)statement).getTarget(), symbolTable, funcParamsTable, structTable,expectedReturnType);
 			Type rValue = checkExpression(((AssignmentStatement)statement).getSource(), symbolTable, funcParamsTable, structTable,expectedReturnType);
 
-			if (!lValue.toString().equals(rValue.toString())){
+			if (!(rValue instanceof NullType) && !lValue.toString().equals(rValue.toString())){
 				throw new TypeCheckException("ERROR on Line " + ((AssignmentStatement)statement).getLine() + ": invalid assignment. target = " + lValue.toString() + ", source = " + rValue.toString());
 			}
 
@@ -142,7 +142,7 @@ public class MiniTypeChecker {
 		}
 		else if (statement instanceof ReturnStatement) {
 			Type checkThis =  checkExpression(((ReturnStatement)statement).getExpression(), symbolTable, funcParamsTable, structTable, expectedReturnType);
-			if (!checkThis.toString().equals(expectedReturnType.toString())) {
+			if (!checkThis.toString().equals(expectedReturnType.toString()) && !(checkThis instanceof NullType)) {
 				throw new TypeCheckException ("ERROR :on Line " + ((ReturnStatement)statement).getLine() +": return statement type needs to be " + expectedReturnType.toString() + " but it's " + checkThis.toString());
 			}
 
@@ -153,7 +153,10 @@ public class MiniTypeChecker {
 			return type;
 		}
 		else if (statement instanceof ReturnEmptyStatement) {
-			return new VoidType();
+			if (expectedReturnType instanceof VoidType) {
+				return new VoidType();
+			}
+			throw new TypeCheckException ("ERROR :on Line " + ((ReturnEmptyStatement)statement).getLine() +": return statement type needs to be " + expectedReturnType.toString() + " but it's empty" );
 		}
 
 		// PLACEHOLDER
@@ -292,10 +295,10 @@ public class MiniTypeChecker {
 
 				case EQ:
 				case NE:
-					if (left instanceof IntType && right instanceof IntType) {
+					if (left instanceof IntType && (right instanceof IntType || right instanceof NullType)) {
 						return new BoolType();
 					}
-					if (left instanceof StructType && right instanceof StructType) {
+					if (left instanceof StructType && (right instanceof StructType || right instanceof NullType)) {
 						return new BoolType();
 					}
 
@@ -337,8 +340,8 @@ public class MiniTypeChecker {
 
 				for (int i = 0; i < args.size(); i++) {
 					if (!args.get(i).toString().equals(params.get(i).toString())) {
-						if (!(params.get(i).toString().equals("StructType") && args.get(i).toString().equals("NullType"))) {
-							throw new TypeCheckException ("ERROR : arg type does not match param type, arg is " + args.get(i).toString() + " while param is " + params.get(i).toString());
+						if (!args.get(i).toString().equals("null") && !(params.get(i) instanceof StructType)) {
+							throw new TypeCheckException ("ERROR : arg " + i +" type does not match param type, arg is " + args.get(i).toString() + " while param is " + params.get(i).toString());
 						}
 					}
 				}
@@ -383,9 +386,13 @@ public class MiniTypeChecker {
 			else throw new TypeCheckException ("ERROR on Line " + ((NewExpression)exp).getLine() + ": did not find struct");
 		}
 
-		return new VoidType();
+		else if (exp instanceof ReadExpression) {
+			return new IntType();
+		}
+
+		//return new VoidType();
 		// need to implement readexpression
-		//throw new TypeCheckException("Need to implement checkExpression for " + exp.toString());
+		throw new TypeCheckException("Need to implement checkExpression for " + exp.toString());
  
 	}
 	public static void displayData(HashMap <String, Type> symbolTable,

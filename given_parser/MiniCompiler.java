@@ -19,6 +19,7 @@ public class MiniCompiler
    private static boolean jsonPrint = false;
    private static boolean cfg = false;
    private static boolean ssa = false;
+   private static boolean typecheck = false;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
@@ -60,8 +61,11 @@ public class MiniCompiler
          *.    NEED TO FINISH!!
          */
 
-         // CheckRedeclarations.checkProgram(program);
-         // MiniTypeChecker.checkProgram(program);
+         //Milestone 1
+         if (typecheck) {
+            CheckRedeclarations.checkProgram(program);
+            MiniTypeChecker.checkProgram(program);
+         }
 
          //Milestone 2 
          if (cfg) {
@@ -108,6 +112,9 @@ public class MiniCompiler
             }
             else if (args[i].equals("-llvm")) {
                ssa = true;
+            }
+            else if (args[i].equals("-tc")) {
+               typecheck = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);
