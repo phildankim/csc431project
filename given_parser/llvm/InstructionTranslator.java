@@ -28,8 +28,19 @@ public class InstructionTranslator {
 			else {
 
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
-				InstructionStore instr = new InstructionStore(target, source, target.getType());
-				b.addInstruction(instr);
+				if (b.getLastInstruction() instanceof InstructionIcmp) {
+					IntObject i = new IntObject();
+					Register zextReg = new Register(i);
+					InstructionZext zext = new InstructionZext(zextReg, source, new Immediate("1",i));
+					b.addInstruction(zext);
+
+					InstructionStore instr = new InstructionStore(target, zextReg, target.getType());
+					b.addInstruction(instr);
+				}
+				else {
+					InstructionStore instr = new InstructionStore(target, source, target.getType());
+					b.addInstruction(instr);
+				}
 			}
 		}
 
@@ -273,6 +284,21 @@ public class InstructionTranslator {
 				case AND:
 					type = new BoolObject();
 					reg = new Register(type);
+					if (b.getLastInstruction() instanceof InstructionIcmp) {
+						IntObject i = new IntObject();
+
+						InstructionZext zextRight = new InstructionZext(reg, right, new Immediate("1",i));
+						b.addInstruction(zextRight);
+
+						Register leftreg = new Register(i);
+						InstructionZext zextLeft = new InstructionZext(leftreg, left, new Immediate("1",i));
+						b.addInstruction(zextLeft);
+
+						Register andReg = new Register(i);
+						instr = new InstructionOr(andReg, reg, leftreg);
+						b.addInstruction(instr);
+						return andReg;
+					}
 					instr = new InstructionAnd(reg, left, right);
 					b.addInstruction(instr);
 					return reg;
