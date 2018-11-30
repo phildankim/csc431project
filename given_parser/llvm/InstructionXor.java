@@ -14,6 +14,6 @@ public class InstructionXor implements Instruction {
 
 	@Override
 	public String toString() {
-		return register.toString() + " = xor i32 " + operand1 + ", " + operand2;
+		return register.toString() + " = xor " + operand1.getType() + " " + operand1 + ", " + operand2;
 	}
 }

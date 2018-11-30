@@ -20,7 +20,7 @@ public class InstructionTranslator {
 			AssignmentStatement as = (AssignmentStatement)s;
 
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
-			
+			System.out.println("target: " + as.getTarget() + " " + target);
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
@@ -133,7 +133,6 @@ public class InstructionTranslator {
 		}
 
 		else if (e instanceof NullExpression) {
-			System.out.println("null: " + InstructionTranslator.convertTypeToObject(f.getType()));
 			return new NullValue();
 		}
 
@@ -164,7 +163,17 @@ public class InstructionTranslator {
 
 					IntObject i = new IntObject();
 					i.setValue("1");
+					
+					if (b.getLastInstruction() instanceof InstructionIcmp) {
+						Register zextReg = new Register(new IntObject());
+						InstructionZext zext = new InstructionZext(zextReg, operand, new Immediate("1",i));
+						b.addInstruction(zext);
 
+						Register xorReg = new Register(new IntObject());
+						Instruction xor = new InstructionXor(xorReg, new Immediate("1",i), zextReg);
+						b.addInstruction(xor);
+						return xorReg;
+					}
 					Instruction xor = new InstructionXor(reg, new Immediate("1",i), operand);
 					b.addInstruction(xor);
 
@@ -227,37 +236,37 @@ public class InstructionTranslator {
 					b.addInstruction(instr);
 					return reg;
 				case LT:
-					type = new BoolObject("i1");
+					type = new BoolObject();
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "slt", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case GT:
-					type = new BoolObject("i1");
+					type = new BoolObject();
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "sgt", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case GE:
-					type = new BoolObject("i1");
+					type = new BoolObject();
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "sge", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case LE:
-					type = new BoolObject("i1");
+					type = new BoolObject();
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "sle", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case EQ:
-					type = new BoolObject("i1");
+					type = new BoolObject();
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "eq", left, right);
 					b.addInstruction(instr);
 					return reg;
 				case NE:
-					type = new BoolObject("i1");
+					type = new BoolObject();
 					reg = new Register(type);
 					instr = new InstructionIcmp(reg, "ne", left, right);
 					b.addInstruction(instr);
@@ -403,7 +412,7 @@ public class InstructionTranslator {
 			LvalueId lvid = (LvalueId)lv;
 			String id = lvid.getId();
 			LLVMObject type = CFG.getType(id);
-
+			System.out.println("lvalue type: " + type + " " + id);
 			if (type == null) {
 				type = LLVM.getType(id);
 			}
@@ -470,6 +479,7 @@ public class InstructionTranslator {
 			CFG.addToLocals(d.getName(), obj);	
 			b.addInstruction(localDecl);
 		}
+		//CFG.printStructs();
 	}
 
 	public static void setLocalParamInstruction(Block b, List<Declaration> params ) {

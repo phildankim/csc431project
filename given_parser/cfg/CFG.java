@@ -218,7 +218,6 @@ public class CFG {
 			Value resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p, f);
 
 			Value returnReg = new Register(resultReg.getType(), "_retval_");
-			System.out.println("return statement: " + resultReg.getType() + " expression: " + rs.getExpression());
 
 			LLVMObject funcReturnType = InstructionTranslator.convertTypeToObject(f.getType());
 
