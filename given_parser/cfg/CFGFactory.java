@@ -24,6 +24,7 @@ public class CFGFactory {
 			//Register.printRegisters();
 			cfg.clearStructs();
 			cfg.removeEmptyBlocks();
+			cfg.removeUnnecessaryBranch();
 		}
 
 		return cfgs;

@@ -70,8 +70,16 @@ public class CFG {
 		return CFG.locals.get(id);
 	}
 
-	public static void getParam(Function f, int i) {
-		System.out.println(f.getParams().get(0));
+	public void removeUnnecessaryBranch() {
+		for (Block b : this.blocks) {
+			if (b.getLastInstruction() instanceof InstructionBr || 
+				b.getLastInstruction() instanceof InstructionBrCond) {
+				if (b.instructions.get(b.instructions.size() - 2) instanceof InstructionBr || 
+				b.instructions.get(b.instructions.size() - 2) instanceof InstructionBrCond) {
+					b.instructions.remove(b.instructions.size() - 1);
+				}
+			}
+		}
 	}
 
 	public Block createCFG(Statement statement) {
