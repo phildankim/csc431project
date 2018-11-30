@@ -426,6 +426,15 @@ public class InstructionTranslator {
 			String id = lvid.getId();
 			LLVMObject type = CFG.getType(id);
 
+			if (type == null) {
+				type = LLVM.getType(id);
+				// Register globalReg = new Register(type, "@" + id);
+				// Register reg = new Register(type);
+				// InstructionLoad load = new InstructionLoad(reg, globalReg, type);
+				// b.addInstruction(load);
+				// return reg;
+			}
+
 			for (Declaration param : f.getParams()) {
 				if (id.equals(param.getName())) {
 					Register paramId = new Register(type,"_P_" + id);
