@@ -41,12 +41,12 @@ public class Block {
 	}
 
 	public void seal() {
-		sealed = true;
 		// get target variables of all incomplete phis in this block
 		for (InstructionPhi phi: phiInstructions) {
 			// for each variable, fill phi based on predecessors
 			addPhiOperands(phi.getId(), phi.getValue().getType(), phi);
 		}
+		sealed = true;
 	}
 
 	public void addPred(Block p) {

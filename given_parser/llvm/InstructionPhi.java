@@ -39,9 +39,9 @@ public class InstructionPhi implements Instruction {
 				returnString += ", ";
 			}
 
-			if (po.getValue().toString().equals(register.toString())) {
-			invalid = true;
-			}
+			// if (po.getValue().toString().equals(register.toString())) {
+			// 	invalid = true;
+			// }
 		}
 
 		if (invalid) {
