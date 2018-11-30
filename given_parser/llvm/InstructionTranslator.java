@@ -20,17 +20,13 @@ public class InstructionTranslator {
 			AssignmentStatement as = (AssignmentStatement)s;
 			
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
-			System.out.println("target: " + target);
-
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
 				b.addInstruction(ir);
 			}
 			else {
-				System.out.println("in assign, source is: " + as.getSource());				
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
-				System.out.println("source value is " + source);
 				InstructionStore instr = new InstructionStore(target, source, source.getType());
 				b.addInstruction(instr);
 			}
@@ -60,23 +56,6 @@ public class InstructionTranslator {
 
 			// find struct name for expression:
 			String structName = "IDIDNTFINDIT";
-
-			// if (ds.getExpression() instanceof IdentifierExpression) {
-			// 	IdentifierExpression ie = (IdentifierExpression)ds.getExpression();
-			// 	String id = ie.getId();
-
-			// 	LLVMObject so = CFG.getType(id);
-			// 	if (so == null) { // if not in local, check global
-			// 		so = LLVM.getType(id);
-			// 	}
-			// 	if (so instanceof StructObject) {
-			// 		structName = ((StructObject)so).getName();
-			// 		System.out.println("structname: " + structName);
-			// 	}
-			// }
-			// else {
-			// 	System.out.println("its not an IdentifierExpression, it's " + ds.getExpression())f;
-			// }
 
 			Value parseVal = InstructionTranslator.parseExpression(b, ds.getExpression(),p, f);
 			Register regForLoad = (Register)parseVal;
@@ -124,7 +103,6 @@ public class InstructionTranslator {
 				Register reg = new Register(type);
 				InstructionLoad load = new InstructionLoad(reg, globalReg, type);
 				b.addInstruction(load);
-				System.out.println("reg num in identifier is " + reg.getName());
 				return reg;
 			}
 
@@ -141,7 +119,6 @@ public class InstructionTranslator {
  			}
 			load = new InstructionLoad(reg, new Register(type,id), type);
 			b.addInstruction(load);
-			System.out.println("reg num in identifier is " + reg.getName());
 			return reg;
 		}
 
@@ -153,10 +130,13 @@ public class InstructionTranslator {
 			return new Immediate("0");
 		}
 
+		else if (e instanceof NullExpression) {
+			return new NullValue();
+		}
+
 		else if (e instanceof UnaryExpression) {
 			UnaryExpression ue = (UnaryExpression)e;
 
-			System.out.println("ue: " + ue.getOperand() + " opr: " + ue.getOperator());
 			Value operand = InstructionTranslator.parseExpression(b, ue.getOperand(), p, f);
 
 			if (ue.getOperator().equals(UnaryExpression.Operator.NOT)) {
@@ -184,7 +164,7 @@ public class InstructionTranslator {
 
 					Instruction xor = new InstructionXor(reg, new Immediate("1",i), operand);
 					b.addInstruction(xor);
-					
+
 					return reg;
 				}
 			}
@@ -204,7 +184,6 @@ public class InstructionTranslator {
 			}
 
 			else {
-				System.out.println("GETTING HERE");
 				throw new RuntimeException("UNARY ERRORRRR");
 			}
 		}	
@@ -341,7 +320,6 @@ public class InstructionTranslator {
 			// fix this shit
 			NewExpression ne = (NewExpression)e;
 			String structName = ne.getId();
-			System.out.println("in NE: structName is " + structName);
 			Value regForMalloc = new Register(new StructObject(structName));
 			Value regForBitcast = new Register(new StructObject(structName));
 
@@ -453,11 +431,9 @@ public class InstructionTranslator {
 		else { // otherwise, it's an lvaluedot
 			LvalueDot lvdot = (LvalueDot)lv;	
 			String lvId = lvdot.getId();
-			System.out.println("lvdot left: " + lvdot.getLeft());
 			Value regLeftNum = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
 			StructObject regObject = (StructObject)regLeftNum.getType();
 
-			System.out.println("in lvaluedot: id is " + lvId + " and type is " + regObject);
 			
 			LLVMObject idObj = LLVM.getStructField(regObject.getName(), lvId);
 			Register idRes = new Register(idObj); //automatically adds to hashmap
@@ -540,9 +516,7 @@ public class InstructionTranslator {
 	}
 
 	public static void setGuardInstruction(Block curr, Block ifThen, Block ifElse, Expression e, Program p, Function f) {
-		System.out.println("e: " + e);
 		Value guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
-		System.out.println("guardReg type: " + guardReg.getName());
 
 		if (curr.getLastInstruction() instanceof InstructionIcmp) {
 			InstructionBrCond instr = new InstructionBrCond(guardReg, ifThen.getLabel(), ifElse.getLabel());
@@ -560,7 +534,6 @@ public class InstructionTranslator {
 
 	public static void setWhileGuardInstruction(Block curr, Block join, Block body, Expression e, Program p, Function f) {
 		Value guardReg = InstructionTranslator.parseExpression(curr, e, p, f);
-		System.out.println("guardReg type: " + guardReg.getName());
 
 		if (curr.getLastInstruction() instanceof InstructionIcmp) {
 			InstructionBrCond instr = new InstructionBrCond(guardReg, body.getLabel(), join.getLabel());

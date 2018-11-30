@@ -22,9 +22,8 @@ public class LLVM {
 		this.p = p;
 		setDeclInstructions();
 		setTypeDeclInstructions();
-		LLVM.printGlobals();
-		LLVM.printStructTable();
-		System.out.println("structTable size: " + LLVM.structTable.size());
+		//LLVM.printGlobals();
+		//LLVM.printStructTable();
 		this.cfgs = CFGFactory.createAllCFG(p);
 	}
 
