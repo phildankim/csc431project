@@ -66,20 +66,9 @@ public class CFGBuilder {
 			Block b = buildFunc(func);
 			blocks.add(b);
 
-			Set<Block> visited = new HashSet<>();
-        	Queue<Block> queue = new ArrayDeque<>();
-        	visited.add(b);
-        	queue.add(b);
-	        while (queue.size() > 0) {
-	            Block cur = queue.poll();
-	            List<Block> newSuccessors = cur.getSuccessors().stream()
-	                    .filter(successor -> !visited.contains(successor))
-	                    //.filter(successor -> successor != returnBlock)
-	                    .collect(Collectors.toList());
-	            queue.addAll(newSuccessors);
-	            visited.addAll(newSuccessors);
-	            cur.printSSA(writer);
-	        }
+			printLLVM(b,writer);
+
+
 
 			writer.write("}\n");
 
@@ -674,6 +663,23 @@ public class CFGBuilder {
 		throw new RuntimeException ("buildexpression error: should not reach here " + e.toString());
 	}
 
+	public void printLLVM (Block b, BufferedWriter writer) throws IOException{
+
+		Set<Block> visited = new HashSet<>();
+    	Queue<Block> queue = new ArrayDeque<>();
+    	visited.add(b);
+    	queue.add(b);
+        while (queue.size() > 0) {
+            Block cur = queue.poll();
+            List<Block> newSuccessors = cur.getSuccessors().stream()
+                    .filter(successor -> !visited.contains(successor))
+                    //.filter(successor -> successor != returnBlock)
+                    .collect(Collectors.toList());
+            queue.addAll(newSuccessors);
+            visited.addAll(newSuccessors);
+            cur.printSSA(writer);
+        }
+    }
 	public Integer findIndex(String structName, String fieldName) {
 		List<Declaration> fields = structTable.get(structName);
 		if (fields != null) {
