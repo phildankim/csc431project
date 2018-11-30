@@ -72,13 +72,16 @@ public class CFG {
 
 	public void removeUnnecessaryBranch() {
 		for (Block b : this.blocks) {
-			if (b.getLastInstruction() instanceof InstructionBr || 
-				b.getLastInstruction() instanceof InstructionBrCond) {
-				if (b.instructions.get(b.instructions.size() - 2) instanceof InstructionBr || 
-				b.instructions.get(b.instructions.size() - 2) instanceof InstructionBrCond) {
-					b.instructions.remove(b.instructions.size() - 1);
+			if (b.instructions.size() > 2) {
+				if (b.getLastInstruction() instanceof InstructionBr || 
+					b.getLastInstruction() instanceof InstructionBrCond) {
+					if (b.instructions.get(b.instructions.size() - 2) instanceof InstructionBr || 
+						b.instructions.get(b.instructions.size() - 2) instanceof InstructionBrCond) {
+						b.instructions.remove(b.instructions.size() - 1);
+					}
 				}
 			}
+			
 		}
 	}
 
