@@ -22,7 +22,7 @@ public class LLVM {
 		this.p = p;
 		setDeclInstructions();
 		setTypeDeclInstructions();
-		LLVM.printGlobals();
+		//LLVM.printGlobals();
 		//LLVM.printStructTable();
 		this.cfgs = CFGFactory.createAllCFG(p);
 	}

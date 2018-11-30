@@ -19,16 +19,6 @@ public class InstructionTranslator {
 		else if (s instanceof AssignmentStatement) {
 			AssignmentStatement as = (AssignmentStatement)s;
 
-			// String targetId = as.getTarget().getId();
-			// if (targetId.charAt(0) == '@') {
-			// 	String targetKey = targetId.replace("@", "");
-			// 	LLVMObject target = LLVM.getType(targetKey);
-			// 	System.out.println("target: " + target);
-			// }
-			// else {
-			// 	Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
-			// }
-
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
 			
 
@@ -39,7 +29,6 @@ public class InstructionTranslator {
 			else {
 
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
-				//System.out.println("source: " + source + " target: " + targetId + target.getType());
 				InstructionStore instr = new InstructionStore(target, source, target.getType());
 				b.addInstruction(instr);
 			}
@@ -303,17 +292,6 @@ public class InstructionTranslator {
 				if (ie.getName().equals(func.getName())){
 					Type t = func.getType();
 
-					// expand for all types
-					// if (t instanceof IntType) {
-					// 	retType = new IntObject();
-					// }
-					// else if (t instanceof BoolType) {
-					// 	retType = new BoolObject();
-					// }
-					// else {
-					// 	retType = new VoidObject();
-					// }
-
 					retType = convertTypeToObject(t);
 				}
 			}
@@ -428,11 +406,6 @@ public class InstructionTranslator {
 
 			if (type == null) {
 				type = LLVM.getType(id);
-				// Register globalReg = new Register(type, "@" + id);
-				// Register reg = new Register(type);
-				// InstructionLoad load = new InstructionLoad(reg, globalReg, type);
-				// b.addInstruction(load);
-				// return reg;
 			}
 
 			for (Declaration param : f.getParams()) {
@@ -466,7 +439,6 @@ public class InstructionTranslator {
 			
 			InstructionGetElementPtr gep = new InstructionGetElementPtr(gepReg, regObject, regLeftNum, Integer.toString(index));
 			b.addInstruction(gep);
-			System.out.println("lvalue reg type: " + idObj);
 			return gepReg;
 		}
 	}
