@@ -279,6 +279,23 @@ public class InstructionTranslator {
 				case OR:
 					type = new BoolObject();
 					reg = new Register(type);
+					if (b.getLastInstruction() instanceof InstructionIcmp) {
+						// InstructionIcmp icmp = (InstructionIcmp)b.getLastInstruction();
+						// Register icmpReg = icmp.getResult();
+						IntObject i = new IntObject();
+						//Register zextReg = new Register(i);
+						InstructionZext zextRight = new InstructionZext(reg, right, new Immediate("1",i));
+						b.addInstruction(zextRight);
+
+						Register leftreg = new Register(i);
+						InstructionZext zextLeft = new InstructionZext(leftreg, left, new Immediate("1",i));
+						b.addInstruction(zextLeft);
+
+						Register orReg = new Register(i);
+						instr = new InstructionOr(orReg, reg, leftreg);
+						b.addInstruction(instr);
+						return orReg;
+					}
 					instr = new InstructionOr(reg, left, right);
 					b.addInstruction(instr);
 					return reg;

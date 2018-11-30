@@ -14,6 +14,10 @@ public class InstructionIcmp implements Instruction
 		this.operand2 = operand2;
 	}
 
+	public Value getResult() {
+		return this.result;
+	}
+
 	@Override
 	public String toString() {
 		return result + " = icmp " + condition + " " + operand1.getType() + " " + operand1 + ", " + operand2;
