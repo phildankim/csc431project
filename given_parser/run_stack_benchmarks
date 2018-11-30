@@ -1,8 +1,0 @@
-#!/bin/bash
-#make clean;make
-for dir in benchmarks/*; do
-   f=${dir##*/}
-   echo $f
-   java MiniCompiler $dir/${f}.mini -stack
-done
-scp benchmarks/*.ll dkim96@unix3.csc.calpoly.edu:benchmarks
