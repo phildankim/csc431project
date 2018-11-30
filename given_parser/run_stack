@@ -1,0 +1,14 @@
+#!/bin/bash
+
+make clean;make
+
+# exit when any command fails
+set -e
+
+for dir in benchmarks/*; do
+   f=${dir##*/}
+   echo $f
+   java MiniCompiler $dir/${f}.mini -stack
+   clang $dir/${f}.ll -m32
+   ./a.out < $dir/${f}.input > ${f}.txt
+done
