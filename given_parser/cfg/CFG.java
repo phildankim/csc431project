@@ -70,6 +70,10 @@ public class CFG {
 		return CFG.locals.get(id);
 	}
 
+	public static void getParam(Function f, int i) {
+		System.out.println(f.getParams().get(0));
+	}
+
 	public Block createCFG(Statement statement) {
 
 		if (statement instanceof BlockStatement) { 

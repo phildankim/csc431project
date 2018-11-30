@@ -20,7 +20,6 @@ public class InstructionTranslator {
 			AssignmentStatement as = (AssignmentStatement)s;
 
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
-			System.out.println("target: " + as.getTarget() + " " + target);
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
@@ -291,9 +290,22 @@ public class InstructionTranslator {
 		else if (e instanceof InvocationExpression) {
 			InvocationExpression ie = (InvocationExpression)e;
 			ArrayList<Value> arguments = new ArrayList<Value>();
-			for (Expression arg : ie.getArgs()) {
+			// for (Expression arg : ie.getArgs()) {
+			// 	Value argReg = InstructionTranslator.parseExpression(b,arg, p, f);
+			// 	arguments.add(argReg);
+			// }
+
+			for (int i = 0; i < ie.getArgs().size(); i++) {
+				Expression arg = ie.getArgs().get(i);
 				Value argReg = InstructionTranslator.parseExpression(b,arg, p, f);
-				arguments.add(argReg);
+				if (argReg.getName() == "null") {
+					NullValue nullVal = (NullValue)argReg;
+					nullVal.setType(InstructionTranslator.convertDeclarationToObject(f.getParams().get(i)));
+					arguments.add(nullVal);
+				}
+				else {
+					arguments.add(argReg);
+				}
 			}
 
 			LLVMObject retType = new VoidObject();
@@ -304,6 +316,7 @@ public class InstructionTranslator {
 					retType = convertTypeToObject(t);
 				}
 			}
+			//CFG.printParams(f);
 			Register result = new Register(retType);
 			// if not void, then store in register and return reg
 			if (!(retType instanceof VoidObject)) {
@@ -412,9 +425,14 @@ public class InstructionTranslator {
 			LvalueId lvid = (LvalueId)lv;
 			String id = lvid.getId();
 			LLVMObject type = CFG.getType(id);
-			System.out.println("lvalue type: " + type + " " + id);
 			if (type == null) {
 				type = LLVM.getType(id);
+				for (Declaration global : p.getDecls()) {
+	 				if (id.equals(global.getName())) {
+	 					Register globalVar = new Register(type, "@" + id);
+	 					return globalVar;
+	 				}
+	 			}
 			}
 
 			for (Declaration param : f.getParams()) {
@@ -422,13 +440,6 @@ public class InstructionTranslator {
 					Register paramId = new Register(type,"_P_" + id);
 					return paramId;
 				}
- 			}
-
- 			for (Declaration global : p.getDecls()) {
- 				if (id.equals(global.getName())) {
- 					Register globalVar = new Register(type, "@" + id);
- 					return globalVar;
- 				}
  			}
 			
 			return new Register(type,id);

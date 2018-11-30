@@ -4,25 +4,29 @@ import cfg.*;
 
 public class NullValue implements Value {
 
-	String type;
+	LLVMObject type;
 
 	public NullValue() {
+		this.type = null;
 	}
 
-	public NullValue(String type) {
+	public NullValue(LLVMObject type) {
 		this.type = type;
 	}
 
-	public String nullType() {
-		return this.type;
+	public void setType(LLVMObject type) {
+		this.type = type;
 	}
 
 	public LLVMObject getType() {
+		if (this.type != null) {
+			return this.type;
+		}
 		return new IntObject();
 	}
 
 	public String getName() {
-		return "i32*";
+		return "null";
 	}
 
 	public String toString() {
