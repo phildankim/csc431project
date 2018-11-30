@@ -16,7 +16,7 @@ public class NullValue implements Value {
 	}
 
 	public String toString() {
-		return "0";
+		return "null";
 	}
 
 }
