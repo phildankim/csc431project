@@ -22,7 +22,7 @@ public class LLVM {
 		this.p = p;
 		setDeclInstructions();
 		setTypeDeclInstructions();
-		//LLVM.printGlobals();
+		LLVM.printGlobals();
 		//LLVM.printStructTable();
 		this.cfgs = CFGFactory.createAllCFG(p);
 	}
@@ -30,7 +30,7 @@ public class LLVM {
 	public static void printGlobals() {
 		System.out.println("--Currently in LLVM.Globals");
 		for (String key : LLVM.globals.keySet()) {
-			System.out.println("Key: " + key + "\tValue: " + CFG.getType(key));
+			System.out.println("Key: " + key + "\tValue: " + LLVM.getType(key));
 		}
 	}
 

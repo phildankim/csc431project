@@ -18,16 +18,29 @@ public class InstructionTranslator {
 		}
 		else if (s instanceof AssignmentStatement) {
 			AssignmentStatement as = (AssignmentStatement)s;
-			
+
+			// String targetId = as.getTarget().getId();
+			// if (targetId.charAt(0) == '@') {
+			// 	String targetKey = targetId.replace("@", "");
+			// 	LLVMObject target = LLVM.getType(targetKey);
+			// 	System.out.println("target: " + target);
+			// }
+			// else {
+			// 	Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
+			// }
+
 			Value target = InstructionTranslator.parseLvalue(b, as.getTarget(), p, f);
+			
 
 			if (as.getSource() instanceof ReadExpression) {
 				InstructionScan ir = new InstructionScan(target);
 				b.addInstruction(ir);
 			}
 			else {
+
 				Value source = InstructionTranslator.parseExpression(b, as.getSource(), p, f);
-				InstructionStore instr = new InstructionStore(target, source, source.getType());
+				//System.out.println("source: " + source + " target: " + targetId + target.getType());
+				InstructionStore instr = new InstructionStore(target, source, target.getType());
 				b.addInstruction(instr);
 			}
 		}
@@ -131,6 +144,7 @@ public class InstructionTranslator {
 		}
 
 		else if (e instanceof NullExpression) {
+			System.out.println("null: " + InstructionTranslator.convertTypeToObject(f.getType()));
 			return new NullValue();
 		}
 
@@ -434,20 +448,16 @@ public class InstructionTranslator {
 			Value regLeftNum = InstructionTranslator.parseExpression(b, lvdot.getLeft(), p, f);
 			StructObject regObject = (StructObject)regLeftNum.getType();
 
-			
 			LLVMObject idObj = LLVM.getStructField(regObject.getName(), lvId);
-			Register idRes = new Register(idObj); //automatically adds to hashmap
+			Register idRes = new Register(idObj); 
 
 			int index = LLVM.getFieldIndex(regObject.getName(), lvId);
 
 			Register gepReg = new Register(idObj);
-
-			// this instruction needs to be preceded by a LOAD
-			// refer to domath() in mixed.ll
 			
 			InstructionGetElementPtr gep = new InstructionGetElementPtr(gepReg, regObject, regLeftNum, Integer.toString(index));
 			b.addInstruction(gep);
-
+			System.out.println("lvalue reg type: " + idObj);
 			return gepReg;
 		}
 	}

@@ -212,24 +212,24 @@ public class CFG {
 			blocks.add(returnBlock);
 			labelCounter += 1;
 
-			// InstructionBr toRet = new InstructionBr(returnBlock.getLabel());
-			// currBlock.addInstruction(toRet);
-
 			ReturnStatement rs = (ReturnStatement)statement;
 
 			Expression targetExp = rs.getExpression();
 			Value resultReg = InstructionTranslator.parseExpression(currBlock,targetExp,p, f);
 
 			Value returnReg = new Register(resultReg.getType(), "_retval_");
+			System.out.println("return statement: " + resultReg.getType() + " expression: " + rs.getExpression());
 
-			Instruction storeToRetVal = new InstructionStore(returnReg, resultReg, resultReg.getType());
+			LLVMObject funcReturnType = InstructionTranslator.convertTypeToObject(f.getType());
+
+			Instruction storeToRetVal = new InstructionStore(returnReg, resultReg, funcReturnType);
 			currBlock.addInstruction(storeToRetVal);
 
 			InstructionBr branchToReturn = new InstructionBr(returnBlock.getLabel());
 			currBlock.addInstruction(branchToReturn);
 
 			//return instruction loads from _retval_ and calls return:
-			InstructionTranslator.setReturnInstruction(returnBlock, resultReg.getType());
+			InstructionTranslator.setReturnInstruction(returnBlock, funcReturnType);
 
 			Edge toReturn = new Edge(currBlock, returnBlock);
 			edges.add(toReturn);
