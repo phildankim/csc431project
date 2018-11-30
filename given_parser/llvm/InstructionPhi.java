@@ -28,8 +28,19 @@ public class InstructionPhi implements Instruction {
 		return register;
 	}
 
+	public void removeBadPhis() {
+		for (PhiOperand phi : phiOperands) {
+			if (phi.getValue().toString().equals(register.toString())) {
+				phiOperands.remove(phi);
+			}
+		}
+	}
+
 	@Override
 	public String toString() {
+
+		removeBadPhis();
+
 		String returnString = register + " = phi " + register.getType();
 		for (int i = 0; i < phiOperands.size(); i++) {
 			PhiOperand po = phiOperands.get(i);
@@ -39,9 +50,9 @@ public class InstructionPhi implements Instruction {
 				returnString += ", ";
 			}
 
-			// if (po.getValue().toString().equals(register.toString())) {
-			// 	invalid = true;
-			// }
+			 if (po.getValue().toString().equals(register.toString())) {
+			 	invalid = true;
+			 }
 		}
 
 		if (invalid) {
