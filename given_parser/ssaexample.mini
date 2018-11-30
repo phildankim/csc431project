@@ -25,7 +25,12 @@ fun f (int x, int y) int
 
 fun main() int
 {
-	f(1,10);
+	int a, b;
+
+	a = read;
+	b = read;
+
+	f(a,b);
 
 	return 0;
 }
