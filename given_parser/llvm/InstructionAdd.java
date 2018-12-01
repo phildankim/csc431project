@@ -2,9 +2,9 @@ package llvm;
 
 public class InstructionAdd implements Instruction {
 	
-	Value operand1;
-	Value operand2;
-	Value register;
+	public Value operand1;
+	public Value operand2;
+	public Value register;
 
 	public InstructionAdd (Value register, Value operand1, Value operand2) {
 		this.register = register;

@@ -320,6 +320,19 @@ public class CFG {
 		writer.write("}" + "\n");
 	}
 
+	public void printToARM(BufferedWriter writer) throws IOException {
+
+		// function header??
+		writer.write("\t.align 2\n");
+		writer.write("\t.global " + f.getName() + "\n");
+		writer.write(f.getName() + ":\n");
+
+		for (Block b : blocks) {
+			b.printToARM(writer);
+		}
+
+	}
+
 	public void printCFG() {
 		
 		System.out.println("===== CFG FOR FUNCTION: " + this.functionName + " =====");

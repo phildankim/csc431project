@@ -72,6 +72,37 @@ public class LLVM {
 		writer.write("@.read_scratch = common global i32 0, align 8\n");
 	}
 
+	public void printToARM(BufferedWriter writer) throws IOException {
+		writer.write("\t.arch armv7-a\n");
+
+		for (Instruction i : globalDecls) {
+			if (i instanceof InstructionDecl) {
+				writer.write ("/* hi i found a global declaration */\n");
+			}
+			else if (i instanceof InstructionTypeDecl) {
+				writer.write("/* hi this is a struct declaration */\n");
+			}
+			else {
+				throw new RuntimeException("globaldecls isnt an instruction decl wth! " + i.toString());
+			}
+		}
+
+		for (CFG c: this.cfgs) {
+			c.printToARM(writer);
+		}
+
+		writer.write(".PRINTLN_FMT:\n");
+		writer.write("\t.asciz  \"%ld\\n\"\n");
+		writer.write("\t.align. 2\n");
+		writer.write(".PRINT_FMT:\n");
+		writer.write("\t.asciz  \"%ld \"\n");
+		writer.write("\t.align. 2\n");
+		writer.write(".READ_FMT:\n");
+		writer.write("\t.asciz  \"%ld\"\n");
+		writer.write("\t.comm   .read_scratch,4,4\n");
+		writer.write("\t.global __aeabi_idiv\n");
+	}
+
 	public void setDeclInstructions() {
 		for (Declaration d : this.p.getDecls()) {
 	 		this.globalDecls.add(InstructionTranslator.setDeclInstruction(d));

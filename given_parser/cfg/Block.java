@@ -136,6 +136,14 @@ public class Block {
 		}
 	}
 
+	public void printToARM(BufferedWriter writer) throws IOException {
+		writer.write("." + this.getLabel() + ":\n");
+		for (Instruction i : instructions) {
+			String armTranslation = ARMTranslator.translate(i);
+			writer.write(armTranslation);
+		}
+	}
+
 	public void printSSA(BufferedWriter writer) throws IOException {
 
 		writer.write(this.getLabel() + ":" + "\n");

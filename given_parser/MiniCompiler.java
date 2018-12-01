@@ -74,7 +74,8 @@ public class MiniCompiler
             llvm.printProgram();
          }
          if (stack) {
-                     LLVM llvm = new LLVM(program);
+            
+            LLVM llvm = new LLVM(program);
 
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
@@ -87,6 +88,15 @@ public class MiniCompiler
             CFGBuilder cb = new CFGBuilder(program, fileName);
             cb.build();
          }
+
+         // this is for Milestone 6: Code Generation
+         // basing this on Milestone 2's CFG.
+         LLVM llvm = new LLVM(program);
+         String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "s";
+         BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+         llvm.printToARM(writer);
+         writer.close();
+
       }
    }
 
