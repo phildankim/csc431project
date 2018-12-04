@@ -119,7 +119,7 @@ public class CFGBuilder {
 		else {
 			LLVMObject retType = toLLVMObject(f.getType());
 			Value val = returnBlock.readVariable("_retval_", retType);
-			Instruction ret = new InstructionRet(val);
+			Instruction ret = new InstructionRet(val, retType);
 			returnBlock.addInstruction(ret);
 		}
 
@@ -776,7 +776,7 @@ public class CFGBuilder {
 			this.globalDecls.add(InstructionTranslator.setTypeDeclInstruction(td));
 		}
 	}
-	
+
 	public String buildFuncHeader(Function f) {
 		String header = "define ";
 
