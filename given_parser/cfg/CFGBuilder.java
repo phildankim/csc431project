@@ -441,7 +441,7 @@ public class CFGBuilder {
 			}
 			else if (globalSymbolTable.containsKey(id)) {
 				Register res = new Register(toLLVMObject(globalSymbolTable.get(id)));
-				Register ptr = new Register(toLLVMObject(globalSymbolTable.get(id)));
+				Register ptr = new Register(toLLVMObject(globalSymbolTable.get(id)), "@" + id);
 
 				Instruction inst = new InstructionLoad(res,ptr,toLLVMObject(globalSymbolTable.get(id)));
 				b.addInstruction(inst);
