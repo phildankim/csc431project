@@ -196,8 +196,8 @@ public class CFG {
 			edges.add(toGuard);
 			blocks.add(whileGuard);
 
-			// InstructionBr toThisBlock = new InstructionBr(whileGuard.getLabel());
-			// currBlock.addInstruction(toThisBlock);
+			InstructionBr toThisBlock = new InstructionBr(whileGuard.getLabel());
+			currBlock.addInstruction(toThisBlock);
 
 			this.updateCurr(whileGuard);
 
