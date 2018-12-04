@@ -250,8 +250,22 @@ public class CFGBuilder {
 			Value guardRegister = buildExpression(ws.getGuard(), currentBlock);
 			Block body = new Block("LU" + blockCounter++);
 			Block join = new Block("LU" + blockCounter++);
-			Instruction br = new InstructionBrCond(guardRegister, body.getLabel(), join.getLabel());
-			currentBlock.addInstruction(br);
+			
+			// Instruction br = new InstructionBrCond(guardRegister, body.getLabel(), join.getLabel());
+			// currentBlock.addInstruction(br);
+
+			if (currentBlock.getLastInstruction() instanceof InstructionIcmp) {
+				Instruction br = new InstructionBrCond(guardRegister, body.getLabel(), join.getLabel());
+				currentBlock.addInstruction(br);			
+			}
+
+			else {
+				Register truncReg = new Register(new BoolObject());
+				InstructionTrunc trunc = new InstructionTrunc(truncReg,guardRegister);
+				currentBlock.addInstruction(trunc);
+				Instruction br = new InstructionBrCond(truncReg, body.getLabel(), join.getLabel());
+				currentBlock.addInstruction(br);
+			}
 
 			Block resultBlock = buildStatement(ws.getBody(), body, returnBlock);
 
