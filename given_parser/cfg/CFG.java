@@ -138,8 +138,12 @@ public class CFG {
 				Edge thenJoin = new Edge(thenRes, join);
 				// InstructionBr toJoin = new InstructionBr(join.getLabel());
 				// ifThen.addInstruction(toJoin);
-				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				currBlock.addInstruction(toJoin);
+				if (!(this.isReturn(currBlock))) {
+					System.out.println("in then: " + currBlock.getLabel());
+					InstructionBr toJoin = new InstructionBr(join.getLabel());
+					currBlock.addInstruction(toJoin);
+				}
+				
 				// if (!hasBranch(ifThen)) {
 				// 	ifThen.addInstruction(toJoin);
 				// }
@@ -163,25 +167,23 @@ public class CFG {
 				edges.add(elseJoin);
 				// InstructionBr toJoin = new InstructionBr(join.getLabel());
 				// ifElse.addInstruction(toJoin);
-				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				currBlock.addInstruction(toJoin);
-				// if (!hasBranch(ifElse)) {
-					
-				// }
+				if (!(this.isReturn(currBlock))) {
+					System.out.println("in else: " + currBlock.getLabel());
+					InstructionBr toJoin = new InstructionBr(join.getLabel());
+					currBlock.addInstruction(toJoin);
+				}
 			}
 			else {
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
 				ifElse.addInstruction(toJoin);
-				// if (!hasBranch(ifElse)) {
-					
-				// }
 			}
 
 
-			InstructionBr toCurr = new InstructionBr(join.getLabel());
-			currBlock.addInstruction(toCurr);
-
-			this.updateCurr(join);
+			// InstructionBr toCurr = new InstructionBr(join.getLabel());
+			// currBlock.addInstruction(toCurr);
+			if (!(this.isReturn(currBlock))) {
+				this.updateCurr(join);
+			}
 
 			return currBlock;
 		}
@@ -194,8 +196,8 @@ public class CFG {
 			edges.add(toGuard);
 			blocks.add(whileGuard);
 
-			InstructionBr toThisBlock = new InstructionBr(whileGuard.getLabel());
-			currBlock.addInstruction(toThisBlock);
+			// InstructionBr toThisBlock = new InstructionBr(whileGuard.getLabel());
+			// currBlock.addInstruction(toThisBlock);
 
 			this.updateCurr(whileGuard);
 

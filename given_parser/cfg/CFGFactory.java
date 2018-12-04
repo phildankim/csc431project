@@ -22,7 +22,6 @@ public class CFGFactory {
 			cfgs.add(cfg);
 			cfg.addPredecessorsAndSuccessors();
 			//Register.printRegisters();
-			//cfg.searchForEmptyJoins();
 			cfg.clearStructs();
 			cfg.removeUnnecessaryBranch();
 			cfg.removeEmptyBlocks();
