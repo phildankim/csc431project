@@ -407,6 +407,7 @@ public class CFGBuilder {
 
 					Instruction xor = new InstructionXor(reg, new Immediate("1",i), operand);
 
+					b.addInstruction(xor);
 					return reg;
 				}
 			}
