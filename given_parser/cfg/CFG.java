@@ -73,12 +73,16 @@ public class CFG {
 	public void removeUnnecessaryBranch() {
 		for (Block b : this.blocks) {
 			if (b.instructions.size() >= 2) {
-				if (b.getLastInstruction() instanceof InstructionBr || 
-					b.getLastInstruction() instanceof InstructionBrCond) {
+				if (b.getLastInstruction() instanceof InstructionBr) {
 					if (b.instructions.get(b.instructions.size() - 2) instanceof InstructionBr || 
 						b.instructions.get(b.instructions.size() - 2) instanceof InstructionBrCond) {
 						b.instructions.remove(b.instructions.size()-1);
 					}
+				}
+			}
+			if (this.isReturn(b)) {
+				if (b.getLastInstruction() instanceof InstructionBr) {
+					b.instructions.remove(b.instructions.size() - 1);
 				}
 			}
 			
@@ -157,8 +161,10 @@ public class CFG {
 				Block elseRes = opt.get();
 				Edge elseJoin = new Edge(elseRes, join);
 				edges.add(elseJoin);
+				// InstructionBr toJoin = new InstructionBr(join.getLabel());
+				// ifElse.addInstruction(toJoin);
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-				ifElse.addInstruction(toJoin);
+				currBlock.addInstruction(toJoin);
 				// if (!hasBranch(ifElse)) {
 					
 				// }
@@ -409,6 +415,14 @@ public class CFG {
 		return false;
 	}
 
+	public boolean isReturn(Block b) {
+		String regex = "Return\\d+";
+		if (Pattern.matches(regex, b.getLabel())) {
+			return true;
+		}	
+		return false;
+	}
+
 	public String buildFuncHeader(Function f) {
 		String header = "define ";
 
@@ -461,28 +475,4 @@ public class CFG {
 
 		return false;
 	}
-
-	// public void addBrToReturn(Block join) {
-	// 	InstructionBr toRet;
-	// 	int maxRet = 0;
-	// 	for (Block b : this.blocks) {
-	// 		if (b.getLabel().matches("Return*")) {
-	// 			int cmp = Integer.parseInt(b.getLabel().split("Return")[1]);
-	// 			if (cmp > maxRet)
-	// 				maxRet = cmp;
-	// 		}
-	// 	}
-	// 	if (maxRet > 0) {
-	// 		toRet = new InstructionBr("Return" + Integer.toString(maxRet));
-	// 		join.addInstruction(toRet);
-	// 	}
-	// }
-
-	// public void searchForEmptyJoins() {
-	// 	for (Block b : this.blocks) {
-	// 		if (this.isJoin(b) && b.instructions.size() == 0) {
-	// 			this.addBrToReturn(b);
-	// 		}
-	// 	}
-	// }
 }
