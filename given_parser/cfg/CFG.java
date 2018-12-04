@@ -72,12 +72,12 @@ public class CFG {
 
 	public void removeUnnecessaryBranch() {
 		for (Block b : this.blocks) {
-			if (b.instructions.size() > 2) {
+			if (b.instructions.size() >= 2) {
 				if (b.getLastInstruction() instanceof InstructionBr || 
 					b.getLastInstruction() instanceof InstructionBrCond) {
 					if (b.instructions.get(b.instructions.size() - 2) instanceof InstructionBr || 
 						b.instructions.get(b.instructions.size() - 2) instanceof InstructionBrCond) {
-						b.instructions.remove(b.instructions.size() - 1);
+						b.instructions.remove(b.instructions.size()-1);
 					}
 				}
 			}
@@ -96,6 +96,8 @@ public class CFG {
 			for (Statement s : statements) {
 				result = this.createCFG(s);
 			} 
+
+
 			return result;
 		}
 		else if (statement instanceof ConditionalStatement) {
@@ -130,19 +132,21 @@ public class CFG {
 
 				//Branch instructions here
 				Edge thenJoin = new Edge(thenRes, join);
+				// InstructionBr toJoin = new InstructionBr(join.getLabel());
+				// ifThen.addInstruction(toJoin);
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-
-				if (!hasBranch(ifThen)) {
-					ifThen.addInstruction(toJoin);
-				}
+				currBlock.addInstruction(toJoin);
+				// if (!hasBranch(ifThen)) {
+				// 	ifThen.addInstruction(toJoin);
+				// }
 
 			}
 			else {
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-
-				if (!hasBranch(ifThen)) {
-					ifThen.addInstruction(toJoin);
-				}
+				ifThen.addInstruction(toJoin);
+				// if (!hasBranch(ifThen)) {
+				// 	ifThen.addInstruction(toJoin);
+				// }
 			}
 
 			// Branch IfElse
@@ -154,20 +158,25 @@ public class CFG {
 				Edge elseJoin = new Edge(elseRes, join);
 				edges.add(elseJoin);
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-
-				if (!hasBranch(ifElse)) {
-					ifElse.addInstruction(toJoin);
-				}
+				ifElse.addInstruction(toJoin);
+				// if (!hasBranch(ifElse)) {
+					
+				// }
 			}
 			else {
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
-
-				if (!hasBranch(ifElse)) {
-					ifElse.addInstruction(toJoin);
-				}
+				ifElse.addInstruction(toJoin);
+				// if (!hasBranch(ifElse)) {
+					
+				// }
 			}
 
+
+			InstructionBr toCurr = new InstructionBr(join.getLabel());
+			currBlock.addInstruction(toCurr);
+
 			this.updateCurr(join);
+
 			return currBlock;
 		}
 		else if (statement instanceof WhileStatement) {
@@ -209,14 +218,18 @@ public class CFG {
 
 				Edge bodyJoin = new Edge(bodyRes, whileGuard);
 				edges.add(bodyJoin);
+				InstructionBr joinInstr = new InstructionBr(join.getLabel());
+				bodyRes.addInstruction(joinInstr);
 			}
 			else {
 				whileBody.addInstruction(instr);
 
 				Edge whileLoop = new Edge(whileBody, whileGuard);
 				edges.add(whileLoop);
-			}
 
+			}
+			InstructionBr toCurr = new InstructionBr(join.getLabel());
+			currBlock.addInstruction(toCurr);
 			this.updateCurr(join);
 			return currBlock;
 
@@ -226,6 +239,9 @@ public class CFG {
 			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
 			blocks.add(returnBlock);
 			labelCounter += 1;
+
+			// InstructionBr toCurr = new InstructionBr(returnBlock.getLabel());
+			// currBlock.addInstruction(toCurr);
 
 			ReturnStatement rs = (ReturnStatement)statement;
 
@@ -445,4 +461,28 @@ public class CFG {
 
 		return false;
 	}
+
+	// public void addBrToReturn(Block join) {
+	// 	InstructionBr toRet;
+	// 	int maxRet = 0;
+	// 	for (Block b : this.blocks) {
+	// 		if (b.getLabel().matches("Return*")) {
+	// 			int cmp = Integer.parseInt(b.getLabel().split("Return")[1]);
+	// 			if (cmp > maxRet)
+	// 				maxRet = cmp;
+	// 		}
+	// 	}
+	// 	if (maxRet > 0) {
+	// 		toRet = new InstructionBr("Return" + Integer.toString(maxRet));
+	// 		join.addInstruction(toRet);
+	// 	}
+	// }
+
+	// public void searchForEmptyJoins() {
+	// 	for (Block b : this.blocks) {
+	// 		if (this.isJoin(b) && b.instructions.size() == 0) {
+	// 			this.addBrToReturn(b);
+	// 		}
+	// 	}
+	// }
 }

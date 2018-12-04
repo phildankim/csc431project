@@ -22,9 +22,10 @@ public class CFGFactory {
 			cfgs.add(cfg);
 			cfg.addPredecessorsAndSuccessors();
 			//Register.printRegisters();
+			//cfg.searchForEmptyJoins();
 			cfg.clearStructs();
-			cfg.removeEmptyBlocks();
 			cfg.removeUnnecessaryBranch();
+			cfg.removeEmptyBlocks();
 		}
 
 		return cfgs;
