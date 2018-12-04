@@ -214,6 +214,7 @@ public class CFGBuilder {
 			else {
 				Register truncReg = new Register(new BoolObject());
 				InstructionTrunc trunc = new InstructionTrunc(truncReg,guardRegister);
+				currentBlock.addInstruction(trunc);
 				Instruction br = new InstructionBrCond(truncReg, thenBlock.getLabel(), elseBlock.getLabel());
 				currentBlock.addInstruction(br);
 			}
