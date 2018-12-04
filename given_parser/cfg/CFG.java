@@ -139,7 +139,6 @@ public class CFG {
 				// InstructionBr toJoin = new InstructionBr(join.getLabel());
 				// ifThen.addInstruction(toJoin);
 				if (!(this.isReturn(currBlock))) {
-					System.out.println("in then: " + currBlock.getLabel());
 					InstructionBr toJoin = new InstructionBr(join.getLabel());
 					currBlock.addInstruction(toJoin);
 				}
@@ -168,7 +167,6 @@ public class CFG {
 				// InstructionBr toJoin = new InstructionBr(join.getLabel());
 				// ifElse.addInstruction(toJoin);
 				if (!(this.isReturn(currBlock))) {
-					System.out.println("in else: " + currBlock.getLabel());
 					InstructionBr toJoin = new InstructionBr(join.getLabel());
 					currBlock.addInstruction(toJoin);
 				}
