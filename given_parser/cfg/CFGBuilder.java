@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 public class CFGBuilder {
  
 	private Program p;
-	private Function f;
 	private String filename;
 	private HashMap <String, Type> globalSymbolTable = new HashMap<>();
 	private HashMap <String, Type> localParamTable = new HashMap<>();
@@ -50,8 +49,6 @@ public class CFGBuilder {
 		structTable = buildStructTable();
 
 		for (Function func : p.getFuncs()) {
-
-			f = func;
 
 			writer.write(buildFuncHeader(func) + "\n");
 			writer.write("{\n");
@@ -569,13 +566,30 @@ public class CFGBuilder {
 		else if (e instanceof InvocationExpression) {
 			InvocationExpression ie = (InvocationExpression)e;
 			ArrayList<Value> arguments = new ArrayList<Value>();
+			// for (Expression arg : ie.getArgs()) {
+				
+			// 	Value argReg = buildExpression(arg, b);
+				
+			// 	if (argReg.getName() == "null") {
+			// 		NullValue nullVal = (NullValue)argReg;
+			// 		nullVal.setType(InstructionTranslator.convertDeclarationToObject(f.getParams().get(i)));
+			// 		arguments.add(nullVal);
+			// 	}
+			// 	else {
+			// 		arguments.add(argReg);
+			// 	}
+			// }
 
 			for (int i = 0; i < ie.getArgs().size(); i++) {
 				Expression arg = ie.getArgs().get(i);
-				Value argReg = InstructionTranslator.parseExpression(b,arg, p, f);
+				Value argReg = buildExpression(arg, b);
 				if (argReg.getName() == "null") {
 					NullValue nullVal = (NullValue)argReg;
-					nullVal.setType(InstructionTranslator.convertDeclarationToObject(f.getParams().get(i)));
+
+					String funcCallName = ie.getName();
+					List<Declaration> params = funcParamsTable.get(funcCallName);
+
+					nullVal.setType(toLLVMObject(params.get(i).getType()));
 					arguments.add(nullVal);
 				}
 				else {
