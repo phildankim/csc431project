@@ -2,12 +2,9 @@
 
 make clean;make
 
-# exit when any command fails
-set -e
-
 for dir in benchmarks/*; do
    f=${dir##*/}
-   echo $f
+   echo '-'$f
    java MiniCompiler $dir/${f}.mini -stack
    clang $dir/${f}.ll -m32
    ./a.out < $dir/input > ${f}.txt
@@ -15,3 +12,5 @@ for dir in benchmarks/*; do
    diff ${f}.txt $dir/output
    echo 'diffing complete'
 done
+
+echo 'benchmarks passed!!'
