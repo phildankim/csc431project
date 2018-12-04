@@ -343,7 +343,14 @@ public class InstructionTranslator {
 				Value argReg = InstructionTranslator.parseExpression(b,arg, p, f);
 				if (argReg.getName() == "null") {
 					NullValue nullVal = (NullValue)argReg;
-					nullVal.setType(InstructionTranslator.convertDeclarationToObject(f.getParams().get(i)));
+
+					String funcCallName = ie.getName();
+					for (Function func: p.getFuncs()) {
+						if (funcCallName.equals(func.getName())) {
+							nullVal.setType(InstructionTranslator.convertDeclarationToObject(func.getParams().get(i)));
+						}
+					}
+					//nullVal.setType(InstructionTranslator.convertDeclarationToObject(f.getParams().get(i)));
 					arguments.add(nullVal);
 				}
 				else {
