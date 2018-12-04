@@ -66,6 +66,7 @@ public class CFGBuilder {
 			Block b = buildFunc(func);
 			blocks.add(b);
 
+			fixPhis(b);
 			printLLVM(b,writer);
 
 
@@ -659,6 +660,10 @@ public class CFGBuilder {
 			return result;
 		}
 
+		else if (e instanceof NullExpression) {
+				return new NullValue();
+			}
+
 
 		throw new RuntimeException ("buildexpression error: should not reach here " + e.toString());
 	}
@@ -771,7 +776,7 @@ public class CFGBuilder {
 			this.globalDecls.add(InstructionTranslator.setTypeDeclInstruction(td));
 		}
 	}
-
+	
 	public String buildFuncHeader(Function f) {
 		String header = "define ";
 
@@ -782,7 +787,8 @@ public class CFGBuilder {
 			header += "void";
 		}
 		else if (f.getType() instanceof StructType) {
-			header += "i8*";
+			StructType st = (StructType)f.getType();
+			header += "%struct." + st.getName() + "*";
 		}
 		else {
 			throw new RuntimeException("building func header but return is not int or bool or void or struct");
@@ -795,7 +801,15 @@ public class CFGBuilder {
 		for (int i = 0; i < params.size(); i++) {
 			Declaration currDec = params.get(i);
 
-			header += "i32 %" + currDec.getName();
+			if (currDec.getType() instanceof IntType || currDec.getType() instanceof BoolType) {
+				header += "i32 %" + currDec.getName();
+			}
+			else if (currDec.getType() instanceof StructType) {
+				StructType st = (StructType)currDec.getType();
+				header += "%struct." + st.getName() + "* %" + currDec.getName();
+			}
+
+
 			if (i != (params.size() - 1)) {
 				header += ", ";
 			}
@@ -804,5 +818,9 @@ public class CFGBuilder {
 		header += ")";
 
 		return header;
+	}
+
+	public void fixPhis(Block b) {
+
 	}
 }
