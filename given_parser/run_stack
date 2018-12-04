@@ -10,5 +10,8 @@ for dir in benchmarks/*; do
    echo $f
    java MiniCompiler $dir/${f}.mini -stack
    clang $dir/${f}.ll -m32
-   ./a.out < $dir/${f}.input > ${f}.txt
+   ./a.out < $dir/input > ${f}.txt
+   echo 'diffing'
+   diff ${f}.txt $dir/output
+   echo 'diffing complete'
 done
