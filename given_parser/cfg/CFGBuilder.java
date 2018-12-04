@@ -401,6 +401,9 @@ public class CFGBuilder {
 				}
 				else if (operand instanceof Register) {
 
+					IntObject i = new IntObject();
+					i.setValue("1");
+
 					if (b.getLastInstruction() instanceof InstructionIcmp) {
 						Register zextReg = new Register(new IntObject());
 						InstructionZext zext = new InstructionZext(zextReg, operand, new Immediate("1",i));
@@ -413,9 +416,6 @@ public class CFGBuilder {
 					}
 
 					Register reg = new Register(new BoolObject());
-
-					IntObject i = new IntObject();
-					i.setValue("1");
 
 					Instruction xor = new InstructionXor(reg, new Immediate("1",i), operand);
 
