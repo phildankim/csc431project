@@ -24,11 +24,19 @@ public class CFGBuilder {
 
 	private BufferedWriter writer;
 
+	private boolean uce = false;
+
 
 	public CFGBuilder (Program p, String filename){
 		this.p = p;
 		this.filename = filename;
 
+	}
+
+	public CFGBuilder (Program p, String filename, boolean uce){
+		this.p = p;
+		this.filename = filename;
+		this.uce = uce;
 	}
 
 

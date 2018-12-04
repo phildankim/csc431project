@@ -20,6 +20,7 @@ public class MiniCompiler
    private static boolean cfg = false;
    private static boolean ssa = false;
    private static boolean typecheck = true;
+   private static boolean uce = false;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
@@ -67,13 +68,23 @@ public class MiniCompiler
             MiniTypeChecker.checkProgram(program);
          }
 
+         if (stack && uce) {
+            throw new RuntimeException("I dont know how to uce with stack");
+         }
+
          //Milestone 2 
-         if (cfg) {
+         else if (cfg) {
             LLVM llvm = new LLVM(program);
             //LLVM.printStructs();
             llvm.printProgram();
          }
-         if (stack) {
+
+         else if (ssa && uce) {
+            String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
+            CFGBuilder cb = new CFGBuilder(program, fileName, true);
+            cb.build();
+         }
+         else if (stack) {
             
             LLVM llvm = new LLVM(program);
 
@@ -83,7 +94,7 @@ public class MiniCompiler
             writer.close();
          }
 
-         if (ssa) {
+         else if (ssa) {
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             CFGBuilder cb = new CFGBuilder(program, fileName);
             cb.build();
@@ -125,6 +136,9 @@ public class MiniCompiler
             }
             else if (args[i].equals("-tc")) {
                typecheck = true;
+            }
+            else if (args[i].equals("-uce")) {
+               uce = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);
