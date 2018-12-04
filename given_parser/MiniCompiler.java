@@ -19,7 +19,7 @@ public class MiniCompiler
    private static boolean jsonPrint = false;
    private static boolean cfg = false;
    private static boolean ssa = false;
-   private static boolean typecheck = false;
+   private static boolean typecheck = true;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
