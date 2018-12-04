@@ -30,7 +30,7 @@ fun main() int
 	a = read;
 	b = read;
 
-	f(a,b);
+	print f(a,b);
 
 	return 0;
 }
