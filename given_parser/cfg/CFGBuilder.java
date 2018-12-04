@@ -400,6 +400,18 @@ public class CFGBuilder {
 					}
 				}
 				else if (operand instanceof Register) {
+
+					if (b.getLastInstruction() instanceof InstructionIcmp) {
+						Register zextReg = new Register(new IntObject());
+						InstructionZext zext = new InstructionZext(zextReg, operand, new Immediate("1",i));
+						b.addInstruction(zext);
+
+						Register xorReg = new Register(new IntObject());
+						Instruction xor = new InstructionXor(xorReg, new Immediate("1",i), zextReg);
+						b.addInstruction(xor);
+						return xorReg;
+					}
+
 					Register reg = new Register(new BoolObject());
 
 					IntObject i = new IntObject();
