@@ -206,8 +206,17 @@ public class CFGBuilder {
 			currentBlock.addSucc(thenBlock);
 			currentBlock.addSucc(elseBlock);
 
-			Instruction br = new InstructionBrCond(guardRegister, thenBlock.getLabel(), elseBlock.getLabel());
-			currentBlock.addInstruction(br);
+			if (currentBlock.getLastInstruction() instanceof InstructionIcmp) {
+				Instruction br = new InstructionBrCond(guardRegister, thenBlock.getLabel(), elseBlock.getLabel());
+				currentBlock.addInstruction(br);			
+			}
+
+			else {
+				Register truncReg = new Register(new BoolObject());
+				InstructionTrunc trunc = new InstructionTrunc(truncReg,guardRegister);
+				Instruction br = new InstructionBrCond(truncReg, thenBlock.getLabel(), elseBlock.getLabel());
+				currentBlock.addInstruction(br);
+			}
 
 			if (then == returnBlock && els == returnBlock) {
 				return returnBlock;
