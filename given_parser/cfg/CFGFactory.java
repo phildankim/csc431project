@@ -9,7 +9,7 @@ public class CFGFactory {
 	public CFGFactory() {
 	}
 
-	public static ArrayList<CFG> createAllCFG(Program p) {
+	public static ArrayList<CFG> createAllCFG(Program p, boolean simp) {
 		
 		ArrayList<CFG> cfgs = new ArrayList<CFG>();
 		List<Function> functions = p.getFuncs();
@@ -25,6 +25,8 @@ public class CFGFactory {
 			cfg.clearStructs();
 			cfg.removeUnnecessaryBranch();
 			cfg.removeEmptyBlocks();
+			if (simp) 
+				cfg.simplify();
 		}
 
 		return cfgs;

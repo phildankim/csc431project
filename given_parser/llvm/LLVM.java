@@ -18,13 +18,16 @@ public class LLVM {
 	// key: name of struct, value: list of fields
 	private static HashMap<String, ArrayList<LLVMObject>> structTable = new HashMap<String, ArrayList<LLVMObject>>();
 
-	public LLVM(Program p) {
+	public LLVM(Program p, String opt) {
 		this.p = p;
 		setDeclInstructions();
 		setTypeDeclInstructions();
 		//LLVM.printGlobals();
 		//LLVM.printStructTable();
-		this.cfgs = CFGFactory.createAllCFG(p);
+		if (opt.equals("simp"))
+			this.cfgs = CFGFactory.createAllCFG(p, true);
+		else
+			this.cfgs = CFGFactory.createAllCFG(p, false);
 	}
 
 	public static void printGlobals() {

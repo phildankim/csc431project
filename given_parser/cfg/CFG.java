@@ -134,26 +134,18 @@ public class CFG {
 			if (opt.isPresent()) {
 				Block thenRes = opt.get();
 
-				//Branch instructions here
 				Edge thenJoin = new Edge(thenRes, join);
-				// InstructionBr toJoin = new InstructionBr(join.getLabel());
-				// ifThen.addInstruction(toJoin);
+
 				if (!(this.isReturn(currBlock))) {
 					InstructionBr toJoin = new InstructionBr(join.getLabel());
 					currBlock.addInstruction(toJoin);
 				}
-				
-				// if (!hasBranch(ifThen)) {
-				// 	ifThen.addInstruction(toJoin);
-				// }
 
 			}
 			else {
 				InstructionBr toJoin = new InstructionBr(join.getLabel());
 				ifThen.addInstruction(toJoin);
-				// if (!hasBranch(ifThen)) {
-				// 	ifThen.addInstruction(toJoin);
-				// }
+
 			}
 
 			// Branch IfElse
@@ -164,8 +156,7 @@ public class CFG {
 				Block elseRes = opt.get();
 				Edge elseJoin = new Edge(elseRes, join);
 				edges.add(elseJoin);
-				// InstructionBr toJoin = new InstructionBr(join.getLabel());
-				// ifElse.addInstruction(toJoin);
+
 				if (!(this.isReturn(currBlock))) {
 					InstructionBr toJoin = new InstructionBr(join.getLabel());
 					currBlock.addInstruction(toJoin);
@@ -176,9 +167,6 @@ public class CFG {
 				ifElse.addInstruction(toJoin);
 			}
 
-
-			// InstructionBr toCurr = new InstructionBr(join.getLabel());
-			// currBlock.addInstruction(toCurr);
 			if (!(this.isReturn(currBlock))) {
 				this.updateCurr(join);
 			}
@@ -245,9 +233,6 @@ public class CFG {
 			Block returnBlock = new Block("Return" + Integer.toString(labelCounter));
 			blocks.add(returnBlock);
 			labelCounter += 1;
-
-			// InstructionBr toCurr = new InstructionBr(returnBlock.getLabel());
-			// currBlock.addInstruction(toCurr);
 
 			ReturnStatement rs = (ReturnStatement)statement;
 
@@ -326,8 +311,6 @@ public class CFG {
 	}
 
 	public void printInstructions(BufferedWriter writer) throws IOException {
-		//System.out.println("===== LLVM FOR FUNCTION: " + this.functionName + " =====");
-
 		//function header
 		String funcHeader = buildFuncHeader(f);
 
@@ -467,12 +450,60 @@ public class CFG {
 	}
 
 	public boolean hasBranch(Block b) {
-		for (int i = 0; i < b.instructions.size(); i++) {
-			if(b.instructions.get(i) instanceof InstructionBr) {
-				return true;
+		return b.getLastInstruction() instanceof InstructionBr || 
+		b.getLastInstruction() instanceof InstructionBrCond;
+	}
+
+	// Milestone 5: CFG Simplification
+	public void simplify() {
+		// Start by removing all empty blocks
+		ArrayList<Block> blocksToRemove = new ArrayList<Block>();
+		for (Block b : this.blocks) {
+			if (hasBranch(b)) {
+			Instruction instr = b.getLastInstruction();
+
+				if (instr instanceof InstructionBr) {
+					InstructionBr br = (InstructionBr)instr;
+					Block destination = getBlock(br.destination);
+					System.out.println("destination: " + destination.getLabel());
+					br.destination = findFinalDestination(destination, blocksToRemove).getLabel();
+				}
+
+				else if (instr instanceof InstructionBrCond) {
+					InstructionBrCond brcond = (InstructionBrCond)instr;
+					Block thenBlock = getBlock(brcond.labelTrue);
+					Block elseBlock = getBlock(brcond.labelFalse);
+					System.out.println("then: " + thenBlock.getLabel() + ", else: " + elseBlock.getLabel());
+
+					String newThenDest = findFinalDestination(thenBlock, blocksToRemove).getLabel();
+					String newElseDest = findFinalDestination(elseBlock, blocksToRemove).getLabel();
+
+					brcond.labelTrue = newThenDest;
+					brcond.labelFalse = newElseDest;
+				}
+
+				else
+					continue;
 			}
 		}
+		for (Block b : blocksToRemove) {
+			this.blocks.remove(getBlock(b.getLabel()));
+		}
 
-		return false;
 	}
+
+	public Block findFinalDestination(Block b, ArrayList<Block> blocksToRemove) {
+		if (isEmpty(b)) {
+			InstructionBr br = (InstructionBr)b.getLastInstruction();
+			blocksToRemove.add(b);
+			return findFinalDestination(getBlock(br.destination), blocksToRemove);
+		}
+		else 
+			return b;
+	}
+
+	public boolean isEmpty(Block b) {
+		return b.instructions.size() == 1 && b.getLastInstruction() instanceof InstructionBr;
+	}
+
 }

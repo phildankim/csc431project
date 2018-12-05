@@ -21,6 +21,7 @@ public class MiniCompiler
    private static boolean ssa = false;
    private static boolean typecheck = true;
    private static boolean uce = false;
+   private static boolean simp = false;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
@@ -74,7 +75,7 @@ public class MiniCompiler
 
          //Milestone 2 
          else if (cfg) {
-            LLVM llvm = new LLVM(program);
+            LLVM llvm = new LLVM(program, "");
             //LLVM.printStructs();
             llvm.printProgram();
          }
@@ -86,7 +87,11 @@ public class MiniCompiler
          }
          else if (stack) {
             
-            LLVM llvm = new LLVM(program);
+            LLVM llvm;
+            if (simp)
+               llvm = new LLVM(program, "simp");
+            else
+               llvm = new LLVM(program, "");
 
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
@@ -102,7 +107,7 @@ public class MiniCompiler
 
          // this is for Milestone 6: Code Generation
          // basing this on Milestone 2's CFG.
-         LLVM llvm = new LLVM(program);
+         LLVM llvm = new LLVM(program, "");
          String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "s";
          BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
          llvm.printToARM(writer);
@@ -139,6 +144,9 @@ public class MiniCompiler
             }
             else if (args[i].equals("-uce")) {
                uce = true;
+            }
+            else if (args[i].equals("-simp")) {
+               simp = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);
