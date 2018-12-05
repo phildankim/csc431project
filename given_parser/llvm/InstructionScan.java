@@ -3,7 +3,7 @@ package llvm;
 public class InstructionScan implements Instruction {
 	
 
-	Value register;
+	public Value register;
 
 	public InstructionScan (Value register) {
 		this.register = register;

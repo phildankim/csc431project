@@ -3,7 +3,7 @@ package llvm;
 public class InstructionPrint implements Instruction {
 	
 
-	Value register;
+	public Value register;
 
 	public InstructionPrint (Value register) {
 		this.register = register;

@@ -2,9 +2,9 @@ package llvm;
 
 public class InstructionBrCond implements Instruction{
 	
-	Value condition;
-	String labelTrue;
-	String labelFalse;
+	public Value condition;
+	public String labelTrue;
+	public String labelFalse;
 
 	public InstructionBrCond (Value condition, String labelTrue, String labelFalse) {
 		this.condition = condition;

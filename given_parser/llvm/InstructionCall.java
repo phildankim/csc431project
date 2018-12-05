@@ -4,11 +4,11 @@ import java.util.*;
 
 public class InstructionCall implements Instruction {
 
-	Value result;
-	LLVMObject type;
-	String funcptr;
-	ArrayList<Value> args;
-	String argList;
+	public Value result;
+	public LLVMObject type;
+	public String funcptr;
+	public ArrayList<Value> args;
+	public String argList;
 
 	public InstructionCall (Value result, LLVMObject type, String funcptr, ArrayList<Value> args) {
 		this.result= result;
