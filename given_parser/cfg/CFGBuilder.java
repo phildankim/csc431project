@@ -1095,18 +1095,18 @@ public class CFGBuilder {
 			}
 			else if (i instanceof InstructionCall) {
 				InstructionCall ic = (InstructionCall)i;
+				//System.out.println(ic.toString());
 				if (ic.result instanceof Register) {
 					Register used = (Register)ic.result;
 					definitions.remove(used);
-
-					for (Value arg : ic.args) {
+				}
+				for (Value arg : ic.args) {
 						if (arg instanceof Register) {
 							Register usedArg = (Register)arg;
 							definitions.remove(usedArg);
 							System.out.println("REMOVED " + usedArg);
 						}
 					}
-				}
 			}
 			else if (i instanceof InstructionDecl) {
 				// do nothing - these are all globals
