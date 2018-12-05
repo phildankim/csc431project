@@ -308,16 +308,17 @@ public class CFG {
 			}
 		}
 		
-		// for (Block b : this.blocks) {
-		// 	System.out.println("Predecessors for " + b.getLabel());
-		// 	for (Block p : b.predecessors) {
-		// 		System.out.println("\t" + p.getLabel());
-		// 	}
-		// 	System.out.println("Successors for " + b.getLabel());
-		// 	for (Block s : b.successors) {
-		// 		System.out.println("\t" + s.getLabel());
-		// 	}
-		// }
+		for (Block b : this.blocks) {
+			System.out.println("Predecessors for " + b.getLabel());
+			for (Block p : b.predecessors) {
+				System.out.println("\t" + p.getLabel());
+			}
+			System.out.println("Successors for " + b.getLabel());
+			for (Block s : b.successors) {
+				System.out.println("\t" + s.getLabel());
+			}
+			System.out.println("\n");
+		}
 	}
 
 	public void clearPredsSuccs() {
@@ -483,11 +484,14 @@ public class CFG {
 
 	// Milestone 5: CFG Simplification
 	public void simplify() {
+		
 		// Start by removing all empty blocks
 		removeUnnecessaryBlocks();
 
 		// Get Preds and Succs
 		addPredecessorsAndSuccessors();
+
+		removeUnnecessaryBranch();
 
 		// Combine blocks
 		combineBlocks();
@@ -546,12 +550,46 @@ public class CFG {
 	public void combineInstructions(Block from, Block to) {
 		from.instructions.remove(from.getLastInstruction());
 		from.instructions.addAll(to.instructions);
+
+		from.successors.addAll(to.successors);
+
+		// replace all labels going to 'to' to 'from'
+		String toLabel = to.getLabel();
+		String fromLabel = from.getLabel();
+
+		for (Block b : this.blocks) {
+			Instruction instr = b.getLastInstruction();
+
+			if (instr instanceof InstructionBr) {
+				InstructionBr br = (InstructionBr)instr;
+				if (br.destination.equals(toLabel)) {
+					br.destination = fromLabel;
+				}
+			}
+
+			else if (instr instanceof InstructionBrCond) {
+				InstructionBrCond brcond = (InstructionBrCond)instr;
+
+				if (brcond.labelTrue.equals(toLabel)) {
+					brcond.labelTrue = fromLabel;
+				}
+
+				if (brcond.labelFalse.equals(toLabel)) {
+					brcond.labelFalse = fromLabel;
+				}
+			}
+
+			else
+				continue;
+		}
+
 	}
 
 	public Block findFinalDestination(Block b, ArrayList<Block> blocksToRemove) {
 		if (isEmpty(b)) {
 			InstructionBr br = (InstructionBr)b.getLastInstruction();
 			blocksToRemove.add(b);
+			System.out.println("removing block: " + b.getLabel());
 			return findFinalDestination(getBlock(br.destination), blocksToRemove);
 		}
 		else 
