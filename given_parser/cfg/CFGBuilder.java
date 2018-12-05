@@ -1024,6 +1024,14 @@ public class CFGBuilder {
 
 	public boolean deleteInstructions(HashMap<Register, Instruction> definitions, Block b) {
 		boolean somethingChanged = false;
+
+		if (b.phiInstructions.removeAll(definitions.values())){
+			somethingChanged = true;
+		}
+		if (b.instructions.removeAll(definitions.values())){
+			somethingChanged = true;
+		}
+
 		return somethingChanged;
 	}
 
@@ -1065,6 +1073,195 @@ public class CFGBuilder {
 				}
 				if (ia.operand2 instanceof Register){
 					Register used = (Register)ia.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionBitcast) {
+				InstructionBitcast ib = (InstructionBitcast)i;
+				if (ib.register instanceof Register) {
+					Register used = (Register)ib.register;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionBr) {
+				// do nothing - branch only has a label				
+			}
+			else if (i instanceof InstructionBrCond) {
+				InstructionBrCond ib = (InstructionBrCond)i;
+				if (ib.condition instanceof Register) {
+					Register used = (Register)ib.condition;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionCall) {
+				InstructionCall ic = (InstructionCall)i;
+				if (ic.result instanceof Register) {
+					Register used = (Register)ic.result;
+					definitions.remove(used);
+
+					for (Value arg : ic.args) {
+						if (arg instanceof Register) {
+							Register usedArg = (Register)arg;
+							definitions.remove(usedArg);
+						}
+					}
+				}
+			}
+			else if (i instanceof InstructionDecl) {
+				// do nothing - these are all globals
+			}
+			else if (i instanceof InstructionFree) {
+				InstructionFree inst = (InstructionFree)i;
+				if (inst.register instanceof Register) {
+					Register used = (Register)inst.register;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionGetElementPtr) {
+				InstructionGetElementPtr igep = (InstructionGetElementPtr)i;
+				if (igep.ptrval instanceof Register) {
+					Register used = (Register)igep.ptrval;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionIcmp) {
+				InstructionIcmp ic = (InstructionIcmp)i;
+				if (ic.operand1 instanceof Register) {
+					Register used = (Register)ic.operand1;
+					definitions.remove(used);
+				}
+				if (ic.operand2 instanceof Register) {
+					Register used = (Register)ic.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionLoad) {
+				InstructionLoad il = (InstructionLoad)i;
+				if (il.pointer instanceof Register) {
+					Register used = (Register)il.pointer;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionMalloc) {
+				// do nothing, malloc only has a definition?
+			}
+			else if (i instanceof InstructionMul) {
+				InstructionMul im = (InstructionMul)i;
+				if (im.operand1 instanceof Register) {
+					Register used = (Register)im.operand1;
+					definitions.remove(used);
+				}
+				if (im.operand2 instanceof Register) {
+					Register used = (Register)im.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionOr) {
+				InstructionOr io = (InstructionOr)i;
+				if (io.operand1 instanceof Register) {
+					Register used = (Register)io.operand1;
+					definitions.remove(used);
+				}
+				if (io.operand2 instanceof Register) {
+					Register used = (Register)io.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionPhi) {
+				throw new RuntimeException("protectusedregusters : whats a phi doing in regular instrs");
+			}
+			else if (i instanceof InstructionPrint) {
+				InstructionPrint ip = (InstructionPrint)i;
+				if (ip.register instanceof Register) {
+					Register used = (Register)ip.register;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionPrintLn) {
+				InstructionPrintLn ip = (InstructionPrintLn)i;
+				if (ip.register instanceof Register) {
+					Register used = (Register)ip.register;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionRet) {
+				InstructionRet ir = (InstructionRet)i;
+				if (ir.register instanceof Register) {
+					Register used = (Register)ir.register;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionRetVoid) {
+				// do nothing - ret void has no definitions or uses
+			}
+			else if (i instanceof InstructionScan) {
+				InstructionScan is = (InstructionScan)i;
+				if (is.register instanceof Register) {
+					Register used = (Register)is.register;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionSdiv) {
+				InstructionSdiv id = (InstructionSdiv)i;
+				if (id.operand1 instanceof Register) {
+					Register used = (Register)id.operand1;
+					definitions.remove(used);
+				}
+				if (id.operand2 instanceof Register) {
+					Register used = (Register)id.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionStore) {
+				InstructionStore is = (InstructionStore)i;
+				if (is.value instanceof Register) {
+					Register used = (Register)is.value;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionStub) {
+				throw new RuntimeException("what is a stub doing in protectUsedRegisters instrucionlist");
+			}
+			else if (i instanceof InstructionSub) {
+				InstructionSub is = (InstructionSub)i;
+				if (is.operand1 instanceof Register) {
+					Register used = (Register)is.operand1;
+					definitions.remove(used);
+				}
+				if (is.operand2 instanceof Register) {
+					Register used = (Register)is.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionTrunc) {
+				InstructionTrunc it = (InstructionTrunc)i;
+				if (it.register instanceof Register) {
+					Register used = (Register)it.register;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionTypeDecl) {
+				// do nothing, this is a struct declaration
+			}
+			else if (i instanceof InstructionXor) {
+				InstructionXor ix = (InstructionXor)i;
+				if (ix.operand1 instanceof Register) {
+					Register used = (Register)ix.operand1;
+					definitions.remove(used);
+				}
+				if (ix.operand2 instanceof Register) {
+					Register used = (Register)ix.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionZext) {
+				InstructionZext iz = (InstructionZext)i;
+				if (iz.operand1 instanceof Register) {
+					Register used = (Register)iz.operand1;
+					definitions.remove(used);
+				}
+				if (iz.operand2 instanceof Register) {
+					Register used = (Register)iz.operand2;
 					definitions.remove(used);
 				}
 			}
