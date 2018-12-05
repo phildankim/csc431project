@@ -75,7 +75,7 @@ public class CFGBuilder {
 			blocks.add(b);
 
 			fixPhis(b);
-			printLLVM(b,writer);
+			//printLLVM(b,writer);
 
 
 
@@ -85,6 +85,14 @@ public class CFGBuilder {
 			for (String name : localParamTable.keySet()) {
 				System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
 			}
+		}
+
+		if (uce) {
+			eliminateUselessCode();
+		}
+
+		for (Block b : blocks) {
+			printLLVM(b,writer);
 		}
 
 		writer.write("declare i8* @malloc(i32)\n");
@@ -938,6 +946,10 @@ public class CFGBuilder {
 		header += ")";
 
 		return header;
+	}
+
+	public void eliminateUselessCode() {
+		
 	}
 
 	public void fixPhis(Block b) {
