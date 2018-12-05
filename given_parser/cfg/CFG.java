@@ -119,7 +119,7 @@ public class CFG {
 			Edge toThen = new Edge(currBlock, ifThen);
 			edges.add(toThen);
 			Edge toElse = new Edge(currBlock, ifElse);
-			edges.add(toElse);
+			edges.add(toElse); 
 
 			Block join = new Block("Join" + Integer.toString(labelCounter));
 			blocks.add(join);
@@ -132,9 +132,6 @@ public class CFG {
 			Optional<Block> opt = Optional.ofNullable(createCFG(cs.getThen()));
 			
 			if (opt.isPresent()) {
-				Block thenRes = opt.get();
-
-				Edge thenJoin = new Edge(thenRes, join);
 
 				if (!(this.isReturn(currBlock))) {
 					InstructionBr toJoin = new InstructionBr(join.getLabel());
@@ -153,9 +150,6 @@ public class CFG {
 			opt = Optional.ofNullable(createCFG(cs.getElse()));		
 			
 			if (opt.isPresent()) {
-				Block elseRes = opt.get();
-				Edge elseJoin = new Edge(elseRes, join);
-				edges.add(elseJoin);
 
 				if (!(this.isReturn(currBlock))) {
 					InstructionBr toJoin = new InstructionBr(join.getLabel());
@@ -292,14 +286,47 @@ public class CFG {
 	}
 
 	public void addPredecessorsAndSuccessors() {
-		for (Edge e : this.edges) {
-			Block from = e.getFrom();
-			Block to = e.getTo();
-			from.addSucc(to);
-			to.addPred(from);
+		clearPredsSuccs();
+		for (Block b : this.blocks) {
+			Instruction instr = b.getLastInstruction();
+
+			if (instr instanceof InstructionBr) {
+				InstructionBr br = (InstructionBr)instr;
+				Block destination = getBlock(br.destination);
+				b.addSucc(destination);
+				destination.addPred(b);
+			}
+
+			if (instr instanceof InstructionBrCond) {
+				InstructionBrCond brcond = (InstructionBrCond)instr;
+				Block thenBlock = getBlock(brcond.labelTrue);
+				Block elseBlock = getBlock(brcond.labelFalse);
+				b.addSucc(thenBlock);
+				thenBlock.addPred(b);
+				b.addSucc(elseBlock);
+				elseBlock.addPred(b);
+			}
+		}
+		
+		for (Block b : this.blocks) {
+			System.out.println("Predecessors for " + b.getLabel());
+			for (Block p : b.predecessors) {
+				System.out.println("\t" + p.getLabel());
+			}
+			System.out.println("Successors for " + b.getLabel());
+			for (Block s : b.successors) {
+				System.out.println("\t" + s.getLabel());
+			}
 		}
 	}
 
+	public void clearPredsSuccs() {
+		for (Block b : this.blocks) {
+			b.predecessors.clear();
+			b.successors.clear();
+		}
+	}
+					
 	public Block getBlock(String label) {
 		for (Block b : this.blocks) {
 			if (b.getLabel().equals(label)) {
@@ -458,13 +485,19 @@ public class CFG {
 	public void simplify() {
 		// Start by removing all empty blocks
 		removeUnnecessaryBlocks();
+
+		// Get Preds and Succs
+		addPredecessorsAndSuccessors();
+
+		// Combine blocks
+		combineBlocks();
 	}
 
 	public void removeUnnecessaryBlocks() {
 		ArrayList<Block> blocksToRemove = new ArrayList<Block>();
 		for (Block b : this.blocks) {
 			if (hasBranch(b)) {
-			Instruction instr = b.getLastInstruction();
+				Instruction instr = b.getLastInstruction();
 
 				if (instr instanceof InstructionBr) {
 					InstructionBr br = (InstructionBr)instr;
@@ -491,6 +524,28 @@ public class CFG {
 		for (Block b : blocksToRemove) {
 			this.blocks.remove(getBlock(b.getLabel()));
 		}
+	}
+
+	public void combineBlocks() {
+		ArrayList<Block> blocksToRemove = new ArrayList<Block>();
+		for (Block b : this.blocks) {
+			if (b.successors.size() == 1) {
+				Block blockBeingAbsorbed = b.successors.get(0);
+
+				if (blockBeingAbsorbed.predecessors.size() == 1) {
+					combineInstructions(b, blockBeingAbsorbed);
+					blocksToRemove.add(blockBeingAbsorbed);
+				}
+			}
+		}
+		for (Block b : blocksToRemove) {
+			this.blocks.remove(getBlock(b.getLabel()));
+		}
+	}
+
+	public void combineInstructions(Block from, Block to) {
+		from.instructions.remove(from.getLastInstruction());
+		from.instructions.addAll(to.instructions);
 	}
 
 	public Block findFinalDestination(Block b, ArrayList<Block> blocksToRemove) {
