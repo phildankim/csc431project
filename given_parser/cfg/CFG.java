@@ -457,6 +457,10 @@ public class CFG {
 	// Milestone 5: CFG Simplification
 	public void simplify() {
 		// Start by removing all empty blocks
+		removeUnnecessaryBlocks();
+	}
+
+	public void removeUnnecessaryBlocks() {
 		ArrayList<Block> blocksToRemove = new ArrayList<Block>();
 		for (Block b : this.blocks) {
 			if (hasBranch(b)) {
@@ -465,7 +469,6 @@ public class CFG {
 				if (instr instanceof InstructionBr) {
 					InstructionBr br = (InstructionBr)instr;
 					Block destination = getBlock(br.destination);
-					System.out.println("destination: " + destination.getLabel());
 					br.destination = findFinalDestination(destination, blocksToRemove).getLabel();
 				}
 
@@ -473,7 +476,6 @@ public class CFG {
 					InstructionBrCond brcond = (InstructionBrCond)instr;
 					Block thenBlock = getBlock(brcond.labelTrue);
 					Block elseBlock = getBlock(brcond.labelFalse);
-					System.out.println("then: " + thenBlock.getLabel() + ", else: " + elseBlock.getLabel());
 
 					String newThenDest = findFinalDestination(thenBlock, blocksToRemove).getLabel();
 					String newElseDest = findFinalDestination(elseBlock, blocksToRemove).getLabel();
@@ -489,7 +491,6 @@ public class CFG {
 		for (Block b : blocksToRemove) {
 			this.blocks.remove(getBlock(b.getLabel()));
 		}
-
 	}
 
 	public Block findFinalDestination(Block b, ArrayList<Block> blocksToRemove) {
