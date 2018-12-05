@@ -4,9 +4,9 @@ import java.util.*;
 
 public class InstructionPhi implements Instruction {
 	
-	Value register;
-	String id;
-	Boolean invalid = false;
+	public Value register;
+	public String id;
+	public Boolean invalid = false;
 
 	ArrayList<PhiOperand> phiOperands = new ArrayList<>();
 

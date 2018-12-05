@@ -5,8 +5,8 @@ import java.util.*;
 
 public class InstructionAlloca implements Instruction {
 
-	Value result;
-	LLVMObject type;
+	public Value result;
+	public LLVMObject type;
 
 	public InstructionAlloca(LLVMObject type, Value res) {
 		this.type = type;

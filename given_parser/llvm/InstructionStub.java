@@ -4,7 +4,7 @@ import llvm.*;
 
 public class InstructionStub implements Instruction{
 
-	String message;
+	public String message;
 
 	public InstructionStub(String message) {
 		this.message = message;

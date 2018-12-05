@@ -2,8 +2,8 @@
 
 public class InstructionTrunc implements Instruction {
 	
-	Value result;
-	Value register;
+	public Value result;
+	public Value register;
 
 	public InstructionTrunc (Value result, Value register) {
 		this.result = result;

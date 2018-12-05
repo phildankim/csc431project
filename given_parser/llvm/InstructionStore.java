@@ -4,9 +4,9 @@ import cfg.*;
 
 public class InstructionStore implements Instruction {
 
-	Value value; //target
-	Value pointer; //source
-	LLVMObject type;
+	public Value value; //target
+	public Value pointer; //source
+	public LLVMObject type;
 
 	public InstructionStore (Value target, Value source) {
 		this.value = source;

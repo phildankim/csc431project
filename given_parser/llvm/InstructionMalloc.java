@@ -2,8 +2,8 @@ package llvm;
 
 public class InstructionMalloc implements Instruction {
 	
-	Value register;
-	int numBytes;
+	public Value register;
+	public int numBytes;
 
 	public InstructionMalloc (Value register, int numBytes) {
 		this.register = register;

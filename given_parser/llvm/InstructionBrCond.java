@@ -2,7 +2,8 @@ package llvm;
 
 public class InstructionBrCond implements Instruction{
 	
-	Value condition;
+
+	public Value condition;
 	public String labelTrue;
 	public String labelFalse;
 

@@ -2,10 +2,10 @@
 
 public class InstructionBitcast implements Instruction {
 	
-	Value result;
-	Value register;
-	String structName;
-	Boolean isMalloc;
+	public Value result;
+	public Value register;
+	public String structName;
+	public Boolean isMalloc;
 
 	public InstructionBitcast (Value result, Value register, String structName, Boolean isMalloc) {
 		this.result = result;

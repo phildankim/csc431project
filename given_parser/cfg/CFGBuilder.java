@@ -58,8 +58,8 @@ public class CFGBuilder {
 
 		for (Function func : p.getFuncs()) {
 
-			writer.write(buildFuncHeader(func) + "\n");
-			writer.write("{\n");
+			// writer.write(buildFuncHeader(func) + "\n");
+			// writer.write("{\n");
 
 			localParamTable = new HashMap<>();
 
@@ -75,16 +75,27 @@ public class CFGBuilder {
 			blocks.add(b);
 
 			fixPhis(b);
-			printLLVM(b,writer);
+			//printLLVM(b,writer);
 
 
 
-			writer.write("}\n");
+			// writer.write("}\n");
 
 			System.out.println("This is function " + func.getName());
 			for (String name : localParamTable.keySet()) {
 				System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
 			}
+		}
+
+		if (uce) {
+			eliminateUselessCode();
+		}
+
+		for (int i = 0; i < p.getFuncs().size(); i++) {
+			writer.write(buildFuncHeader(p.getFuncs().get(i)) + "\n");
+			writer.write("{\n");
+			printLLVM(blocks.get(i),writer);
+			writer.write("}\n");
 		}
 
 		writer.write("declare i8* @malloc(i32)\n");
@@ -938,6 +949,15 @@ public class CFGBuilder {
 		header += ")";
 
 		return header;
+	}
+
+	public void eliminateUselessCode() {
+		System.out.println("ELIMINATING USELESS CODEEEEE");
+
+		for (Block b: blocks) {
+			System.out.println("");
+		}
+
 	}
 
 	public void fixPhis(Block b) {

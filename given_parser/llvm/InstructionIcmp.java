@@ -2,10 +2,10 @@ package llvm;
 
 public class InstructionIcmp implements Instruction 
 {
-	String condition;
-	Value operand1;
-	Value operand2;
-	Value result;
+	public String condition;
+	public Value operand1;
+	public Value operand2;
+	public Value result;
 
 	public InstructionIcmp (Value result, String condition, Value operand1, Value operand2) {
 		this.result = result;

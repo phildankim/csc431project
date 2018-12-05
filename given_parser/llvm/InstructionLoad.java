@@ -4,9 +4,9 @@ import llvm.*;
 
 public class InstructionLoad implements Instruction{
 	
-	Value result;
-	Value pointer;
-	LLVMObject type;
+	public Value result;
+	public Value pointer;
+	public LLVMObject type;
 
 	public InstructionLoad (Value result, Value pointer, LLVMObject type) {
 		this.result = result;
