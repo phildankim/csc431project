@@ -809,7 +809,6 @@ public class CFGBuilder {
             Block cur = queue.poll();
             List<Block> newSuccessors = cur.getSuccessors().stream()
                     .filter(successor -> !visited.contains(successor))
-                    //.filter(successor -> successor != returnBlock)
                     .collect(Collectors.toList());
             queue.addAll(newSuccessors);
             visited.addAll(newSuccessors);
@@ -951,13 +950,235 @@ public class CFGBuilder {
 		return header;
 	}
 
+
 	public void eliminateUselessCode() {
 		System.out.println("ELIMINATING USELESS CODEEEEE");
 
-		for (Block b: blocks) {
-			System.out.println("");
+		HashMap<Register,Instruction> definitions = new HashMap<>();
+
+		boolean somethingChanged = true;
+		while (somethingChanged) {
+
+			somethingChanged = false;
+
+			for (Block b: blocks) {
+
+				Set<Block> visited = new HashSet<>();
+		    	Queue<Block> queue = new ArrayDeque<>();
+		    	visited.add(b);
+		    	queue.add(b);
+		        while (queue.size() > 0) {
+		            Block current = queue.poll();
+		            List<Block> newSuccessors = current.getSuccessors().stream()
+		                    .filter(successor -> !visited.contains(successor))
+		                    .collect(Collectors.toList());
+		            queue.addAll(newSuccessors);
+		            visited.addAll(newSuccessors);
+
+		            definitions.putAll(getDefinitions(current));
+		        }
+			}
+		}
+		printDefinitions(definitions);
+	}
+
+	public void printDefinitions(HashMap<Register, Instruction> definitions) {
+		for (Register reg : definitions.keySet()) {
+			System.out.println(reg.toString() + " is in " + definitions.get(reg).toString());
+		}
+	}
+
+	public HashMap<Register, Instruction> getDefinitions(Block b) {
+		ArrayList<InstructionPhi> phiInstructions = b.phiInstructions;
+		ArrayList<Instruction> instructions = b.instructions;
+
+		HashMap<Register,Instruction> defMap = new HashMap<Register, Instruction>();
+
+		for (InstructionPhi phiI : phiInstructions) {
+
+			if (phiI.register instanceof Register) {
+				Register key = (Register)phiI.register;
+				Instruction val = phiI;
+
+				defMap.put(key, val);
+			}
 		}
 
+		for (Instruction i : instructions) {
+
+			if (i instanceof InstructionAdd) {
+				InstructionAdd ia = (InstructionAdd)i;
+				if (ia.register instanceof Register) {
+					Register key = (Register)ia.register;
+					defMap.put(key,i);
+				}
+			}
+			else if (i instanceof InstructionAlloca) {
+				InstructionAlloca ia = (InstructionAlloca)i;
+				if (ia.result instanceof Register) {
+					Register key = (Register)ia.result;
+					defMap.put(key,i);
+				}
+			}
+			else if (i instanceof InstructionAnd) {
+				InstructionAnd ia = (InstructionAnd)i;
+				if (ia.register instanceof Register) {
+					Register key = (Register)ia.register;
+					defMap.put(key,i);
+				}
+			}
+			else if (i instanceof InstructionBitcast) {
+				InstructionBitcast ib = (InstructionBitcast)i;
+				if (ib.result instanceof Register) {
+					Register key = (Register)ib.result;
+					defMap.put(key,i);
+				}
+			}
+			else if (i instanceof InstructionBr) {
+				// DO NOTHING - BRANCH INSTRUCTIONS HAVE NO DEFS
+			}
+
+			else if (i instanceof InstructionBrCond) {
+				// DO NOTHING - BRANCH INSTRUCTIONS HAVE NO DEFS
+			}
+
+			else if (i instanceof InstructionCall) {
+				// do nothing - calls are all uses
+			}
+
+			else if (i instanceof InstructionDecl) {
+				// DO NOTHING - THESE ARE GLOBAL DECLARATIONS
+			}
+
+			else if (i instanceof InstructionFree) {
+				// DO NOTHING - FREE IS CALL VOID WHICH IS A USE
+			}
+			else if (i instanceof InstructionGetElementPtr) {
+				InstructionGetElementPtr ig = (InstructionGetElementPtr)i;
+				if (ig.result instanceof Register) {
+					Register key = (Register)ig.result;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionIcmp) {
+				InstructionIcmp ic = (InstructionIcmp)i;
+				if (ic.result instanceof Register) {
+					Register key = (Register)ic.result;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionLoad) {
+				InstructionLoad il = (InstructionLoad)i;
+				if (il.result instanceof Register) {
+					Register key = (Register)il.result;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionMalloc) {
+				InstructionMalloc im = (InstructionMalloc)i;
+				if (im.register instanceof Register) {
+					Register key = (Register)im.register;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionMul) {
+				InstructionMul im = (InstructionMul)i;
+				if (im.register instanceof Register) {
+					Register key = (Register)im.register;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionOr) {
+				InstructionOr io = (InstructionOr)i;
+				if (io.register instanceof Register) {
+					Register key = (Register)io.register;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionPhi) {
+				throw new RuntimeException("WTH is a PhiInstruction doing in the regular instructions list");
+			}
+
+			else if (i instanceof InstructionPrint) {
+				// do nothing, print only has a use but no def
+			}
+
+			else if (i instanceof InstructionPrintLn) {
+				// do nothing print only has a use but no def
+			}
+
+			else if (i instanceof InstructionRet) {
+				// ret only has a use no def
+			}
+
+			else if (i instanceof InstructionRetVoid) {
+				// retvoid only has use no def
+			}
+			else if (i instanceof InstructionScan) {
+				// scan only has a use
+			}
+			else if (i instanceof InstructionSdiv) {
+				InstructionSdiv is = (InstructionSdiv)i;
+				if (is.register instanceof Register) {
+					Register key = (Register)is.register;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionStore) {
+				InstructionStore is = (InstructionStore)i;
+				if (is.pointer instanceof Register) {
+					Register key = (Register)is.pointer;
+					defMap.put(key,i);
+				}
+			}
+			else if (i instanceof InstructionStub) {
+				throw new RuntimeException("WHYS IS THERE A STUB IN the intructionlist");
+			}
+			else if (i instanceof InstructionSub) {
+				InstructionSub is = (InstructionSub)i;
+				if (is.register instanceof Register) {
+					Register key = (Register)is.register;
+					defMap.put(key,i);
+				}
+			}
+
+			else if (i instanceof InstructionTrunc) {
+				InstructionTrunc it = (InstructionTrunc)i;
+				if (it.result instanceof Register) {
+					Register key = (Register)it.result;
+					defMap.put(key,i);
+				}
+			}
+			else if (i instanceof InstructionTypeDecl) {
+				// type declarations are struct declarations. it's fine
+			}
+			else if (i instanceof InstructionXor) {
+				InstructionXor ix = (InstructionXor)i;
+				if (ix.register instanceof Register) {
+					Register key = (Register)ix.register;
+					defMap.put(key,i);
+				}
+			}
+			else if (i instanceof InstructionZext) {
+				InstructionZext iz = (InstructionZext)i;
+				if (iz.register instanceof Register) {
+					Register key = (Register)iz.register;
+					defMap.put(key,i);
+				}
+			}
+			else throw new RuntimeException("UCE getDef error: unknown behavior for " + i.toString());
+		}
+
+
+
+		return defMap;
 	}
 
 	public void fixPhis(Block b) {

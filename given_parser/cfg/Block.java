@@ -17,7 +17,7 @@ public class Block {
 
 	public HashMap<String, Value> currentDef = new HashMap<>();
 	private boolean sealed = false;
-	private ArrayList<InstructionPhi> phiInstructions = new ArrayList<InstructionPhi>();
+	public ArrayList<InstructionPhi> phiInstructions = new ArrayList<InstructionPhi>();
 
 	// public ArrayList<Phi> phis = new ArrayList<Phi>();
 
