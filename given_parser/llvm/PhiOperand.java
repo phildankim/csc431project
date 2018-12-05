@@ -6,8 +6,8 @@ import cfg.*;
 
 public class PhiOperand {
 
-	String id;
-	Value value;
+	public String id;
+	public Value value;
 
 	public PhiOperand (String id, Value value) {
 		this.id = id;

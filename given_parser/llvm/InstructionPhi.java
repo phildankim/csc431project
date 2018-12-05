@@ -8,7 +8,7 @@ public class InstructionPhi implements Instruction {
 	public String id;
 	public Boolean invalid = false;
 
-	ArrayList<PhiOperand> phiOperands = new ArrayList<>();
+	public ArrayList<PhiOperand> phiOperands = new ArrayList<>();
 
 	public InstructionPhi (Value register, String id) {
 		this.register = register;

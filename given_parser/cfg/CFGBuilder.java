@@ -960,7 +960,9 @@ public class CFGBuilder {
 		while (somethingChanged) {
 
 			somethingChanged = false;
+			definitions = new HashMap<>();
 
+			// gather all definitions
 			for (Block b: blocks) {
 
 				Set<Block> visited = new HashSet<>();
@@ -978,8 +980,98 @@ public class CFGBuilder {
 		            definitions.putAll(getDefinitions(current));
 		        }
 			}
+
+			// delete all registers from definitions that get used
+			for (Block b: blocks) {
+
+				Set<Block> visited = new HashSet<>();
+		    	Queue<Block> queue = new ArrayDeque<>();
+		    	visited.add(b);
+		    	queue.add(b);
+		        while (queue.size() > 0) {
+		            Block current = queue.poll();
+		            List<Block> newSuccessors = current.getSuccessors().stream()
+		                    .filter(successor -> !visited.contains(successor))
+		                    .collect(Collectors.toList());
+		            queue.addAll(newSuccessors);
+		            visited.addAll(newSuccessors);
+
+		            protectUsedRegisters(definitions, current);
+		        }
+			}
+
+			// delete instructions with definitions that dont get used
+			for (Block b: blocks) {
+
+				Set<Block> visited = new HashSet<>();
+		    	Queue<Block> queue = new ArrayDeque<>();
+		    	visited.add(b);
+		    	queue.add(b);
+		        while (queue.size() > 0) {
+		            Block current = queue.poll();
+		            List<Block> newSuccessors = current.getSuccessors().stream()
+		                    .filter(successor -> !visited.contains(successor))
+		                    .collect(Collectors.toList());
+		            queue.addAll(newSuccessors);
+		            visited.addAll(newSuccessors);
+
+		            somethingChanged = deleteInstructions(definitions, current);
+		        }
+			}
 		}
 		printDefinitions(definitions);
+	}
+
+	public boolean deleteInstructions(HashMap<Register, Instruction> definitions, Block b) {
+		boolean somethingChanged = false;
+		return somethingChanged;
+	}
+
+	public void protectUsedRegisters(HashMap<Register, Instruction> definitions, Block b) {
+
+		ArrayList<InstructionPhi> phiInstructions = b.phiInstructions;
+		ArrayList<Instruction> instructions = b.instructions;
+
+		for (InstructionPhi phiI : phiInstructions) {
+			ArrayList<PhiOperand> phiOperands = phiI.phiOperands;
+			for (PhiOperand po : phiOperands) {
+				if (po.value instanceof Register) {
+					Register used = (Register)po.value;
+					definitions.remove(used);
+				}
+			}
+		}
+
+		for (Instruction i : instructions) {
+			if (i instanceof InstructionAdd) {
+				InstructionAdd ia = (InstructionAdd)i;
+				if (ia.operand1 instanceof Register){
+					Register used = (Register)ia.operand1;
+					definitions.remove(used);
+				}
+				if (ia.operand2 instanceof Register){
+					Register used = (Register)ia.operand2;
+					definitions.remove(used);
+				}
+			}
+			else if (i instanceof InstructionAlloca) {
+				// do nothing, alloca only has definitions
+			}
+			else if (i instanceof InstructionAnd) {
+				InstructionAnd ia = (InstructionAnd)i;
+				if (ia.operand1 instanceof Register){
+					Register used = (Register)ia.operand1;
+					definitions.remove(used);
+				}
+				if (ia.operand2 instanceof Register){
+					Register used = (Register)ia.operand2;
+					definitions.remove(used);
+				}
+			}
+
+			else throw new RuntimeException("protectUsedRegisters error: undefined instruction " + i.toString());
+		}
+
 	}
 
 	public void printDefinitions(HashMap<Register, Instruction> definitions) {
@@ -989,6 +1081,7 @@ public class CFGBuilder {
 	}
 
 	public HashMap<Register, Instruction> getDefinitions(Block b) {
+
 		ArrayList<InstructionPhi> phiInstructions = b.phiInstructions;
 		ArrayList<Instruction> instructions = b.instructions;
 
