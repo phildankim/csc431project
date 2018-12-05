@@ -954,7 +954,7 @@ public class CFGBuilder {
 	public void eliminateUselessCode() {
 		System.out.println("ELIMINATING USELESS CODEEEEE");
 
-		(for Block b: block) {
+		for (Block b: blocks) {
 			System.out.println("");
 		}
 
