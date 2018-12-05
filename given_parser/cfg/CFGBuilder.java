@@ -1020,7 +1020,7 @@ public class CFGBuilder {
 		            visited.addAll(newSuccessors);
 
 		            if(deleteInstructions(definitions, current)) {
-		            	somethingChanged = false;
+		            	somethingChanged = true;
 		            }
 		        }
 			}
@@ -1222,6 +1222,11 @@ public class CFGBuilder {
 				InstructionStore is = (InstructionStore)i;
 				if (is.value instanceof Register) {
 					Register used = (Register)is.value;
+					definitions.remove(used);
+				}
+
+				if (is.pointer instanceof Register) {
+					Register used = (Register)is.pointer;
 					definitions.remove(used);
 				}
 			}
@@ -1428,11 +1433,13 @@ public class CFGBuilder {
 			}
 
 			else if (i instanceof InstructionStore) {
-				InstructionStore is = (InstructionStore)i;
-				if (is.pointer instanceof Register) {
-					Register key = (Register)is.pointer;
-					defMap.put(key,i);
-				}
+				// InstructionStore is = (InstructionStore)i;
+				// if (is.pointer instanceof Register) {
+				// 	Register key = (Register)is.pointer;
+				// 	defMap.put(key,i);
+				// }
+
+				// store has both as uses?!?
 			}
 			else if (i instanceof InstructionStub) {
 				throw new RuntimeException("WHYS IS THERE A STUB IN the intructionlist");
