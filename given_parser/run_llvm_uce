@@ -1,0 +1,16 @@
+#!/bin/bash
+
+make clean;make
+
+for dir in benchmarks/*; do
+   f=${dir##*/}
+   echo $f
+   java MiniCompiler $dir/${f}.mini -llvm -uce
+   clang $dir/${f}.ll -m32
+   ./a.out < $dir/input > ${f}.txt
+   echo 'diffing'
+   diff ${f}.txt $dir/output
+   echo 'diffing complete'
+done
+
+echo 'benchmarks passed!'
