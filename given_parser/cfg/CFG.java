@@ -551,6 +551,7 @@ public class CFG {
 		from.instructions.remove(from.getLastInstruction());
 		from.instructions.addAll(to.instructions);
 
+		from.successors.remove(to);
 		from.successors.addAll(to.successors);
 
 		// replace all labels going to 'to' to 'from'
