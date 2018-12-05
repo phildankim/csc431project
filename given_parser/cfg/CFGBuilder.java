@@ -1015,7 +1015,9 @@ public class CFGBuilder {
 		            queue.addAll(newSuccessors);
 		            visited.addAll(newSuccessors);
 
-		            somethingChanged = deleteInstructions(definitions, current);
+		            if(deleteInstructions(definitions, current)) {
+		            	somethingChanged = true;
+		            }
 		        }
 			}
 		}
@@ -1106,7 +1108,7 @@ public class CFGBuilder {
 							definitions.remove(usedArg);
 							System.out.println("REMOVED " + usedArg);
 						}
-					}
+				}
 			}
 			else if (i instanceof InstructionDecl) {
 				// do nothing - these are all globals
