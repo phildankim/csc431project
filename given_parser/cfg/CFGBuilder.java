@@ -1000,6 +1000,10 @@ public class CFGBuilder {
 		        }
 			}
 
+			System.out.println("TO DELETE: ");
+			printDefinitions(definitions);
+
+
 			// delete instructions with definitions that dont get used
 			for (Block b: blocks) {
 
@@ -1016,12 +1020,11 @@ public class CFGBuilder {
 		            visited.addAll(newSuccessors);
 
 		            if(deleteInstructions(definitions, current)) {
-		            	somethingChanged = true;
+		            	somethingChanged = false;
 		            }
 		        }
 			}
 		}
-		printDefinitions(definitions);
 	}
 
 	public boolean deleteInstructions(HashMap<Register, Instruction> definitions, Block b) {
