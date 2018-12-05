@@ -1220,8 +1220,8 @@ public class CFGBuilder {
 			}
 			else if (i instanceof InstructionStore) {
 				InstructionStore is = (InstructionStore)i;
-				if (is.pointer instanceof Register) {
-					Register used = (Register)is.pointer;
+				if (is.value instanceof Register) {
+					Register used = (Register)is.value;
 					definitions.remove(used);
 				}
 			}
@@ -1429,8 +1429,8 @@ public class CFGBuilder {
 
 			else if (i instanceof InstructionStore) {
 				InstructionStore is = (InstructionStore)i;
-				if (is.value instanceof Register) {
-					Register key = (Register)is.value;
+				if (is.pointer instanceof Register) {
+					Register key = (Register)is.pointer;
 					defMap.put(key,i);
 				}
 			}
