@@ -590,7 +590,7 @@ public class CFG {
 		if (isEmpty(b)) {
 			InstructionBr br = (InstructionBr)b.getLastInstruction();
 			blocksToRemove.add(b);
-			System.out.println("removing block: " + b.getLabel());
+			//System.out.println("removing block: " + b.getLabel());
 			return findFinalDestination(getBlock(br.destination), blocksToRemove);
 		}
 		else 
