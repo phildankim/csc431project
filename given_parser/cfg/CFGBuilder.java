@@ -1103,6 +1103,7 @@ public class CFGBuilder {
 						if (arg instanceof Register) {
 							Register usedArg = (Register)arg;
 							definitions.remove(usedArg);
+							System.out.println("REMOVED " + usedArg);
 						}
 					}
 				}
@@ -1214,8 +1215,8 @@ public class CFGBuilder {
 			}
 			else if (i instanceof InstructionStore) {
 				InstructionStore is = (InstructionStore)i;
-				if (is.value instanceof Register) {
-					Register used = (Register)is.value;
+				if (is.pointer instanceof Register) {
+					Register used = (Register)is.pointer;
 					definitions.remove(used);
 				}
 			}
@@ -1423,8 +1424,8 @@ public class CFGBuilder {
 
 			else if (i instanceof InstructionStore) {
 				InstructionStore is = (InstructionStore)i;
-				if (is.pointer instanceof Register) {
-					Register key = (Register)is.pointer;
+				if (is.value instanceof Register) {
+					Register key = (Register)is.value;
 					defMap.put(key,i);
 				}
 			}
