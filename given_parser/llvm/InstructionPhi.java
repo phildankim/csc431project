@@ -20,6 +20,17 @@ public class InstructionPhi implements Instruction {
 		phiOperands.add(po);
 	}
 
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+
+		for (PhiOperand po : this.phiOperands) {
+			res.add(po.getValue());
+		}
+
+		res.add(register);
+		return res;
+	}
+
 	public String getId() {
 		return id;
 	}

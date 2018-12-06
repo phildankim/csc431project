@@ -39,6 +39,12 @@ public class InstructionTypeDecl implements Instruction {
 		} 
 	}
 
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+
+		return res;
+	}
+
 	@Override
 	public String toString() {
 		String pre = "%struct." + this.name + " = type ";	

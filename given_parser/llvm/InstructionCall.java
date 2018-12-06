@@ -45,7 +45,6 @@ public class InstructionCall implements Instruction {
 
 	}
 
-
 	@Override
 	public String toString() {
 
@@ -55,5 +54,12 @@ public class InstructionCall implements Instruction {
 		else {
 			return result + " = call " + type + " @" + funcptr + argList;
 		}
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(result);
+
+		return res;
 	}
 }

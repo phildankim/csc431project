@@ -1,5 +1,7 @@
 package llvm;
 
+import java.util.*;
+
 public class InstructionZext implements Instruction {
 	
 	public Value operand1;
@@ -15,5 +17,13 @@ public class InstructionZext implements Instruction {
 	@Override
 	public String toString() {
 		return register.toString() + " = zext i1 " + operand1 + " to i32";
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(operand1);
+		res.add(operand2);
+		res.add(register);
+		return res;
 	}
 }

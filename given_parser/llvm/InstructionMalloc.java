@@ -1,5 +1,7 @@
 package llvm;
 
+import java.util.*;
+
 public class InstructionMalloc implements Instruction {
 	
 	public Value register;
@@ -13,5 +15,11 @@ public class InstructionMalloc implements Instruction {
 	@Override
 	public String toString() {
 		return register + " = call i8* @malloc(i32 " + numBytes + ")";
+	}
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+
+		res.add(register);
+		return res;
 	}
 }

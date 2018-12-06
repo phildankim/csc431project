@@ -35,4 +35,10 @@ public class InstructionDecl implements Instruction {
 		}
 	}
 
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+
+		return res;
+	}
+
 }

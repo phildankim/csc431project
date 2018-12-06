@@ -1,5 +1,7 @@
 package llvm;
 
+import java.util.*;
+
 public class InstructionBrCond implements Instruction{
 	
 
@@ -16,5 +18,12 @@ public class InstructionBrCond implements Instruction{
 	@Override
 	public String toString() {
 		return "br i1 " + condition + ", label %" + labelTrue + ", label %" + labelFalse; 
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(condition);
+
+		return res;
 	}
 }

@@ -1,5 +1,7 @@
 package llvm;
 
+import java.util.*;
+
 public class InstructionIcmp implements Instruction 
 {
 	public String condition;
@@ -21,6 +23,14 @@ public class InstructionIcmp implements Instruction
 	@Override
 	public String toString() {
 		return result + " = icmp " + condition + " " + operand1.getType() + " " + operand1 + ", " + operand2;
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(operand1);
+		res.add(operand2);
+		res.add(result);
+		return res;
 	}
 
 }

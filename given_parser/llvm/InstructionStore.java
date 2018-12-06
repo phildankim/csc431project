@@ -1,6 +1,7 @@
 package llvm;
 
 import cfg.*;
+import java.util.*;
 
 public class InstructionStore implements Instruction {
 
@@ -24,5 +25,12 @@ public class InstructionStore implements Instruction {
 	@Override
 	public String toString() {
 		return "store " + type + " " + value + ", " + type +"* " + pointer;
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(value);
+		res.add(pointer);
+		return res;
 	}
 }

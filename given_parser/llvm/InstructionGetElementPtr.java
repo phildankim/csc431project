@@ -1,5 +1,7 @@
 package llvm;
 
+import java.util.*;
+
 public class InstructionGetElementPtr implements Instruction{
 	
 	public Value result;
@@ -17,5 +19,12 @@ public class InstructionGetElementPtr implements Instruction{
 	@Override
 	public String toString() {
 		return result + " = getelementptr " + type + " " + ptrval + ", i1 0, i32 " + index;
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(result);
+		res.add(ptrval);
+		return res;
 	}
 }

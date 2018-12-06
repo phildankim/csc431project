@@ -18,4 +18,11 @@ public class InstructionAlloca implements Instruction {
 	public String toString() {
 		return this.result + " = alloca " + this.type.toString();
 	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(result);
+
+		return res;
+	}
 }

@@ -1,4 +1,6 @@
-	package llvm;
+package llvm;
+
+import java.util.*;
 
 public class InstructionBitcast implements Instruction {
 	
@@ -23,5 +25,12 @@ public class InstructionBitcast implements Instruction {
 		else {
 			return result + " = bitcast %struct." + structName + "* " + register + " to i8*";
 		}
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(result);
+		res.add(register);
+		return res;
 	}
 }

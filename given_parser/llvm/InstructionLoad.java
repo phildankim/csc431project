@@ -1,6 +1,7 @@
 package llvm;
 
 import llvm.*;
+import java.util.*;
 
 public class InstructionLoad implements Instruction{
 	
@@ -17,5 +18,12 @@ public class InstructionLoad implements Instruction{
 	@Override
 	public String toString() {
 		return result.toString() + " = load " + type + "* " + pointer; 
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(result);
+		res.add(pointer);
+		return res;
 	}
 }

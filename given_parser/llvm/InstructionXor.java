@@ -1,5 +1,7 @@
 package llvm;
 
+import java.util.*;
+
 public class InstructionXor implements Instruction {
 	
 	public Value operand1;
@@ -15,5 +17,13 @@ public class InstructionXor implements Instruction {
 	@Override
 	public String toString() {
 		return register.toString() + " = xor " + operand1.getType() + " " + operand1 + ", " + operand2;
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(operand1);
+		res.add(operand2);
+		res.add(register);
+		return res;
 	}
 }

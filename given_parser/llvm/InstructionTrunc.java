@@ -1,4 +1,6 @@
-	package llvm;
+package llvm;
+
+import java.util.*;
 
 public class InstructionTrunc implements Instruction {
 	
@@ -14,5 +16,12 @@ public class InstructionTrunc implements Instruction {
 	@Override
 	public String toString() {
 		return result + " = trunc " + register.getType() + " " + register + " to i1";
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(result);
+		res.add(register);
+		return res;
 	}
 }

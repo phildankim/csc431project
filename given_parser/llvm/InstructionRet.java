@@ -1,5 +1,7 @@
 package llvm;
 
+import java.util.*;
+
 public class InstructionRet implements Instruction {
 	
 	public Value register;
@@ -18,5 +20,12 @@ public class InstructionRet implements Instruction {
 	@Override
 	public String toString() {
 		return "ret "+ type.toString() + " " + register;
+	}
+
+	public ArrayList<Value> getRegisters() {
+		ArrayList<Value> res = new ArrayList<>();
+
+		res.add(register);
+		return res;
 	}
 }
