@@ -31,6 +31,18 @@ public class InstructionPhi implements Instruction {
 		return res;
 	}
 
+	public ArrayList<Value> getUses() {
+		ArrayList<Value> res = new ArrayList<>();
+		for (PhiOperand po : this.phiOperands) {
+			res.add(po.getValue());
+		}
+		return res;
+	}
+
+	public Value getDef() {
+		return register;
+	}
+
 	public String getId() {
 		return id;
 	}

@@ -27,4 +27,14 @@ public class InstructionGetElementPtr implements Instruction{
 		res.add(ptrval);
 		return res;
 	}
+
+	public ArrayList<Value> getUses() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(ptrval);
+		return res;
+	}
+
+	public Value getDef() {
+		return result;
+	}
 }

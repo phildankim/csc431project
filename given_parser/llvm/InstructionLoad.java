@@ -26,4 +26,14 @@ public class InstructionLoad implements Instruction{
 		res.add(pointer);
 		return res;
 	}
+
+	public ArrayList<Value> getUses() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(pointer);
+		return res;
+	}
+
+	public Value getDef() {
+		return result;
+	}
 }

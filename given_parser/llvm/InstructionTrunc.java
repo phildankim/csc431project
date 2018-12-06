@@ -24,4 +24,14 @@ public class InstructionTrunc implements Instruction {
 		res.add(register);
 		return res;
 	}
+
+	public ArrayList<Value> getUses() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(register);
+		return res;
+	}
+
+	public Value getDef() {
+		return result;
+	}
 }

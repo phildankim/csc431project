@@ -26,4 +26,15 @@ public class InstructionXor implements Instruction {
 		res.add(register);
 		return res;
 	}
+
+	public ArrayList<Value> getUses() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(operand1);
+		res.add(operand2);
+		return res;
+	}
+
+	public Value getDef() {
+		return register;
+	}
 }

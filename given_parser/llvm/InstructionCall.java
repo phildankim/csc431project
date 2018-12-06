@@ -62,4 +62,15 @@ public class InstructionCall implements Instruction {
 
 		return res;
 	}
+
+	public ArrayList<Value> getUses() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.addAll(args);
+		res.add(result);
+		return res;
+	}
+
+	public Value getDef() {
+		return result;
+	}
 }

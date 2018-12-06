@@ -33,4 +33,15 @@ public class InstructionStore implements Instruction {
 		res.add(pointer);
 		return res;
 	}
+
+	public ArrayList<Value> getUses() {
+		ArrayList<Value> res = new ArrayList<>();
+		res.add(value);
+		res.add(pointer);
+		return res;
+	}
+
+	public Value getDef() {
+		return new NullValue();
+	}
 }
