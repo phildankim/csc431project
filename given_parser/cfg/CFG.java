@@ -494,7 +494,7 @@ public class CFG {
 		removeUnnecessaryBranch();
 
 		// Combine blocks
-		//combineBlocks();
+		combineBlocks();
 	}
 
 	public void removeUnnecessaryBlocks() {
