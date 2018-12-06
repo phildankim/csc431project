@@ -495,6 +495,17 @@ public class CFG {
 
 		// Combine blocks
 		combineBlocks();
+		// for (Block b : this.blocks) {
+		// 	System.out.println("Predecessors for " + b.getLabel());
+		// 	for (Block p : b.predecessors) {
+		// 		System.out.println("\t" + p.getLabel());
+		// 	}
+		// 	System.out.println("Successors for " + b.getLabel());
+		// 	for (Block s : b.successors) {
+		// 		System.out.println("\t" + s.getLabel());
+		// 	}
+		// 	System.out.println("\n");
+		// }
 	}
 
 	public void removeUnnecessaryBlocks() {
@@ -551,9 +562,12 @@ public class CFG {
 		from.instructions.remove(from.getLastInstruction());
 		from.instructions.addAll(to.instructions);
 
-		from.successors.remove(to);
-		from.successors.addAll(to.successors);
-		from.predecessors.addAll(to.predecessors);
+		// from.successors.remove(to);
+		// from.successors.addAll(to.successors);
+		//from.predecessors.remove(to);
+		//from.predecessors.addAll(to.predecessors);
+
+		addPredecessorsAndSuccessors();
 
 		// replace all labels going to 'to' to 'from'
 		String toLabel = to.getLabel();
