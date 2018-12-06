@@ -494,7 +494,7 @@ public class CFG {
 		removeUnnecessaryBranch();
 
 		// Combine blocks
-		combineBlocks();
+		//combineBlocks();
 	}
 
 	public void removeUnnecessaryBlocks() {
@@ -553,6 +553,7 @@ public class CFG {
 
 		from.successors.remove(to);
 		from.successors.addAll(to.successors);
+		from.predecessors.addAll(to.predecessors);
 
 		// replace all labels going to 'to' to 'from'
 		String toLabel = to.getLabel();
