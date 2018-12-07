@@ -494,7 +494,7 @@ public class CFG {
 		removeUnnecessaryBranch();
 
 		// Combine blocks
-		//combineBlocks();
+		combineBlocks();
 		// for (Block b : this.blocks) {
 		// 	System.out.println("Predecessors for " + b.getLabel());
 		// 	for (Block p : b.predecessors) {
