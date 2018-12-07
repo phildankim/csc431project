@@ -567,7 +567,7 @@ public class CFG {
 		//from.predecessors.remove(to);
 		//from.predecessors.addAll(to.predecessors);
 
-		addPredecessorsAndSuccessors();
+		
 
 		// replace all labels going to 'to' to 'from'
 		String toLabel = to.getLabel();
@@ -598,6 +598,8 @@ public class CFG {
 			else
 				continue;
 		}
+
+		addPredecessorsAndSuccessors();
 
 	}
 
