@@ -22,6 +22,7 @@ public class MiniCompiler
    private static boolean typecheck = true;
    private static boolean uce = false;
    private static boolean simp = false;
+   private static boolean sscp = false;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
@@ -80,9 +81,24 @@ public class MiniCompiler
             llvm.printProgram();
          }
 
+         else if (ssa && uce && sscp) {
+            String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
+            CFGBuilder cb = new CFGBuilder(program, fileName, true, true);
+            cb.build();         
+         }
+         else if (ssa && sscp) {
+            String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
+            CFGBuilder cb = new CFGBuilder(program, fileName, false, true);
+            cb.build(); 
+         }
          else if (ssa && uce) {
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             CFGBuilder cb = new CFGBuilder(program, fileName, true);
+            cb.build();
+         }
+         else if (ssa) {
+            String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
+            CFGBuilder cb = new CFGBuilder(program, fileName);
             cb.build();
          }
          else if (stack) {
@@ -97,12 +113,6 @@ public class MiniCompiler
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             llvm.printInstructions(writer);
             writer.close();
-         }
-
-         else if (ssa) {
-            String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
-            CFGBuilder cb = new CFGBuilder(program, fileName);
-            cb.build();
          }
 
          // this is for Milestone 6: Code Generation
@@ -147,6 +157,9 @@ public class MiniCompiler
             }
             else if (args[i].equals("-simp")) {
                simp = true;
+            }
+            else if (args[i].equals("-sscp")) {
+               sscp = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);

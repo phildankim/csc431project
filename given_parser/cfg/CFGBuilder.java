@@ -25,6 +25,7 @@ public class CFGBuilder {
 	private BufferedWriter writer;
 
 	private boolean uce = false;
+	private boolean sscp = false;
 
 
 	public CFGBuilder (Program p, String filename){
@@ -37,6 +38,13 @@ public class CFGBuilder {
 		this.p = p;
 		this.filename = filename;
 		this.uce = uce;
+	}
+
+	public CFGBuilder (Program p, String filename, boolean uce, boolean sscp) {
+		this.p = p;
+		this.filename = filename;
+		this.uce = uce;
+		this.sscp = sscp;
 	}
 
 
@@ -85,6 +93,10 @@ public class CFGBuilder {
 			for (String name : localParamTable.keySet()) {
 				System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
 			}
+		}
+
+		if (sscp) {
+			propagateConstants();
 		}
 
 		if (uce) {
@@ -948,6 +960,155 @@ public class CFGBuilder {
 		header += ")";
 
 		return header;
+	}
+
+	public void propagateConstants() {
+		System.out.println("Sparse Simple Constant Propagation!");
+
+		// everything is Top here
+		HashMap<Value, LatticeCell> ssaRegisters = gatherAllRegisters();
+		ArrayList<Value> workList = new ArrayList<>();
+
+		//for (Value v : ssaRegisters.keySet()) {
+		//	System.out.println(v.getName() + ": " + ssaRegisters.get(v).toString());
+		//}
+
+		// initialize values by the rules discussed
+		initializeValues(ssaRegisters, workList);
+		initializeValues(ssaRegisters, workList);
+
+		for (Value v : ssaRegisters.keySet()) {
+			System.out.println(v.getName() + ": " + ssaRegisters.get(v).toString());
+		}
+
+		
+
+	}
+
+	public void initializeValues(HashMap<Value, LatticeCell> ssaRegisters, ArrayList<Value> workList) {
+
+		for (Value v : ssaRegisters.keySet()) {
+			if (v instanceof Immediate) {
+				Immediate immed = (Immediate)v;
+				ssaRegisters.put(v, new ConstantImmed(immed.getValue()));
+			}
+			else if (v instanceof Register) {
+				Register reg = (Register)v;
+				// find the instruction that defines the register
+				Instruction i = findDefinition(reg);
+				System.out.println(i.toString());
+				LatticeCell lc = evaluateInstruction(i, ssaRegisters);
+				ssaRegisters.put(v, lc);
+			}
+			else 
+				System.out.println("some stupid shit");
+		}
+	}
+
+	public LatticeCell evaluateInstruction(Instruction i, HashMap<Value,LatticeCell> ssaRegisters) {
+
+		ArrayList<Value> uses = i.getUses();
+		if (uses.size() == 2) {
+
+			LatticeCell leftLattice = ssaRegisters.get(uses.get(0));
+			LatticeCell rightLattice = ssaRegisters.get(uses.get(1));
+
+			if (leftLattice instanceof Bottom || rightLattice instanceof Bottom) {
+				return new Bottom();
+			}
+			else if (leftLattice instanceof ConstantImmed && rightLattice instanceof ConstantImmed) {
+				if (leftLattice.equals(rightLattice)) {
+					return leftLattice;
+				}
+				else {
+					return new Bottom();
+				}
+			}
+			else if (leftLattice instanceof ConstantBool || rightLattice instanceof ConstantBool) {
+				if (leftLattice.equals(rightLattice)) {
+					return leftLattice;
+				}
+				else {
+					return new Bottom();
+				}
+			}
+			else return new Top();
+		}
+		else if (uses.size() == 1) {
+			return (ssaRegisters.get(uses.get(0)));
+		}
+		// else if (uses.size() > 2) {
+		//	throw new RuntimeException("YOOO MORE THAN 2 uses on " + i);
+		// }
+		else {
+			return new Top();
+		}
+	}
+
+	public Instruction findDefinition (Value reg) {
+		for (Block b: blocks) {
+
+			Set<Block> visited = new HashSet<>();
+	    	Queue<Block> queue = new ArrayDeque<>();
+	    	visited.add(b);
+	    	queue.add(b);
+	        while (queue.size() > 0) {
+	            Block current = queue.poll();
+	            List<Block> newSuccessors = current.getSuccessors().stream()
+	                    .filter(successor -> !visited.contains(successor))
+	                    .collect(Collectors.toList());
+	            queue.addAll(newSuccessors);
+	            visited.addAll(newSuccessors);
+
+	            for (InstructionPhi iPhi : current.phiInstructions) {
+	            	if (iPhi.getDef().equals(reg)) {
+	            		return iPhi;
+	            	}
+	            }
+	            for (Instruction i : current.instructions) {
+	            	if (i.getDef().equals(reg)) {
+	            		return i;
+	            	}
+	            }
+	        }
+		}
+
+		return new InstructionStub("NOOOOOO");
+	}
+
+	public HashMap<Value,LatticeCell> gatherAllRegisters() {
+
+		ArrayList<Value> registerList = new ArrayList<Value>();
+		HashMap<Value,LatticeCell> registerMap = new HashMap<>();
+
+		for (Block b: blocks) {
+
+			Set<Block> visited = new HashSet<>();
+	    	Queue<Block> queue = new ArrayDeque<>();
+	    	visited.add(b);
+	    	queue.add(b);
+	        while (queue.size() > 0) {
+	            Block current = queue.poll();
+	            List<Block> newSuccessors = current.getSuccessors().stream()
+	                    .filter(successor -> !visited.contains(successor))
+	                    .collect(Collectors.toList());
+	            queue.addAll(newSuccessors);
+	            visited.addAll(newSuccessors);
+
+	            for (InstructionPhi iPhi : current.phiInstructions) {
+	            	registerList.addAll(iPhi.getRegisters());
+	            }
+	            for (Instruction i : current.instructions) {
+	            	registerList.addAll(i.getRegisters());
+	            }
+	        }
+		}
+
+		for (Value v : registerList) {
+			registerMap.put(v,new Top());
+		}
+
+		return registerMap;
 	}
 
 
