@@ -5,7 +5,7 @@ make clean;make
 for dir in benchmarks/*; do
    f=${dir##*/}
    echo '-'$f
-   java MiniCompiler $dir/${f}.mini -stack
+   java MiniCompiler $dir/${f}.mini -stack -simp
    clang $dir/${f}.ll -m32
    ./a.out < $dir/input > ${f}.txt
    echo 'diffing'
