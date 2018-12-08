@@ -967,27 +967,16 @@ public class CFGBuilder {
 		HashMap<Value, LatticeCell> ssaRegisters = gatherAllRegisters();
 		ArrayList<Value> workList = new ArrayList<>();
 
-		//for (Value v : ssaRegisters.keySet()) {
-		//	System.out.println(v.getName() + ": " + ssaRegisters.get(v).toString());
-		//}
-
 		// initialize values by the rules discussed
 		initializeValues(ssaRegisters, workList);
 
-		for (Value v : ssaRegisters.keySet()) {
-			System.out.println(v.getName() + ": " + ssaRegisters.get(v).toString());
-		}
-
 		processWorkList(ssaRegisters,workList);
-		System.out.println("YEEEE\n\n\n");
-		for (Value v : ssaRegisters.keySet()) {
-			System.out.println(v.getName() + ": " + ssaRegisters.get(v).toString());
-		}
 
 		rewriteUses(ssaRegisters);
 	}
 
 	public void rewriteUses(HashMap<Value,LatticeCell> ssaRegisters) {
+
 		for (Value v : ssaRegisters.keySet()) {
 			if (ssaRegisters.get(v) instanceof ConstantImmed) {
 
@@ -1002,6 +991,7 @@ public class CFGBuilder {
 	}
 
 	public void replaceInstruction(Instruction inst, Value thisValue, ConstantImmed withThisValue) {
+		
 		for (Block b: blocks) {
 
 			Set<Block> visited = new HashSet<>();
