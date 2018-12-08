@@ -87,10 +87,10 @@ public class CFGBuilder {
 
 			// writer.write("}\n");
 
-			System.out.println("This is function " + func.getName());
-			for (String name : localParamTable.keySet()) {
-				System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
-			}
+			//System.out.println("This is function " + func.getName());
+			//for (String name : localParamTable.keySet()) {
+			//	System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
+			//}
 		}
 
 		if (sscp) {
@@ -1224,8 +1224,8 @@ public class CFGBuilder {
 					workList.add(v);
 				}
 			}
-			else 
-				System.out.println("some stupid shit");
+			//else 
+			//	System.out.println("some stupid shit");
 		}
 	}
 
