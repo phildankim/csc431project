@@ -85,8 +85,6 @@ public class CFGBuilder {
 			fixPhis(b);
 			//printLLVM(b,writer);
 
-
-
 			// writer.write("}\n");
 
 			System.out.println("This is function " + func.getName());
@@ -975,15 +973,248 @@ public class CFGBuilder {
 
 		// initialize values by the rules discussed
 		initializeValues(ssaRegisters, workList);
-		initializeValues(ssaRegisters, workList);
 
 		for (Value v : ssaRegisters.keySet()) {
 			System.out.println(v.getName() + ": " + ssaRegisters.get(v).toString());
 		}
 
-		
+		processWorkList(ssaRegisters,workList);
+		System.out.println("YEEEE\n\n\n");
+		for (Value v : ssaRegisters.keySet()) {
+			System.out.println(v.getName() + ": " + ssaRegisters.get(v).toString());
+		}
 
+		rewriteUses(ssaRegisters);
 	}
+
+	public void rewriteUses(HashMap<Value,LatticeCell> ssaRegisters) {
+		for (Value v : ssaRegisters.keySet()) {
+			if (ssaRegisters.get(v) instanceof ConstantImmed) {
+
+				ConstantImmed immed = (ConstantImmed)ssaRegisters.get(v);
+				ArrayList<Instruction> uses = getUses(v);
+				for (Instruction use : uses) {
+					replaceInstruction(use,v,immed);
+
+				}
+			}
+		}
+	}
+
+	public void replaceInstruction(Instruction inst, Value thisValue, ConstantImmed withThisValue) {
+		for (Block b: blocks) {
+
+			Set<Block> visited = new HashSet<>();
+	    	Queue<Block> queue = new ArrayDeque<>();
+	    	visited.add(b);
+	    	queue.add(b);
+	        while (queue.size() > 0) {
+	            Block current = queue.poll();
+	            List<Block> newSuccessors = current.getSuccessors().stream()
+	                    .filter(successor -> !visited.contains(successor))
+	                    .collect(Collectors.toList());
+	            queue.addAll(newSuccessors);
+	            visited.addAll(newSuccessors);
+
+	            for (int i = 0; i < b.instructions.size(); i++) {
+	            	Instruction currentInst = b.instructions.get(i);
+	            	if (inst.equals(currentInst)) {
+	            		Instruction revisedInstruction = reviseInstruction(currentInst, thisValue, withThisValue);
+	            		b.instructions.set(i,revisedInstruction);
+	            	}
+	            }
+	        }
+		}
+	}
+
+	public Instruction reviseInstruction(Instruction toChange, Value thisValue, ConstantImmed withThisValue) {
+
+		if (toChange instanceof InstructionAdd) {
+			InstructionAdd ia = (InstructionAdd)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}
+		}
+
+		else if (toChange instanceof InstructionSub) {
+			InstructionSub ia = (InstructionSub)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionMul) {
+			InstructionMul ia = (InstructionMul)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionSdiv) {
+			InstructionSdiv ia = (InstructionSdiv)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}
+		}
+
+		System.out.println(toChange);
+		return toChange;
+	}
+
+	public void processWorkList(HashMap<Value,LatticeCell> ssaRegisters, ArrayList<Value> workList) {
+
+		while (workList.size() > 0) {
+			Value r = workList.remove(0);
+
+
+
+			ArrayList<Instruction> ops = getUses(r);
+
+			for (Instruction op : ops) {
+				if (!(ssaRegisters.get(op.getDef()) instanceof Bottom)) {
+
+					LatticeCell t = ssaRegisters.get(op.getDef());
+					LatticeCell m = evaluate(op, ssaRegisters);
+					if (!m.equals(t) && t != null) {
+						ssaRegisters.put(op.getDef(),m);
+						workList.add(op.getDef());
+					}
+				}
+			}
+		}
+ 	}
+
+ 	public LatticeCell evaluate(Instruction i, HashMap<Value, LatticeCell> ssaRegisters) {
+ 		if (i instanceof InstructionAdd) {
+ 			InstructionAdd ia = (InstructionAdd)i;
+ 			LatticeCell left = ssaRegisters.get(ia.operand1);
+ 			LatticeCell right = ssaRegisters.get(ia.operand2);
+
+ 			if (ia.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)ia.operand1;
+ 				left = new ConstantImmed(im.getValue());
+ 			}
+ 			if (ia.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)ia.operand2;
+ 				right = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (left instanceof Bottom || right instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (left instanceof Top || right instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+ 				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
+ 				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
+ 				Integer answer = lft + rht;
+ 				return new ConstantImmed(answer.toString());
+ 			}
+ 		}
+ 		else if (i instanceof InstructionSub) {
+ 			InstructionSub ia = (InstructionSub)i;
+ 			LatticeCell left = ssaRegisters.get(ia.operand1);
+ 			LatticeCell right = ssaRegisters.get(ia.operand2);
+
+ 			if (ia.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)ia.operand1;
+ 				left = new ConstantImmed(im.getValue());
+ 			}
+ 			if (ia.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)ia.operand2;
+ 				right = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (left instanceof Bottom || right instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (left instanceof Top || right instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+ 				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
+ 				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
+ 				Integer answer = lft - rht;
+ 				return new ConstantImmed(answer.toString());
+ 			}
+ 		}
+  		else if (i instanceof InstructionMul) {
+ 			InstructionMul ia = (InstructionMul)i;
+ 			LatticeCell left = ssaRegisters.get(ia.operand1);
+ 			LatticeCell right = ssaRegisters.get(ia.operand2);
+
+ 			if (ia.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)ia.operand1;
+ 				left = new ConstantImmed(im.getValue());
+ 			}
+ 			if (ia.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)ia.operand2;
+ 				right = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (left instanceof Bottom || right instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (left instanceof Top || right instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+ 				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
+ 				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
+ 				Integer answer = lft * rht;
+ 				return new ConstantImmed(answer.toString());
+ 			}
+ 		}
+   		else if (i instanceof InstructionSdiv) {
+ 			InstructionSdiv ia = (InstructionSdiv)i;
+ 			LatticeCell left = ssaRegisters.get(ia.operand1);
+ 			LatticeCell right = ssaRegisters.get(ia.operand2);
+
+ 			if (ia.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)ia.operand1;
+ 				left = new ConstantImmed(im.getValue());
+ 			}
+ 			if (ia.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)ia.operand2;
+ 				right = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (left instanceof Bottom || right instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (left instanceof Top || right instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+
+ 				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
+
+ 				if (lft == 0) {
+ 					return new Bottom();
+ 				}
+ 				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
+ 				Integer answer = lft  / rht;
+ 				return new ConstantImmed(answer.toString());
+ 			}
+ 		}
+
+ 		else return new Bottom();
+ 	}
 
 	public void initializeValues(HashMap<Value, LatticeCell> ssaRegisters, ArrayList<Value> workList) {
 
@@ -996,13 +1227,239 @@ public class CFGBuilder {
 				Register reg = (Register)v;
 				// find the instruction that defines the register
 				Instruction i = findDefinition(reg);
-				System.out.println(i.toString());
-				LatticeCell lc = evaluateInstruction(i, ssaRegisters);
+
+				LatticeCell lc = initializeInstruction(i, ssaRegisters);
 				ssaRegisters.put(v, lc);
+				if (lc != null && !(lc instanceof Top)) {
+					workList.add(v);
+				}
 			}
 			else 
 				System.out.println("some stupid shit");
 		}
+	}
+
+	public LatticeCell initializeInstruction(Instruction i, HashMap<Value,LatticeCell> ssaRegisters) {
+		if (i instanceof InstructionAdd) {
+			InstructionAdd ia = (InstructionAdd)i;
+			if (ia.operand1 instanceof Immediate && ia.operand2 instanceof Immediate) {
+				Immediate op1 = (Immediate)ia.operand1;
+				Immediate op2 = (Immediate)ia.operand2;
+
+				Integer sum = Integer.parseInt(op1.getValue()) + Integer.parseInt(op2.getValue());
+				return new ConstantImmed(sum.toString());
+			}
+			else {
+				return new Top();
+			}
+		}
+		else if (i instanceof InstructionSub) {
+			InstructionSub is = (InstructionSub)i;
+			if (is.operand2 instanceof Immediate && is.operand1 instanceof Immediate) {
+				Immediate op1 = (Immediate)is.operand1;
+				Immediate op2 = (Immediate)is.operand2;
+
+				Integer difference = Integer.parseInt(op1.getValue()) - Integer.parseInt(op2.getValue());
+				return new ConstantImmed(difference.toString());
+			}
+			else {
+				return new Top();
+			}
+		}
+		else if (i instanceof InstructionMul) {
+			InstructionMul is = (InstructionMul)i;
+			if (is.operand2 instanceof Immediate && is.operand1 instanceof Immediate) {
+				Immediate op1 = (Immediate)is.operand1;
+				Immediate op2 = (Immediate)is.operand2;
+
+				Integer product = Integer.parseInt(op1.getValue()) * Integer.parseInt(op2.getValue());
+				return new ConstantImmed(product.toString());
+			}
+			else {
+				return new Top();
+			}			
+		}
+		else if (i instanceof InstructionSdiv) {
+			InstructionSdiv is = (InstructionSdiv)i;
+
+			if (is.operand2 instanceof Immediate && is.operand1 instanceof Immediate) {
+				Immediate op1 = (Immediate)is.operand1;
+				Immediate op2 = (Immediate)is.operand2;
+
+				if (Integer.parseInt(op2.getValue()) == 0) {
+					return new Bottom();
+				}
+
+				Integer product = Integer.parseInt(op1.getValue()) / Integer.parseInt(op2.getValue());
+				return new ConstantImmed(product.toString());
+			}
+			else {
+				return new Top();
+			}				
+		}
+		else if (i instanceof InstructionIcmp) {
+			InstructionIcmp icmp = (InstructionIcmp)i;
+
+			if (icmp.operand1 instanceof Immediate && icmp.operand2 instanceof Immediate) {
+
+				Immediate op1 = (Immediate)icmp.operand1;
+				Immediate op2 = (Immediate)icmp.operand2;
+				Integer left = Integer.parseInt(op1.getValue());
+				Integer right = Integer.parseInt(op2.getValue());
+
+				if (icmp.condition.equals("slt")) {
+					if (left < right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("sgt")) {
+					if (left > right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("sge")) {
+					if (left >= right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("sle")) {
+					if (left <= right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("eq")) {
+					if (left == right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("ne")) {
+					if (left != right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+			}
+		}
+		else if (i instanceof InstructionAnd) {
+			InstructionAnd ia = (InstructionAnd)i;
+
+			if (ia.operand1 instanceof Immediate && ia.operand2 instanceof Immediate) {
+				Immediate op1 = (Immediate)ia.operand1;
+				Immediate op2 = (Immediate)ia.operand2;
+
+				Integer left = Integer.parseInt(op1.getValue());
+				Integer right = Integer.parseInt(op2.getValue());
+
+				Integer result = left & right;
+
+				return new ConstantImmed(result.toString());
+			}
+		}
+		else if (i instanceof InstructionOr) {
+			InstructionOr ia = (InstructionOr)i;
+
+			if (ia.operand1 instanceof Immediate && ia.operand2 instanceof Immediate) {
+				Immediate op1 = (Immediate)ia.operand1;
+				Immediate op2 = (Immediate)ia.operand2;
+
+				Integer left = Integer.parseInt(op1.getValue());
+				Integer right = Integer.parseInt(op2.getValue());
+
+				Integer result = left | right;
+
+				return new ConstantImmed(result.toString());
+
+			}
+		}
+		else if (i instanceof InstructionXor) {
+			InstructionXor ia = (InstructionXor)i;
+
+			if (ia.operand1 instanceof Immediate && ia.operand2 instanceof Immediate) {
+				Immediate op1 = (Immediate)ia.operand1;
+				Immediate op2 = (Immediate)ia.operand2;
+
+				Integer left = Integer.parseInt(op1.getValue());
+				Integer right = Integer.parseInt(op2.getValue());
+
+				Integer result = left ^ right;
+
+				return new ConstantImmed(result.toString());
+
+			}
+		}
+		else if (i instanceof InstructionAlloca) {
+			return new Top();
+		}
+		else if (i instanceof InstructionBitcast) {
+			return new Top();
+		}
+		else if (i instanceof InstructionBr) {
+			return new Top();
+		}
+		else if (i instanceof InstructionBrCond) {
+			return new Top();
+		}
+		else if (i instanceof InstructionCall) {
+			return new Bottom();
+		}
+		else if (i instanceof InstructionDecl) {
+			return new Top();
+		}
+		else if (i instanceof InstructionFree) {
+			return new Top();
+		}
+		else if (i instanceof InstructionGetElementPtr) {
+			return new Bottom();
+		}
+		else if (i instanceof InstructionLoad) {
+			return new Bottom();
+		}
+		else if (i instanceof InstructionMalloc) {
+			return new Bottom();
+		}
+		else if (i instanceof InstructionPrint) {
+			return new Top();
+		}
+		else if (i instanceof InstructionPrintLn) {
+			return new Top();
+		}
+		else if (i instanceof InstructionRet) {
+			return new Top();
+		}
+		else if (i instanceof InstructionRetVoid) {
+			return new Top();
+		}
+		else if (i instanceof InstructionScan) {
+			return new Bottom();
+		}
+		else if (i instanceof InstructionStore) {
+			return new Top();
+		}
+		else if (i instanceof InstructionStub) {
+			return new Top();
+		}
+		else if (i instanceof InstructionTrunc) {
+
+		}
+
+		return new Top();
 	}
 
 	public LatticeCell evaluateInstruction(Instruction i, HashMap<Value,LatticeCell> ssaRegisters) {
@@ -1076,6 +1533,40 @@ public class CFGBuilder {
 		return new InstructionStub("NOOOOOO");
 	}
 
+	public ArrayList<Instruction> getUses (Value reg) {
+
+		ArrayList<Instruction> uses = new ArrayList<>();
+
+		for (Block b: blocks) {
+
+			Set<Block> visited = new HashSet<>();
+	    	Queue<Block> queue = new ArrayDeque<>();
+	    	visited.add(b);
+	    	queue.add(b);
+	        while (queue.size() > 0) {
+	            Block current = queue.poll();
+	            List<Block> newSuccessors = current.getSuccessors().stream()
+	                    .filter(successor -> !visited.contains(successor))
+	                    .collect(Collectors.toList());
+	            queue.addAll(newSuccessors);
+	            visited.addAll(newSuccessors);
+
+	            for (InstructionPhi iPhi : current.phiInstructions) {
+	            	if (iPhi.getUses().contains(reg)) {
+	            		uses.add(iPhi);
+	            	}
+	            }
+	            for (Instruction i : current.instructions) {
+	            	if (i.getUses().contains(reg)) {
+	            		uses.add(i);
+	            	}
+	            }
+	        }
+		}
+
+		return uses;
+	}
+
 	public HashMap<Value,LatticeCell> gatherAllRegisters() {
 
 		ArrayList<Value> registerList = new ArrayList<Value>();
@@ -1106,6 +1597,12 @@ public class CFGBuilder {
 
 		for (Value v : registerList) {
 			registerMap.put(v,new Top());
+		}
+
+		for (Value v : registerList) {
+			if (v.getName().equals("VOID")) {
+				registerMap.remove(v);
+			}
 		}
 
 		return registerMap;
