@@ -1061,7 +1061,7 @@ public class CFGBuilder {
 			}
 		}
 
-		System.out.println(toChange);
+		// System.out.println(toChange);
 		return toChange;
 	}
 
@@ -1648,8 +1648,8 @@ public class CFGBuilder {
 		        }
 			}
 
-			System.out.println("TO DELETE: ");
-			printDefinitions(definitions);
+			//System.out.println("TO DELETE: ");
+			// printDefinitions(definitions);
 
 
 			// delete instructions with definitions that dont get used
@@ -1757,7 +1757,7 @@ public class CFGBuilder {
 						if (arg instanceof Register) {
 							Register usedArg = (Register)arg;
 							definitions.remove(usedArg);
-							System.out.println("REMOVED " + usedArg);
+							// System.out.println("REMOVED " + usedArg);
 						}
 				}
 			}
