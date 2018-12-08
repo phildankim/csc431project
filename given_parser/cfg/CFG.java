@@ -494,7 +494,7 @@ public class CFG {
 		removeUnnecessaryBranch();
 
 		// Combine blocks
-		//combineBlocks();
+		combineBlocks();
 		// for (Block b : this.blocks) {
 		// 	System.out.println("Predecessors for " + b.getLabel());
 		// 	for (Block p : b.predecessors) {
@@ -567,7 +567,7 @@ public class CFG {
 		//from.predecessors.remove(to);
 		//from.predecessors.addAll(to.predecessors);
 
-		addPredecessorsAndSuccessors();
+		
 
 		// replace all labels going to 'to' to 'from'
 		String toLabel = to.getLabel();
@@ -598,6 +598,8 @@ public class CFG {
 			else
 				continue;
 		}
+
+		addPredecessorsAndSuccessors();
 
 	}
 
