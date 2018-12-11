@@ -23,6 +23,7 @@ public class MiniCompiler
    private static boolean uce = false;
    private static boolean simp = false;
    private static boolean sscp = false;
+   private static boolean count = false;
 
    public static void main(String[] args) throws TypeCheckException, IOException
    {
@@ -109,6 +110,9 @@ public class MiniCompiler
             else
                llvm = new LLVM(program, "");
 
+            if (count)
+               llvm.countNumInstructions();
+
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             llvm.printInstructions(writer);
@@ -117,11 +121,11 @@ public class MiniCompiler
 
          // this is for Milestone 6: Code Generation
          // basing this on Milestone 2's CFG.
-         LLVM llvm = new LLVM(program, "");
-         String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "s";
-         BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-         llvm.printToARM(writer);
-         writer.close();
+         // LLVM llvm = new LLVM(program, "");
+         // String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "s";
+         // BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+         // llvm.printToARM(writer);
+         // writer.close();
 
       }
    }
@@ -160,6 +164,9 @@ public class MiniCompiler
             }
             else if (args[i].equals("-sscp")) {
                sscp = true;
+            }
+            else if (args[i].equals("-count")) {
+               count = true;
             }
             else {
                System.err.println("unexpected option: " + args[i]);

@@ -30,6 +30,14 @@ public class LLVM {
 			this.cfgs = CFGFactory.createAllCFG(p, false);
 	}
 
+	public void countNumInstructions() {
+		int total = 0;
+		for (CFG cfg : this.cfgs) {
+			total += cfg.totalInstructions();
+		}
+		System.out.println("TOTAL INSTRUCTIONS: " + total);
+	}
+
 	public static void printGlobals() {
 		System.out.println("--Currently in LLVM.Globals");
 		for (String key : LLVM.globals.keySet()) {

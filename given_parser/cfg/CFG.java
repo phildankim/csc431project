@@ -49,6 +49,14 @@ public class CFG {
 			System.out.println("Key: " + key + "\tValue: " + CFG.getType(key));
 		}
 	}
+
+	public int totalInstructions() {
+		int total = 0;
+		for (Block b : this.blocks) {
+			total += b.instructions.size();
+		}
+		return total;
+	}
 	
 	public void updateCurr(Block newCurr) {
 		this.currBlock = newCurr;
@@ -494,7 +502,7 @@ public class CFG {
 		removeUnnecessaryBranch();
 
 		// Combine blocks
-		combineBlocks();
+		//combineBlocks();
 		// for (Block b : this.blocks) {
 		// 	System.out.println("Predecessors for " + b.getLabel());
 		// 	for (Block p : b.predecessors) {
