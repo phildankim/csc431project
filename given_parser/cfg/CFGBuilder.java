@@ -961,7 +961,7 @@ public class CFGBuilder {
 	}
 
 	public void propagateConstants() {
-		System.out.println("Sparse Simple Constant Propagation!");
+		// System.out.println("Sparse Simple Constant Propagation!");
 
 		// everything is Top here
 		HashMap<Value, LatticeCell> ssaRegisters = gatherAllRegisters();
@@ -1600,7 +1600,7 @@ public class CFGBuilder {
 
 
 	public void eliminateUselessCode() {
-		System.out.println("ELIMINATING USELESS CODEEEEE");
+		// System.out.println("ELIMINATING USELESS CODEEEEE");
 
 		HashMap<Register,Instruction> definitions = new HashMap<>();
 
