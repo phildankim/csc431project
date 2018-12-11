@@ -1202,7 +1202,84 @@ public class CFGBuilder {
  				return new ConstantImmed(answer.toString());
  			}
  		}
+ 		else if (i instanceof InstructionIcmp) {
+ 			InstructionIcmp icmp = (InstructionIcmp)i;
+ 			LatticeCell lft = ssaRegisters.get(icmp.operand1);
+ 			LatticeCell rht = ssaRegisters.get(icmp.operand2);
 
+ 			if (icmp.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)icmp.operand1;
+ 				lft = new ConstantImmed(im.getValue());
+ 			}
+ 			if (icmp.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)icmp.operand2;
+ 				rht = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (lft instanceof Bottom || rht instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (lft instanceof Top || rht instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+
+ 				Integer left = Integer.parseInt(((ConstantImmed)lft).value);
+ 				Integer right = Integer.parseInt(((ConstantImmed)rht).value);
+
+				if (icmp.condition.equals("slt")) {
+					if (left < right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("sgt")) {
+					if (left > right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("sge")) {
+					if (left >= right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("sle")) {
+					if (left <= right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("eq")) {
+					if (left == right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else if (icmp.condition.equals("ne")) {
+					if (left != right) {
+						return new ConstantImmed("1");
+					}
+					else { 
+						return new ConstantImmed("0");
+					}
+				}
+				else {
+					throw new RuntimeException("idk mayne it's not supposed to be here");
+				}
+			}
+ 		}
  		else return new Bottom();
  	}
 
