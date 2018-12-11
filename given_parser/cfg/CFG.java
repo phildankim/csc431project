@@ -502,18 +502,18 @@ public class CFG {
 		removeUnnecessaryBranch();
 
 		// Combine blocks
-		//combineBlocks();
-		// for (Block b : this.blocks) {
-		// 	System.out.println("Predecessors for " + b.getLabel());
-		// 	for (Block p : b.predecessors) {
-		// 		System.out.println("\t" + p.getLabel());
-		// 	}
-		// 	System.out.println("Successors for " + b.getLabel());
-		// 	for (Block s : b.successors) {
-		// 		System.out.println("\t" + s.getLabel());
-		// 	}
-		// 	System.out.println("\n");
-		// }
+		combineBlocks();
+		for (Block b : this.blocks) {
+			System.out.println("Predecessors for " + b.getLabel());
+			for (Block p : b.predecessors) {
+				System.out.println("\t" + p.getLabel());
+			}
+			System.out.println("Successors for " + b.getLabel());
+			for (Block s : b.successors) {
+				System.out.println("\t" + s.getLabel());
+			}
+			System.out.println("\n");
+		}
 	}
 
 	public void removeUnnecessaryBlocks() {
