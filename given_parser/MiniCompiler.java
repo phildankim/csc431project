@@ -140,7 +140,7 @@ public class MiniCompiler
          {
             if (args[i].equals("-stack")) {
                stack = true;
-               System.out.println("stack detected");
+               //System.out.println("stack detected");
             }
 
             else if (args[i].equals("-json")) {

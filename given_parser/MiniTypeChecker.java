@@ -56,14 +56,48 @@ public class MiniTypeChecker {
 									  HashMap <String, List<Declaration>> funcParamsTable,
 									  HashMap <String, List<Declaration>> structTable) 
 								      throws TypeCheckException{
+		BlockStatement funcBody = (BlockStatement)func.getBody();						      	
+      	if (funcBody.getStatements().isEmpty()  && !(func.getType() instanceof VoidType)) {
+      		throw new TypeCheckException("Function " + func.getName() + " does not return anything. Expected return type of " + func.getType());
+      	}
 		Type funcReturnType = func.getType();
 		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable, funcReturnType);
+
 
 		
 		// if (!funcReturnType.toString().equals(bodyReturnType.toString())) {
 		// 	throw new TypeCheckException ("ERROR on Line " + func.getLine() + ": invalid return type. Expected " + funcReturnType.toString() +" but got " + bodyReturnType.toString());
 		// }
 	
+	}
+
+	// returns true if the statement contains a return
+	public static boolean checkForReturn(Statement statement) {
+		if (statement instanceof BlockStatement) {
+			boolean ret = false;
+			for (Statement s : ((BlockStatement)statement).getStatements()) {
+				ret = MiniTypeChecker.checkForReturn(s);
+			}
+			return ret;
+		}
+		else if (statement instanceof ConditionalStatement) {
+			Statement thenBlock = ((ConditionalStatement)statement).getThen();
+			Statement elseBlock = ((ConditionalStatement)statement).getElse();
+
+			boolean then = MiniTypeChecker.checkForReturn(thenBlock);
+			boolean els = MiniTypeChecker.checkForReturn(elseBlock);
+
+			if (then && els) {
+				return true;
+			}
+			return false;
+		}
+		else if (statement instanceof ReturnStatement || statement instanceof ReturnEmptyStatement) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public static Type checkStatement (Statement statement,
@@ -111,9 +145,20 @@ public class MiniTypeChecker {
 		}
 
 		else if (statement instanceof ConditionalStatement) {
+			Statement thenBlock = ((ConditionalStatement)statement).getThen();
+			Statement elseBlock = ((ConditionalStatement)statement).getElse();
+			boolean thenRet = MiniTypeChecker.checkForReturn(thenBlock);
+			boolean elseRet = MiniTypeChecker.checkForReturn(elseBlock);
+			if (thenRet != elseRet) {
+				throw new TypeCheckException("Function does not return along all paths.");
+			}
+
 			Type guard = checkExpression (((ConditionalStatement)statement).getGuard(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			Type then = checkStatement (((ConditionalStatement)statement).getThen(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			Type els = checkStatement (((ConditionalStatement)statement).getElse(), symbolTable, funcParamsTable, structTable, expectedReturnType);
+			
+
+			
 
 			if (!(guard instanceof BoolType)) {
 				throw new TypeCheckException("ERROR on Line " + ((ConditionalStatement)statement).getLine() + ": guard needs to be BoolType, not " + guard.toString());
