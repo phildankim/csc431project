@@ -973,7 +973,7 @@ public class CFGBuilder {
 		initializeValues(ssaRegisters, workList);
 
 		for (Declaration decl : currentFunc.getParams()) {
-			System.out.println("param: " + decl.getName());
+			//System.out.println("param: " + decl.getName());
 			String lookFor = "%" + decl.getName();
 
 			for (Value v : ssaRegisters.keySet()) {
@@ -984,16 +984,25 @@ public class CFGBuilder {
 					workList.add(v);
 				}
 			}
-
 		}
-
-
+		//System.out.println("Function " + currentFunc.getName());
+		//System.out.println("\tInitialized values:");
+		//   for (Value v : ssaRegisters.keySet()) {
+		//   	if (v instanceof Register) {
+		//   		System.out.println("\t\tv: " + v +", lattice: " + ssaRegisters.get(v));
+		//   	}
+		// }
 
 		processWorkList(ssaRegisters,workList);
 
-		//  for (Value v : ssaRegisters.keySet()) {
-		//  	System.out.println("v: " + v +", lattice: " + ssaRegisters.get(v));
+		// System.out.println("*** FINAL VALUES ***");
+		//   for (Value v : ssaRegisters.keySet()) {
+		//   	if (v instanceof Register) {
+		//   		System.out.println("\t*** v: " + v +", lattice: " + ssaRegisters.get(v));
+		//   	}
 		// }
+
+
 		rewriteUses(ssaRegisters);
 	}
 
@@ -1003,15 +1012,12 @@ public class CFGBuilder {
 			if (ssaRegisters.get(v) instanceof ConstantImmed && v instanceof Register) {
 
 				ConstantImmed immed = (ConstantImmed)ssaRegisters.get(v);
-				System.out.println("looking for " + v.getName() + " so i can replace with " + immed.value) ;
 
+				//System.out.println("I AM ABOUT TO REPLACE "+ v);
 				ArrayList<Instruction> uses = getUses(v);
 				for (Instruction use : uses) {
-
-					System.out.println("it's used in " + use);
-
+					//System.out.println("used in " + use);
 					replaceInstruction(use,v,immed);
-
 				}
 			}
 		}
@@ -1037,10 +1043,21 @@ public class CFGBuilder {
 
 	            	Instruction currentInst = current.instructions.get(i);
 	            	if (inst.equals(currentInst)) {
-	            		System.out.println("FOUND " + inst);
+	            		// System.out.println("FOUND " + inst);
 
 	            		Instruction revisedInstruction = reviseInstruction(currentInst, thisValue, withThisValue);
 	            		current.instructions.set(i,revisedInstruction);
+
+	            	}
+	            }
+	            for (int i = 0; i < current.phiInstructions.size(); i++) {
+
+	            	InstructionPhi currentInst = current.phiInstructions.get(i);
+	            	if (inst.equals(currentInst)) {
+	            		// System.out.println("FOUND " + inst);
+
+	            		InstructionPhi revisedInstruction = (InstructionPhi)reviseInstruction(currentInst, thisValue, withThisValue);
+	            		current.phiInstructions.set(i,revisedInstruction);
 
 	            	}
 	            }
@@ -1190,21 +1207,47 @@ public class CFGBuilder {
 			}			
 		}
 		else if (toChange instanceof InstructionCall) {
+			// System.out.println("Changing call.");
 			InstructionCall ic = (InstructionCall)toChange;
 
 			for (int i = 0; i < ic.args.size(); i++) {
 				Value arg = ic.args.get(i);
 
 				if (arg.equals(thisValue)) {
+					// System.out.println("changing arg from " + arg + " to " + withThisValue.value);
 					ic.args.set(i,new Immediate(withThisValue.value));
+					// System.out.println("Instruction is now " + ic.args.get(i));
+
 				}
 			}
+
+
+			return ic;
 		}
 		else if (toChange instanceof InstructionRet) {
 			InstructionRet ir = (InstructionRet)toChange;
 
 			if (ir.register.equals(thisValue)) {
 				ir.register = new Immediate(withThisValue.value);
+			}
+		}
+
+		else if (toChange instanceof InstructionPhi) {
+			InstructionPhi iphi = (InstructionPhi)toChange;
+
+			for (int i = 0; i < iphi.phiOperands.size(); i++) {
+				PhiOperand phiOp = iphi.phiOperands.get(i);
+				if (phiOp.value.equals(thisValue)) {
+					phiOp.value = new Immediate(withThisValue.value);
+				}
+			}
+		}
+
+		else if (toChange instanceof InstructionBrCond) {
+			InstructionBrCond ibr = (InstructionBrCond)toChange;
+
+			if (ibr.condition.equals(thisValue)) {
+				ibr.condition = new Immediate(withThisValue.value);
 			}
 		}
 
@@ -1222,10 +1265,10 @@ public class CFGBuilder {
 			ArrayList<Instruction> ops = getUses(r);
 
 			for (Instruction op : ops) {
-				System.out.println("op: " + op);
-				System.out.println("def: " +op.getDef());
+				//System.out.print("r: " + r + "op: " + op);
+				//System.out.println(" def: " +op.getDef());
 				LatticeCell temp = ssaRegisters.get(op.getDef());
-				System.out.println("lattice: " + temp);
+				//System.out.println("lattice: " + temp);
 				if (!(ssaRegisters.get(op.getDef()) instanceof Bottom)) {
 
 					LatticeCell t = ssaRegisters.get(op.getDef());
@@ -1292,7 +1335,7 @@ public class CFGBuilder {
  				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
  				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
  				Integer answer = lft - rht;
- 				System.out.println("both constants evaluated to: " + answer);
+ 				//System.out.println("both constants evaluated to: " + answer);
  				return new ConstantImmed(answer.toString());
  			}
  		}
@@ -1467,7 +1510,7 @@ public class CFGBuilder {
 
  		else if (i instanceof InstructionPhi) {
  			InstructionPhi ip = (InstructionPhi)i;
- 			System.out.println("INSTRUCITONPHIIIIIIII"+ip);
+ 			//System.out.println("INSTRUCITONPHIIIIIIII"+ip);
 
  			for (PhiOperand phiOp : ip.phiOperands) {
  				LatticeCell lc = ssaRegisters.get(phiOp.value);
@@ -1509,6 +1552,15 @@ public class CFGBuilder {
  			}
 
  			return new Bottom();
+ 		}
+
+ 		else if (i instanceof InstructionBrCond) {
+ 			InstructionBrCond ibr = (InstructionBrCond)i;
+ 			if (ibr.condition instanceof Immediate) {
+ 				Immediate immed = (Immediate)ibr.condition;
+ 				return new ConstantImmed(immed.getValue());
+ 			}
+ 			else return ssaRegisters.get(ibr.condition);
  		}
 
  		else if (i instanceof InstructionIcmp) {
@@ -1588,8 +1640,16 @@ public class CFGBuilder {
 					throw new RuntimeException("idk mayne it's not supposed to be here");
 				}
 			}
+
  		}
- 		else throw new RuntimeException ("idk how to evaluate " + i);
+		else if (i instanceof InstructionStore) {
+			InstructionStore is = (InstructionStore)i;
+			if (ssaRegisters.get(is.value) instanceof Bottom || ssaRegisters.get(is.pointer) instanceof Bottom) {
+				return new Bottom();
+			}
+			else return new Top();
+		}
+ 		else return new Top();
  	}
 
 	public void initializeValues(HashMap<Value, LatticeCell> ssaRegisters, ArrayList<Value> workList) {
@@ -1617,8 +1677,7 @@ public class CFGBuilder {
 					workList.add(v);
 				}
 			}
-			//else 
-			//	System.out.println("some stupid shit");
+			// else  System.out.println("some stupid shit");
 		}
 	}
 
@@ -1842,14 +1901,19 @@ public class CFGBuilder {
 
 		}
 		else if (i instanceof InstructionPhi) {
+			// System.out.println("InstructionPHIIIIII about to be initialized " + i);
 			InstructionPhi ip = (InstructionPhi)i;
 
 			ArrayList<PhiOperand> phiOperands = ip.phiOperands;
-			HashSet<Value> values = new HashSet<>();
+			HashSet<String> values = new HashSet<>();
 			for (PhiOperand phiOp : phiOperands) {
-				values.add(phiOp.value);
+				values.add(phiOp.value.toString());
 			}
+
+
+
 			if (values.size() > 1) {
+
 				return new Bottom();
 			}
 			if (values.size() == 1 && phiOperands.size() >= 1) {
@@ -1938,6 +2002,7 @@ public class CFGBuilder {
 	public ArrayList<Instruction> getUses (Value reg) {
 
 		ArrayList<Instruction> uses = new ArrayList<>();
+		// System.out.println("hello i am looking for " + reg); 
 
 		for (Block b: blocks) {
 
@@ -1959,7 +2024,9 @@ public class CFGBuilder {
 	            	}
 	            }
 	            for (Instruction i : current.instructions) {
+	            	// System.out.println("is it in "+ i);
 	            	if (i.getUses().contains(reg)) {
+	            		// System.out.println("ifounditin " + i);
 	            		uses.add(i);
 	            	}
 	            }
