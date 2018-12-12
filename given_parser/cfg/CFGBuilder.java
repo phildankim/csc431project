@@ -991,9 +991,9 @@ public class CFGBuilder {
 
 		processWorkList(ssaRegisters,workList);
 
-		for (Value v : ssaRegisters.keySet()) {
-			System.out.println("v: " + v +", lattice: " + ssaRegisters.get(v));
-		}
+		// for (Value v : ssaRegisters.keySet()) {
+		// 	System.out.println("v: " + v +", lattice: " + ssaRegisters.get(v));
+		// }
 		rewriteUses(ssaRegisters);
 	}
 
@@ -1002,11 +1002,12 @@ public class CFGBuilder {
 		for (Value v : ssaRegisters.keySet()) {
 			if (ssaRegisters.get(v) instanceof ConstantImmed) {
 
-				System.out.println("need to replace " + v.getName());
 
 				ConstantImmed immed = (ConstantImmed)ssaRegisters.get(v);
 				ArrayList<Instruction> uses = getUses(v);
 				for (Instruction use : uses) {
+
+					//System.out.println("found " + v.getName() + " in " + use);
 					replaceInstruction(use,v,immed);
 
 				}
@@ -1033,8 +1034,12 @@ public class CFGBuilder {
 	            for (int i = 0; i < b.instructions.size(); i++) {
 	            	Instruction currentInst = b.instructions.get(i);
 	            	if (inst.equals(currentInst)) {
+
+	            		System.out.println("instruction replaced.");
 	            		Instruction revisedInstruction = reviseInstruction(currentInst, thisValue, withThisValue);
 	            		b.instructions.set(i,revisedInstruction);
+
+	            		System.out.println("instruction is now " + b.instructions.get(i));
 	            	}
 	            }
 	        }
@@ -1084,8 +1089,39 @@ public class CFGBuilder {
 				ia.operand2 = new Immediate(withThisValue.value);
 			}
 		}
+		else if (toChange instanceof InstructionPrint) {
+			InstructionPrint ip = (InstructionPrint)toChange;
+			if (ip.register.equals(thisValue)) {
+				ip.register = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionPrintLn) {
+			InstructionPrintLn ip = (InstructionPrintLn)toChange;
+			if (ip.register.equals(thisValue)) {
+				ip.register = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionIcmp) {
+			InstructionIcmp ia = (InstructionIcmp)toChange;
 
-		// System.out.println(toChange);
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionStore) {
+			InstructionStore is = (InstructionStore)toChange;
+			if (is.value.equals(thisValue)) {
+				is.value = new Immediate(withThisValue.value);
+			}
+			if (is.pointer.equals(thisValue)) {
+				is.pointer = new Immediate(withThisValue.value);
+			}
+		}
+		else throw new RuntimeException("YO IMPLEMENT" + toChange);
+
 		return toChange;
 	}
 
