@@ -91,11 +91,13 @@ public class CFGBuilder {
 			//for (String name : localParamTable.keySet()) {
 			//	System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
 			//}
+
+			if (sscp) {
+				propagateConstants(func);
+			}
 		}
 
-		if (sscp) {
-			propagateConstants();
-		}
+
 
 		if (uce) {
 			eliminateUselessCode();
@@ -960,7 +962,7 @@ public class CFGBuilder {
 		return header;
 	}
 
-	public void propagateConstants() {
+	public void propagateConstants(Function currentFunc) {
 		// System.out.println("Sparse Simple Constant Propagation!");
 
 		// everything is Top here
@@ -970,19 +972,44 @@ public class CFGBuilder {
 		// initialize values by the rules discussed
 		initializeValues(ssaRegisters, workList);
 
+		for (Declaration decl : currentFunc.getParams()) {
+			System.out.println("param: " + decl.getName());
+			String lookFor = "%" + decl.getName();
+
+			for (Value v : ssaRegisters.keySet()) {
+
+				if (lookFor.equals(v.getName())) {
+					// System.out.println("I FOUND A PARAMETER");
+					ssaRegisters.put(v, new Bottom());
+					workList.add(v);
+				}
+			}
+
+		}
+
+
+
 		processWorkList(ssaRegisters,workList);
 
+		//  for (Value v : ssaRegisters.keySet()) {
+		//  	System.out.println("v: " + v +", lattice: " + ssaRegisters.get(v));
+		// }
 		rewriteUses(ssaRegisters);
 	}
 
 	public void rewriteUses(HashMap<Value,LatticeCell> ssaRegisters) {
 
 		for (Value v : ssaRegisters.keySet()) {
-			if (ssaRegisters.get(v) instanceof ConstantImmed) {
+			if (ssaRegisters.get(v) instanceof ConstantImmed && v instanceof Register) {
 
 				ConstantImmed immed = (ConstantImmed)ssaRegisters.get(v);
+				System.out.println("looking for " + v.getName() + " so i can replace with " + immed.value) ;
+
 				ArrayList<Instruction> uses = getUses(v);
 				for (Instruction use : uses) {
+
+					System.out.println("it's used in " + use);
+
 					replaceInstruction(use,v,immed);
 
 				}
@@ -1006,11 +1033,15 @@ public class CFGBuilder {
 	            queue.addAll(newSuccessors);
 	            visited.addAll(newSuccessors);
 
-	            for (int i = 0; i < b.instructions.size(); i++) {
-	            	Instruction currentInst = b.instructions.get(i);
+	            for (int i = 0; i < current.instructions.size(); i++) {
+
+	            	Instruction currentInst = current.instructions.get(i);
 	            	if (inst.equals(currentInst)) {
+	            		System.out.println("FOUND " + inst);
+
 	            		Instruction revisedInstruction = reviseInstruction(currentInst, thisValue, withThisValue);
-	            		b.instructions.set(i,revisedInstruction);
+	            		current.instructions.set(i,revisedInstruction);
+
 	            	}
 	            }
 	        }
@@ -1060,8 +1091,126 @@ public class CFGBuilder {
 				ia.operand2 = new Immediate(withThisValue.value);
 			}
 		}
+		else if (toChange instanceof InstructionPrint) {
+			InstructionPrint ip = (InstructionPrint)toChange;
+			if (ip.register.equals(thisValue)) {
+				ip.register = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionPrintLn) {
+			InstructionPrintLn ip = (InstructionPrintLn)toChange;
+			if (ip.register.equals(thisValue)) {
+				ip.register = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionIcmp) {
+			InstructionIcmp ia = (InstructionIcmp)toChange;
 
-		// System.out.println(toChange);
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionStore) {
+			InstructionStore is = (InstructionStore)toChange;
+			if (is.value.equals(thisValue)) {
+				is.value = new Immediate(withThisValue.value);
+			}
+			if (is.pointer.equals(thisValue)) {
+				is.pointer = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionAlloca) {
+			InstructionAlloca is = (InstructionAlloca)toChange;
+			if (is.result.equals(thisValue)) {
+				is.result = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionAnd) {
+			InstructionAnd ia = (InstructionAnd)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionOr) {
+			InstructionOr ia = (InstructionOr)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionBitcast) {
+			InstructionBitcast ia = (InstructionBitcast)toChange;
+
+			if (ia.result.equals(thisValue)) {
+				ia.result = new Immediate(withThisValue.value);
+			}
+			if (ia.register.equals(thisValue)) {
+				ia.register = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionXor) {
+			InstructionXor ia = (InstructionXor)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionZext) {
+			InstructionZext ia = (InstructionZext)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+
+		else if (toChange instanceof InstructionTrunc) {
+			InstructionTrunc ia = (InstructionTrunc)toChange;
+
+			if (ia.result.equals(thisValue)) {
+				ia.result = new Immediate(withThisValue.value);
+			}
+			if (ia.register.equals(thisValue)) {
+				ia.register = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionCall) {
+			InstructionCall ic = (InstructionCall)toChange;
+
+			for (int i = 0; i < ic.args.size(); i++) {
+				Value arg = ic.args.get(i);
+
+				if (arg.equals(thisValue)) {
+					ic.args.set(i,new Immediate(withThisValue.value));
+				}
+			}
+		}
+		else if (toChange instanceof InstructionRet) {
+			InstructionRet ir = (InstructionRet)toChange;
+
+			if (ir.register.equals(thisValue)) {
+				ir.register = new Immediate(withThisValue.value);
+			}
+		}
+
+
+		else throw new RuntimeException("YO IMPLEMENT" + toChange);
+
 		return toChange;
 	}
 
@@ -1070,11 +1219,13 @@ public class CFGBuilder {
 		while (workList.size() > 0) {
 			Value r = workList.remove(0);
 
-
-
 			ArrayList<Instruction> ops = getUses(r);
 
 			for (Instruction op : ops) {
+				System.out.println("op: " + op);
+				System.out.println("def: " +op.getDef());
+				LatticeCell temp = ssaRegisters.get(op.getDef());
+				System.out.println("lattice: " + temp);
 				if (!(ssaRegisters.get(op.getDef()) instanceof Bottom)) {
 
 					LatticeCell t = ssaRegisters.get(op.getDef());
@@ -1089,6 +1240,7 @@ public class CFGBuilder {
  	}
 
  	public LatticeCell evaluate(Instruction i, HashMap<Value, LatticeCell> ssaRegisters) {
+ 		//System.out.println("instruction is " + i);
  		if (i instanceof InstructionAdd) {
  			InstructionAdd ia = (InstructionAdd)i;
  			LatticeCell left = ssaRegisters.get(ia.operand1);
@@ -1140,6 +1292,7 @@ public class CFGBuilder {
  				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
  				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
  				Integer answer = lft - rht;
+ 				System.out.println("both constants evaluated to: " + answer);
  				return new ConstantImmed(answer.toString());
  			}
  		}
@@ -1167,6 +1320,87 @@ public class CFGBuilder {
  				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
  				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
  				Integer answer = lft * rht;
+ 				return new ConstantImmed(answer.toString());
+ 			}
+ 		}
+   		else if (i instanceof InstructionOr) {
+ 			InstructionOr ia = (InstructionOr)i;
+ 			LatticeCell left = ssaRegisters.get(ia.operand1);
+ 			LatticeCell right = ssaRegisters.get(ia.operand2);
+
+ 			if (ia.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)ia.operand1;
+ 				left = new ConstantImmed(im.getValue());
+ 			}
+ 			if (ia.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)ia.operand2;
+ 				right = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (left instanceof Bottom || right instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (left instanceof Top || right instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+ 				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
+ 				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
+ 				Integer answer = lft | rht;
+ 				return new ConstantImmed(answer.toString());
+ 			}
+ 		}
+   		else if (i instanceof InstructionXor) {
+ 			InstructionXor ia = (InstructionXor)i;
+ 			LatticeCell left = ssaRegisters.get(ia.operand1);
+ 			LatticeCell right = ssaRegisters.get(ia.operand2);
+
+ 			if (ia.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)ia.operand1;
+ 				left = new ConstantImmed(im.getValue());
+ 			}
+ 			if (ia.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)ia.operand2;
+ 				right = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (left instanceof Bottom || right instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (left instanceof Top || right instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+ 				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
+ 				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
+ 				Integer answer = lft ^ rht;
+ 				return new ConstantImmed(answer.toString());
+ 			}
+ 		}
+    	else if (i instanceof InstructionAnd) {
+ 			InstructionAnd ia = (InstructionAnd)i;
+ 			LatticeCell left = ssaRegisters.get(ia.operand1);
+ 			LatticeCell right = ssaRegisters.get(ia.operand2);
+
+ 			if (ia.operand1 instanceof Immediate) {
+ 				Immediate im = (Immediate)ia.operand1;
+ 				left = new ConstantImmed(im.getValue());
+ 			}
+ 			if (ia.operand2 instanceof Immediate) {
+ 				Immediate im2 = (Immediate)ia.operand2;
+ 				right = new ConstantImmed(im2.getValue());
+ 			}
+
+ 			if (left instanceof Bottom || right instanceof Bottom) {
+ 				return new Bottom();
+ 			}
+ 			else if (left instanceof Top || right instanceof Top) {
+ 				return new Top();
+ 			}
+ 			else {
+ 				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
+ 				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
+ 				Integer answer = lft & rht;
  				return new ConstantImmed(answer.toString());
  			}
  		}
@@ -1202,6 +1436,81 @@ public class CFGBuilder {
  				return new ConstantImmed(answer.toString());
  			}
  		}
+
+ 		else if (i instanceof InstructionPrint) {
+ 			InstructionPrint ip = (InstructionPrint)i;
+ 			LatticeCell lc = ssaRegisters.get(ip.register);
+ 			if (ip.register instanceof Immediate) {
+ 				Immediate im = (Immediate)ip.register;
+ 				return new ConstantImmed(im.getValue());
+ 			}
+ 			return lc;
+ 		}
+ 		else if (i instanceof InstructionTrunc) {
+ 			InstructionTrunc ip = (InstructionTrunc)i;
+ 			LatticeCell lc = ssaRegisters.get(ip.register);
+ 			if (ip.register instanceof Immediate) {
+ 				Immediate im = (Immediate)ip.register;
+ 				return new ConstantImmed(im.getValue());
+ 			}
+ 			return lc;
+ 		}
+ 		else if (i instanceof InstructionRet) {
+ 			InstructionRet ip = (InstructionRet)i;
+ 			LatticeCell lc = ssaRegisters.get(ip.register);
+ 			if (ip.register instanceof Immediate) {
+ 				Immediate im = (Immediate)ip.register;
+ 				return new ConstantImmed(im.getValue());
+ 			}
+ 			return lc;
+ 		}
+
+ 		else if (i instanceof InstructionPhi) {
+ 			InstructionPhi ip = (InstructionPhi)i;
+ 			System.out.println("INSTRUCITONPHIIIIIIII"+ip);
+
+ 			for (PhiOperand phiOp : ip.phiOperands) {
+ 				LatticeCell lc = ssaRegisters.get(phiOp.value);
+ 				if (lc instanceof Bottom) {
+ 					return new Bottom();
+ 				}
+ 			}
+  			for (PhiOperand phiOp : ip.phiOperands) {
+ 				LatticeCell lc = ssaRegisters.get(phiOp.value);
+ 				if (lc instanceof Top) {
+ 					return new Top();
+ 				}
+ 			}
+
+ 			ArrayList<PhiOperand> phiOperands = ip.phiOperands;
+			HashSet<Value> values = new HashSet<>();
+			for (PhiOperand phiOp : phiOperands) {
+				values.add(phiOp.value);
+			}
+			if (values.size() > 1) {
+				return new Bottom();
+			}
+			if (values.size() == 1 && phiOperands.size() >= 1) {
+				Value phiVal = phiOperands.get(0).value;
+				if (phiVal instanceof Immediate) {
+					Immediate immed = (Immediate)phiVal;
+					return new ConstantImmed(immed.getValue());
+				}
+			}
+
+			return new Bottom();
+ 		}
+
+ 		else if (i instanceof InstructionCall) {
+ 			InstructionCall ic = (InstructionCall)i;
+
+ 			for (Value arg : ic.args) {
+ 				LatticeCell lc = ssaRegisters.get(arg);
+ 			}
+
+ 			return new Bottom();
+ 		}
+
  		else if (i instanceof InstructionIcmp) {
  			InstructionIcmp icmp = (InstructionIcmp)i;
  			LatticeCell lft = ssaRegisters.get(icmp.operand1);
@@ -1280,7 +1589,7 @@ public class CFGBuilder {
 				}
 			}
  		}
- 		else return new Bottom();
+ 		else throw new RuntimeException ("idk how to evaluate " + i);
  	}
 
 	public void initializeValues(HashMap<Value, LatticeCell> ssaRegisters, ArrayList<Value> workList) {
@@ -1296,6 +1605,13 @@ public class CFGBuilder {
 				Instruction i = findDefinition(reg);
 
 				LatticeCell lc = initializeInstruction(i, ssaRegisters);
+
+
+				//PARAMS ARE BOTTOM!
+
+
+
+
 				ssaRegisters.put(v, lc);
 				if (lc != null && !(lc instanceof Top)) {
 					workList.add(v);
@@ -1524,6 +1840,25 @@ public class CFGBuilder {
 		}
 		else if (i instanceof InstructionTrunc) {
 
+		}
+		else if (i instanceof InstructionPhi) {
+			InstructionPhi ip = (InstructionPhi)i;
+
+			ArrayList<PhiOperand> phiOperands = ip.phiOperands;
+			HashSet<Value> values = new HashSet<>();
+			for (PhiOperand phiOp : phiOperands) {
+				values.add(phiOp.value);
+			}
+			if (values.size() > 1) {
+				return new Bottom();
+			}
+			if (values.size() == 1 && phiOperands.size() >= 1) {
+				Value phiVal = phiOperands.get(0).value;
+				if (phiVal instanceof Immediate) {
+					Immediate immed = (Immediate)phiVal;
+					return new ConstantImmed(immed.getValue());
+				}
+			}
 		}
 
 		return new Top();
