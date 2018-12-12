@@ -497,12 +497,13 @@ public class CFG {
 		removeUnnecessaryBlocks();
 
 		// Get Preds and Succs
+		removeUnnecessaryBranch();
 		addPredecessorsAndSuccessors();
 
-		removeUnnecessaryBranch();
+		
 
 		// Combine blocks
-		//combineBlocks();
+		combineBlocks();
 		// for (Block b : this.blocks) {
 		// 	System.out.println("Predecessors for " + b.getLabel());
 		// 	for (Block p : b.predecessors) {
@@ -570,12 +571,10 @@ public class CFG {
 		from.instructions.remove(from.getLastInstruction());
 		from.instructions.addAll(to.instructions);
 
-		// from.successors.remove(to);
-		// from.successors.addAll(to.successors);
-		//from.predecessors.remove(to);
-		//from.predecessors.addAll(to.predecessors);
-
-		
+		from.successors.remove(to);
+		from.successors.addAll(to.successors);
+		from.predecessors.remove(to);
+		from.predecessors.addAll(to.predecessors);
 
 		// replace all labels going to 'to' to 'from'
 		String toLabel = to.getLabel();
@@ -607,7 +606,7 @@ public class CFG {
 				continue;
 		}
 
-		addPredecessorsAndSuccessors();
+		//addPredecessorsAndSuccessors();
 
 	}
 
