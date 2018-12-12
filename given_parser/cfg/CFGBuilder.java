@@ -1156,6 +1156,16 @@ public class CFGBuilder {
 				ia.operand2 = new Immediate(withThisValue.value);
 			}			
 		}
+		else if (toChange instanceof InstructionZext) {
+			InstructionZext ia = (InstructionZext)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
 
 
 		else throw new RuntimeException("YO IMPLEMENT" + toChange);
