@@ -91,11 +91,13 @@ public class CFGBuilder {
 			//for (String name : localParamTable.keySet()) {
 			//	System.out.println("\t" + name + ": " + localParamTable.get(name).toString());
 			//}
+
+			if (sscp) {
+				propagateConstants(func);
+			}
 		}
 
-		if (sscp) {
-			propagateConstants();
-		}
+
 
 		if (uce) {
 			eliminateUselessCode();
@@ -960,7 +962,7 @@ public class CFGBuilder {
 		return header;
 	}
 
-	public void propagateConstants() {
+	public void propagateConstants(Function currentFunc) {
 		// System.out.println("Sparse Simple Constant Propagation!");
 
 		// everything is Top here
@@ -970,8 +972,28 @@ public class CFGBuilder {
 		// initialize values by the rules discussed
 		initializeValues(ssaRegisters, workList);
 
+		for (Declaration decl : currentFunc.getParams()) {
+			System.out.println("param: " + decl.getName());
+			String lookFor = "%" + decl.getName();
+
+			for (Value v : ssaRegisters.keySet()) {
+
+				if (lookFor.equals(v.getName())) {
+					// System.out.println("I FOUND A PARAMETER");
+					ssaRegisters.put(v, new Bottom());
+					workList.add(v);
+				}
+			}
+
+		}
+
+
+
 		processWorkList(ssaRegisters,workList);
 
+		for (Value v : ssaRegisters.keySet()) {
+			System.out.println("v: " + v +", lattice: " + ssaRegisters.get(v));
+		}
 		rewriteUses(ssaRegisters);
 	}
 
@@ -979,6 +1001,8 @@ public class CFGBuilder {
 
 		for (Value v : ssaRegisters.keySet()) {
 			if (ssaRegisters.get(v) instanceof ConstantImmed) {
+
+				System.out.println("need to replace " + v.getName());
 
 				ConstantImmed immed = (ConstantImmed)ssaRegisters.get(v);
 				ArrayList<Instruction> uses = getUses(v);
@@ -1070,11 +1094,13 @@ public class CFGBuilder {
 		while (workList.size() > 0) {
 			Value r = workList.remove(0);
 
-
-
 			ArrayList<Instruction> ops = getUses(r);
 
 			for (Instruction op : ops) {
+				System.out.println("op: " + op);
+				System.out.println("def: " +op.getDef());
+				LatticeCell temp = ssaRegisters.get(op.getDef());
+				System.out.println("lattice: " + temp);
 				if (!(ssaRegisters.get(op.getDef()) instanceof Bottom)) {
 
 					LatticeCell t = ssaRegisters.get(op.getDef());
@@ -1089,6 +1115,7 @@ public class CFGBuilder {
  	}
 
  	public LatticeCell evaluate(Instruction i, HashMap<Value, LatticeCell> ssaRegisters) {
+ 		//System.out.println("instruction is " + i);
  		if (i instanceof InstructionAdd) {
  			InstructionAdd ia = (InstructionAdd)i;
  			LatticeCell left = ssaRegisters.get(ia.operand1);
@@ -1117,10 +1144,12 @@ public class CFGBuilder {
  			}
  		}
  		else if (i instanceof InstructionSub) {
+ 			System.out.println("fucks");
  			InstructionSub ia = (InstructionSub)i;
  			LatticeCell left = ssaRegisters.get(ia.operand1);
  			LatticeCell right = ssaRegisters.get(ia.operand2);
 
+ 			System.out.println("left " + left + ", right " + right);
  			if (ia.operand1 instanceof Immediate) {
  				Immediate im = (Immediate)ia.operand1;
  				left = new ConstantImmed(im.getValue());
@@ -1140,6 +1169,7 @@ public class CFGBuilder {
  				Integer lft = Integer.parseInt(((ConstantImmed)left).value);
  				Integer rht = Integer.parseInt(((ConstantImmed)right).value);
  				Integer answer = lft - rht;
+ 				System.out.println("both constants evaluated to: " + answer);
  				return new ConstantImmed(answer.toString());
  			}
  		}
@@ -1296,6 +1326,13 @@ public class CFGBuilder {
 				Instruction i = findDefinition(reg);
 
 				LatticeCell lc = initializeInstruction(i, ssaRegisters);
+
+
+				//PARAMS ARE BOTTOM!
+
+
+
+
 				ssaRegisters.put(v, lc);
 				if (lc != null && !(lc instanceof Top)) {
 					workList.add(v);
