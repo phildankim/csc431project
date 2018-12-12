@@ -1120,6 +1120,44 @@ public class CFGBuilder {
 				is.pointer = new Immediate(withThisValue.value);
 			}
 		}
+		else if (toChange instanceof InstructionAlloca) {
+			InstructionAlloca is = (InstructionAlloca)toChange;
+			if (is.result.equals(thisValue)) {
+				is.result = new Immediate(withThisValue.value);
+			}
+		}
+		else if (toChange instanceof InstructionAnd) {
+			InstructionAnd ia = (InstructionAnd)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionBitcast) {
+			InstructionBitcast ia = (InstructionBitcast)toChange;
+
+			if (ia.result.equals(thisValue)) {
+				ia.result = new Immediate(withThisValue.value);
+			}
+			if (ia.register.equals(thisValue)) {
+				ia.register = new Immediate(withThisValue.value);
+			}			
+		}
+		else if (toChange instanceof InstructionXor) {
+			InstructionXor ia = (InstructionXor)toChange;
+
+			if (ia.operand1.equals(thisValue)) {
+				ia.operand1 = new Immediate(withThisValue.value);
+			}
+			if (ia.operand2.equals(thisValue)) {
+				ia.operand2 = new Immediate(withThisValue.value);
+			}			
+		}
+
+
 		else throw new RuntimeException("YO IMPLEMENT" + toChange);
 
 		return toChange;
