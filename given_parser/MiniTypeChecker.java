@@ -60,6 +60,9 @@ public class MiniTypeChecker {
       	if (funcBody.getStatements().isEmpty()  && !(func.getType() instanceof VoidType)) {
       		throw new TypeCheckException("Function " + func.getName() + " does not return anything. Expected return type of " + func.getType());
       	}
+      	if (!MiniTypeChecker.checkForReturn(funcBody) && !(func.getType() instanceof VoidType)) {
+      		throw new TypeCheckException("Function " + func.getName() + " does not return along all paths.");
+      	}
 		Type funcReturnType = func.getType();
 		Type bodyReturnType = checkStatement(func.getBody(), symbolTable, funcParamsTable, structTable, funcReturnType);
 
@@ -147,11 +150,12 @@ public class MiniTypeChecker {
 		else if (statement instanceof ConditionalStatement) {
 			Statement thenBlock = ((ConditionalStatement)statement).getThen();
 			Statement elseBlock = ((ConditionalStatement)statement).getElse();
-			boolean thenRet = MiniTypeChecker.checkForReturn(thenBlock);
-			boolean elseRet = MiniTypeChecker.checkForReturn(elseBlock);
-			if (thenRet != elseRet) {
-				throw new TypeCheckException("Function does not return along all paths.");
-			}
+			// boolean thenRet = MiniTypeChecker.checkForReturn(thenBlock);
+			// boolean elseRet = MiniTypeChecker.checkForReturn(elseBlock);
+
+			// if (thenRet != elseRet) {
+			// 	throw new TypeCheckException("Function does not return along all paths.");
+			//}
 
 			Type guard = checkExpression (((ConditionalStatement)statement).getGuard(), symbolTable, funcParamsTable, structTable, expectedReturnType);
 			Type then = checkStatement (((ConditionalStatement)statement).getThen(), symbolTable, funcParamsTable, structTable, expectedReturnType);
@@ -159,7 +163,6 @@ public class MiniTypeChecker {
 			
 
 			
-
 			if (!(guard instanceof BoolType)) {
 				throw new TypeCheckException("ERROR on Line " + ((ConditionalStatement)statement).getLine() + ": guard needs to be BoolType, not " + guard.toString());
 			}
