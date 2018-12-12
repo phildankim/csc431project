@@ -1167,6 +1167,17 @@ public class CFGBuilder {
 			}			
 		}
 
+		else if (toChange instanceof InstructionTrunc) {
+			InstructionTrunc ia = (InstructionTrunc)toChange;
+
+			if (ia.result.equals(thisValue)) {
+				ia.result = new Immediate(withThisValue.value);
+			}
+			if (ia.register.equals(thisValue)) {
+				ia.register = new Immediate(withThisValue.value);
+			}			
+		}
+
 
 		else throw new RuntimeException("YO IMPLEMENT" + toChange);
 
