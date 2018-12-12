@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 make clean;make
 
 for dir in benchmarks/*; do
@@ -9,9 +7,9 @@ for dir in benchmarks/*; do
    echo $f
    java MiniCompiler $dir/${f}.mini -llvm -uce -sscp
    clang $dir/${f}.ll -m32
-   ./a.out < $dir/input > ${f}.txt
+   ./a.out < $dir/input.longer > ${f}.txt
    echo 'diffing'
-   diff ${f}.txt $dir/output
+   diff ${f}.txt $dir/output.longer
    echo 'diffing complete'
 done
 

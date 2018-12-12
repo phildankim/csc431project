@@ -4,8 +4,8 @@ make clean;make
 
 for dir in benchmarks/*; do
    f=${dir##*/}
-   echo $f
-   java MiniCompiler $dir/${f}.mini -llvm -uce
+   echo '-'$f
+   java MiniCompiler $dir/${f}.mini -stack -simp
    clang $dir/${f}.ll -m32
    ./a.out < $dir/input.longer > ${f}.txt
    echo 'diffing'
@@ -13,4 +13,4 @@ for dir in benchmarks/*; do
    echo 'diffing complete'
 done
 
-echo 'benchmarks passed!'
+echo 'benchmarks passed!!'
