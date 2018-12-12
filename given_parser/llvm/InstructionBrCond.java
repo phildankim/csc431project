@@ -29,7 +29,7 @@ public class InstructionBrCond implements Instruction{
 
 	public ArrayList<Value> getUses() {
 		ArrayList<Value> res = new ArrayList<>();
-
+		res.add(condition);
 		return res;
 	}
 

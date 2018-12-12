@@ -48,6 +48,8 @@ public class InstructionCall implements Instruction {
 	@Override
 	public String toString() {
 
+		argList = buildArgList(args);
+
 		if (result instanceof Immediate) {
 			return "call " + type + " @" + funcptr + argList;
 		}
