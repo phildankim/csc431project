@@ -316,17 +316,17 @@ public class CFG {
 			}
 		}
 		
-		// for (Block b : this.blocks) {
-		// 	System.out.println("Predecessors for " + b.getLabel());
-		// 	for (Block p : b.predecessors) {
-		// 		System.out.println("\t" + p.getLabel());
-		// 	}
-		// 	System.out.println("Successors for " + b.getLabel());
-		// 	for (Block s : b.successors) {
-		// 		System.out.println("\t" + s.getLabel());
-		// 	}
-		// 	System.out.println("\n");
-		// }
+		for (Block b : this.blocks) {
+			System.out.println("Predecessors for " + b.getLabel());
+			for (Block p : b.predecessors) {
+				System.out.println("\t" + p.getLabel());
+			}
+			System.out.println("Successors for " + b.getLabel());
+			for (Block s : b.successors) {
+				System.out.println("\t" + s.getLabel());
+			}
+			System.out.println("\n");
+		}
 	}
 
 	public void clearPredsSuccs() {
@@ -497,9 +497,10 @@ public class CFG {
 		removeUnnecessaryBlocks();
 
 		// Get Preds and Succs
+		removeUnnecessaryBranch();
 		addPredecessorsAndSuccessors();
 
-		removeUnnecessaryBranch();
+		
 
 		// Combine blocks
 		combineBlocks();
@@ -570,12 +571,10 @@ public class CFG {
 		from.instructions.remove(from.getLastInstruction());
 		from.instructions.addAll(to.instructions);
 
-		// from.successors.remove(to);
-		// from.successors.addAll(to.successors);
-		//from.predecessors.remove(to);
-		//from.predecessors.addAll(to.predecessors);
-
-		
+		from.successors.remove(to);
+		from.successors.addAll(to.successors);
+		from.predecessors.remove(to);
+		from.predecessors.addAll(to.predecessors);
 
 		// replace all labels going to 'to' to 'from'
 		String toLabel = to.getLabel();
@@ -607,7 +606,7 @@ public class CFG {
 				continue;
 		}
 
-		addPredecessorsAndSuccessors();
+		//addPredecessorsAndSuccessors();
 
 	}
 
