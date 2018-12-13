@@ -47,6 +47,29 @@ public class CFGBuilder {
 		this.sscp = sscp;
 	}
 
+	public int totalInstructions() {
+		int total = 0;
+
+		for (Block b: blocks) {
+
+			Set<Block> visited = new HashSet<>();
+	    	Queue<Block> queue = new ArrayDeque<>();
+	    	visited.add(b);
+	    	queue.add(b);
+	        while (queue.size() > 0) {
+	            Block current = queue.poll();
+	            List<Block> newSuccessors = current.getSuccessors().stream()
+	                    .filter(successor -> !visited.contains(successor))
+	                    .collect(Collectors.toList());
+	            queue.addAll(newSuccessors);
+	            visited.addAll(newSuccessors);
+	            total += current.instructions.size();
+	            total += current.phiInstructions.size();
+	        }
+		}
+		return total;
+	}
+
 
 	public void build() throws IOException{
 

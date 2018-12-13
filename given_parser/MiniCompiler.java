@@ -85,22 +85,38 @@ public class MiniCompiler
          else if (ssa && uce && sscp) {
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             CFGBuilder cb = new CFGBuilder(program, fileName, true, true);
-            cb.build();         
+            cb.build();     
+            if (count) {
+               int totalInstr = cb.totalInstructions();
+               System.out.println("TOTAL INSTRUCTIONS: " + totalInstr);
+            }    
          }
          else if (ssa && sscp) {
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             CFGBuilder cb = new CFGBuilder(program, fileName, false, true);
             cb.build(); 
+            if (count) {
+               int totalInstr = cb.totalInstructions();
+               System.out.println("TOTAL INSTRUCTIONS: " + totalInstr);
+            }
          }
          else if (ssa && uce) {
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             CFGBuilder cb = new CFGBuilder(program, fileName, true);
             cb.build();
+            if (count) {
+               int totalInstr = cb.totalInstructions();
+               System.out.println("TOTAL INSTRUCTIONS: " + totalInstr);
+            }
          }
          else if (ssa) {
             String fileName =  (_inputFile.substring(0, _inputFile.length()-4)) + "ll";
             CFGBuilder cb = new CFGBuilder(program, fileName);
             cb.build();
+            if (count) {
+               int totalInstr = cb.totalInstructions();
+               System.out.println("TOTAL INSTRUCTIONS: " + totalInstr);
+            }
          }
          else if (stack) {
             
