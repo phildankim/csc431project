@@ -1,0 +1,36 @@
+int y;
+
+fun foo(int x) void
+{
+   int a, b, c, d;
+
+   a = y + 1;
+   a = x + 1;
+   a = 3;
+   b = 4;
+   c = a + b;
+   d = b + c;
+   d = b * c;
+
+   a = 99 - a;
+
+   print a;
+   print b;
+   print c;
+   print d;
+
+   d = b / 0;
+
+   print d;
+
+   d = read;
+
+   b = d + 1;
+
+   print b;
+}
+
+fun main() int
+{
+   return 1;
+}

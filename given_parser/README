@@ -5,6 +5,8 @@ Daniel Kim
 Michael Hilomen
 
 ==INSTRUCTIONS FOR OUR COMPILER==
+Make sure to make clean;make before running!
+
 To run stack-based:
 	java MiniCompiler [input].mini -stack [-simp]
 Note: The -simp flag enables optimizations and can only be used with the -stack flag.

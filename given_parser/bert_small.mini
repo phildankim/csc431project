@@ -1,0 +1,25 @@
+fun main() int
+{
+   int pivot, i;
+   pivot = 90;
+   i = 1;
+
+   if (pivot <= 1)
+   {
+      return pivot;
+   }
+
+   pivot = 10;
+
+   while (pivot > 1)
+   {
+      if (pivot > 1 )
+      {
+         print pivot;
+      }
+
+      i = i + 1;
+   }
+
+   return i;
+}
